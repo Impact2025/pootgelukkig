@@ -1,0 +1,225 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #f8aa25;
+  --color-primary-dark: #e39207;
+  --color-navy: #33335c;
+  --color-terracotta: #E2725B;
+  --color-terracotta-dark: #ee5b2b;
+  --color-bg-dark: #12122a;
+  --color-bg-light: #f9fafb;
+  --color-sage: #9db99d;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Voorkom bounce-scroll op iOS in standalone mode */
+  overscroll-behavior: none;
+}
+
+/* Safe area insets voor notch/Dynamic Island/home bar */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+/* Alle knoppen: geen grijze tap-highlight, snellere touch respons */
+button, a, [role="button"] {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Dark mode als standaard voor adoptant-view */
+.dark {
+  color-scheme: dark;
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* iOS blur effect */
+.ios-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Scrollbar verbergen */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Mobile container stijl */
+.mobile-container {
+  @apply relative flex flex-col w-full max-w-[430px] mx-auto min-h-screen shadow-2xl overflow-x-hidden;
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Bottom navigatie */
+.bottom-nav {
+  @apply fixed bottom-0 left-0 right-0 z-50 max-w-[430px] mx-auto;
+  background: rgba(16, 34, 16, 0.9);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Match score badge */
+.match-badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black uppercase tracking-wide;
+  background: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+/* Personality tag */
+.personality-tag {
+  @apply px-3 py-1.5 rounded-full border text-sm font-medium flex items-center gap-1.5;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Adopteer button */
+.btn-adopteer {
+  @apply font-bold py-3 px-5 rounded-xl transition-all active:scale-95 text-sm;
+  background: var(--color-terracotta);
+  color: white;
+}
+
+/* Primary button */
+.btn-primary {
+  @apply w-full font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all active:scale-95;
+  background: var(--color-primary);
+  color: var(--color-bg-dark);
+}
+
+/* Intake optie card */
+.intake-option {
+  @apply relative flex flex-col w-full text-left rounded-2xl overflow-hidden border-2 border-transparent transition-all active:scale-95;
+  background: rgba(26, 46, 26, 0.8);
+}
+.intake-option:hover { border-color: var(--color-primary); }
+.intake-option.geselecteerd { border-color: var(--color-primary); }
+
+/* Medische tijdlijn */
+.timeline-item {
+  @apply relative pl-12;
+}
+.timeline-dot {
+  @apply absolute left-0 top-1 size-10 rounded-full flex items-center justify-center z-10;
+  ring: 4px solid var(--color-bg-light);
+}
+
+/* Chat bubble */
+.bubble-asiel {
+  @apply p-3 rounded-2xl rounded-bl-none text-sm leading-relaxed shadow-sm;
+  background: #d1dbd1;
+  color: #1a1a1a;
+}
+.bubble-user {
+  @apply p-3 rounded-2xl rounded-br-none text-sm leading-relaxed shadow-sm border;
+  background: white;
+  border-color: #e2e8f0;
+  color: #1a1a1a;
+}
+
+/* iOS home indicator */
+.ios-indicator {
+  @apply w-32 h-1 rounded-full mx-auto mt-3;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Poot animatie voor laden */
+@keyframes pootBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.poot-bounce {
+  animation: pootBounce 1s ease-in-out infinite;
+}
+
+/* Fade in met beweging (uitbreiding van Tailwind animate-fade-in) */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeInUp 0.35s ease-out forwards;
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+/* Focus ring standaard */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Tour pulse animatie */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Toast animatie */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)       scale(1); }
+}
+
+.animate-toast {
+  animation: toast-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Heart pop animatie */
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart-pop {
+  animation: heart-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Betere input styling */
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  box-shadow: 0 0 0 3px rgba(248, 170, 37, 0.12);
+}
+
+/* Admin form inputs */
+.admin-input {
+  @apply w-full px-4 py-2.5 text-sm text-[#33335c] bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#33335c]/40 focus:ring-2 focus:ring-[#33335c]/5 transition-colors placeholder:text-[#33335c]/25;
+}
