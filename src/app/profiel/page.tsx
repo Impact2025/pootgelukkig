@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { users, adopterProfielen, matches } from '@/lib/db/schema'
+import { users, adopterProfielen, matches, favorieten } from '@/lib/db/schema'
 import { eq, count } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import BottomNav from '@/components/layout/BottomNav'
@@ -33,7 +33,13 @@ export default async function ProfielPage() {
     .from(matches)
     .where(eq(matches.userId, userId))
 
+  const [favorietTelling] = await db
+    .select({ aantal: count() })
+    .from(favorieten)
+    .where(eq(favorieten.userId, userId))
+
   const aantalMatches = matchTelling?.aantal ?? 0
+  const aantalFavorieten = favorietTelling?.aantal ?? 0
 
   const woningLabel: Record<string, string> = {
     appartement: 'Appartement',
@@ -77,17 +83,23 @@ export default async function ProfielPage() {
 
       {/* Stats */}
       <div className="px-4 mb-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 text-center">
-            <p className="text-3xl font-extrabold text-primary">{aantalMatches}</p>
-            <p className="text-white/50 text-xs font-medium mt-1">Matches</p>
+            <p className="text-2xl font-extrabold text-primary">{aantalMatches}</p>
+            <p className="text-white/50 text-[11px] font-medium mt-1">Matches</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-            <p className="text-3xl font-extrabold text-white">
-              {profiel ? '✓' : '—'}
+            <p className="text-2xl font-extrabold text-white">{aantalFavorieten}</p>
+            <p className="text-white/50 text-[11px] font-medium mt-1">Bewaard</p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+            <p className="text-2xl font-extrabold text-white">
+              {profiel ? (
+                <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+              ) : '—'}
             </p>
-            <p className="text-white/50 text-xs font-medium mt-1">
-              {profiel ? 'Intake gedaan' : 'Intake open'}
+            <p className="text-white/50 text-[11px] font-medium mt-1">
+              {profiel ? 'Intake klaar' : 'Intake open'}
             </p>
           </div>
         </div>

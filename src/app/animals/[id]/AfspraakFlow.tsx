@@ -318,11 +318,11 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
       {/* ── Afspraak Modal ──────────────────────────────────────────────────── */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center"
+          className="fixed inset-0 z-[70] flex items-end justify-center"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
           onClick={(e) => { if (e.target === e.currentTarget) setModalOpen(false) }}
         >
-          <div className="w-full max-w-[430px] bg-[#0e1e0e] border border-white/10 rounded-t-3xl overflow-hidden animate-slide-up">
+          <div className="w-full max-w-[430px] bg-[#0e1e0e] border border-white/10 rounded-t-3xl animate-slide-up flex flex-col max-h-[90svh]">
             {/* Modal header */}
             <div className="px-6 pt-5 pb-4 border-b border-white/8">
               <div className="flex items-center justify-between mb-4">
@@ -356,7 +356,7 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
 
             {/* Stap 1 — Type kiezen */}
             {stap === 1 && (
-              <div className="px-6 py-6 space-y-4">
+              <div className="px-6 py-6 space-y-4 overflow-y-auto">
                 <div>
                   <h3 className="text-white font-extrabold text-xl mb-1">Wat voor afspraak?</h3>
                   <p className="text-white/40 text-sm">Kies hoe je {dierNaam} wilt leren kennen</p>
@@ -413,7 +413,7 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
 
             {/* Stap 2 — Datum & Tijdstip */}
             {stap === 2 && (
-              <div className="px-6 py-6 space-y-5">
+              <div className="px-6 py-6 space-y-5 overflow-y-auto">
                 <div>
                   <h3 className="text-white font-extrabold text-xl mb-1">Wanneer komt het uit?</h3>
                   <p className="text-white/40 text-sm">Het asiel stemt de exacte tijd met je af</p>
@@ -467,7 +467,7 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
 
             {/* Stap 3 — Bevestiging + optioneel bericht */}
             {stap === 3 && (
-              <div className="px-6 py-6 space-y-5">
+              <div className="px-6 py-6 space-y-5 overflow-y-auto">
                 <div>
                   <h3 className="text-white font-extrabold text-xl mb-1">Controleer je afspraak</h3>
                   <p className="text-white/40 text-sm">Voeg eventueel een bericht toe voor het asiel</p>

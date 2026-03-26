@@ -9,7 +9,9 @@ export async function GET(request: NextRequest) {
 
   try {
     // PDOK Locatieserver — gratis Nederlandse overheids-API
-    const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${postcode}&fq=type:postcode&rows=1`
+    // type:postcode werkt op 4-cijferig gebied (bijv. "2153"), niet op 6-karakter postcode
+    const vierCijfers = postcode.slice(0, 4)
+    const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${vierCijfers}&fq=type:postcode&rows=1`
     const res = await fetch(url, {
       next: { revalidate: 86400 }, // 24u cache
     })

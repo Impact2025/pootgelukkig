@@ -123,14 +123,18 @@ export default async function DashboardPage() {
 
       <main className="px-4 pb-32">
         {/* Welkom header */}
-        <header className="pt-8 pb-6">
-          <h2 className="text-3xl font-extrabold text-white">Hoi {voornaam}! 👋</h2>
-          <p className="text-white/60 mt-2 text-base">
+        <header className="pt-8 pb-5">
+          <p className="text-primary text-xs font-bold uppercase tracking-widest mb-1">
+            {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+          <h2 className="text-3xl font-extrabold text-white leading-tight">Hoi {voornaam}!</h2>
+          <p className="text-white/55 mt-1.5 text-base">
             {userMatches.length > 0 ? (
               <>
-                Onze AI heeft{' '}
-                <span className="text-primary font-semibold">{userMatches.length} matches</span>{' '}
-                voor je klaargezet.
+                Je hebt{' '}
+                <span className="text-white font-semibold">{userMatches.length} matches</span>{' '}
+                — je beste is{' '}
+                <span className="text-primary font-bold">{topScore}% compatibel.</span>
               </>
             ) : (
               'Doe de intake en ontdek jouw perfecte match.'
@@ -141,47 +145,56 @@ export default async function DashboardPage() {
         {/* Match profiel widget */}
         {profiel && userMatches.length > 0 && (
           <section className="mb-6">
-            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5 flex items-center justify-between">
-              <div>
-                <p className="text-primary/80 text-xs font-bold uppercase tracking-wider">
-                  Jouw Match Profiel
-                </p>
-                <p className="text-white text-xl font-bold mt-1">
-                  {topScore >= 90
-                    ? 'Uitstekende'
-                    : topScore >= 75
-                      ? 'Hoge'
-                      : 'Goede'}{' '}
-                  compatibiliteit
-                </p>
-                <div className="flex items-center gap-1.5 mt-2">
-                  <span className="material-symbols-outlined text-primary text-sm">
-                    check_circle
-                  </span>
-                  <span className="text-white/60 text-sm">Profiel voltooid</span>
+            <div className="relative overflow-hidden bg-primary/10 border border-primary/20 rounded-2xl p-5">
+              {/* Decoratieve blob */}
+              <div className="absolute -right-8 -top-8 size-32 rounded-full bg-primary/8 blur-2xl pointer-events-none" />
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex-1">
+                  <p className="text-primary text-[10px] font-black uppercase tracking-widest">
+                    AI Match Profiel
+                  </p>
+                  <p className="text-white text-xl font-extrabold mt-1 leading-tight">
+                    {topScore >= 90 ? 'Uitstekende match' : topScore >= 75 ? 'Hoge compatibiliteit' : 'Goede match gevonden'}
+                  </p>
+                  <div className="flex items-center gap-3 mt-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="text-white/60 text-xs font-medium">Profiel voltooid</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        auto_awesome
+                      </span>
+                      <span className="text-white/60 text-xs font-medium">{userMatches.length} matches</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              {/* Circulaire score */}
-              <div className="relative size-16 flex items-center justify-center">
-                <svg className="size-full -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    className="text-white/10"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  />
-                  <path
-                    className="text-primary"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeDasharray={`${topScore}, 100`}
-                    strokeLinecap="round"
-                    strokeWidth="3"
-                  />
-                </svg>
-                <span className="absolute text-white font-bold text-sm">{topScore}%</span>
+                {/* Circulaire score */}
+                <div className="relative size-20 flex items-center justify-center flex-shrink-0">
+                  <svg className="size-full -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.08)"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeDasharray={`${topScore}, 100`}
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      className="text-primary"
+                    />
+                  </svg>
+                  <div className="absolute text-center">
+                    <span className="text-white font-extrabold text-lg leading-none">{topScore}</span>
+                    <span className="text-primary text-[10px] font-bold block leading-none">%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

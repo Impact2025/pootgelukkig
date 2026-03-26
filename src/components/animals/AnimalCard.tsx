@@ -75,41 +75,38 @@ export default function AnimalCard({
             </div>
           )}
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#33335c]/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#12122a]/80 via-transparent to-transparent" />
         </div>
 
         {/* Info */}
         <div className="p-5">
           <div className="flex justify-between items-start gap-3">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="text-2xl font-extrabold text-white leading-none">{naam}</h4>
-              <p className="text-white/50 text-sm mt-1 truncate">
+              <p className="text-white/50 text-sm mt-1.5 truncate">
                 {ras || soort}
                 {leeftijdJaren ? ` · ${leeftijdJaren} jaar` : ''}
               </p>
               {(afstandKm !== null || asielStad) && (
-                <p className="text-white/30 text-xs mt-0.5 flex items-center gap-1">
+                <p className="text-white/30 text-xs mt-1 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[11px]">location_on</span>
                   {afstandKm !== null ? `~${afstandKm} km` : ''}{afstandKm !== null && asielStad ? ' · ' : ''}{asielStad ?? ''}
                 </p>
               )}
             </div>
-            <span className="flex-shrink-0 bg-primary/10 border border-primary/20 text-primary text-xs font-bold px-3 py-2 rounded-xl">
-              Bekijk
-            </span>
           </div>
 
           {/* Tags */}
           {(energieNiveau || gedragTags.length > 0) && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {energieNiveau && (
-                <span className="flex items-center gap-1 text-[10px] bg-primary/15 text-primary px-2 py-1 rounded-full font-bold">
+                <span className="flex items-center gap-1 text-[10px] bg-primary/15 text-primary px-2.5 py-1 rounded-full font-bold">
                   <span className="material-symbols-outlined text-[10px]">bolt</span>
                   {energieLabel[energieNiveau] ?? energieNiveau}
                 </span>
               )}
-              {gedragTags.slice(0, 2).map((tag) => (
-                <span key={tag} className="text-[10px] bg-white/8 text-white/50 px-2 py-1 rounded-full">
+              {gedragTags.slice(0, 3).map((tag) => (
+                <span key={tag} className="text-[10px] bg-white/8 text-white/50 px-2.5 py-1 rounded-full">
                   {tag.charAt(0).toUpperCase() + tag.slice(1)}
                 </span>
               ))}
@@ -118,10 +115,20 @@ export default function AnimalCard({
 
           {/* AI analyse */}
           {analyseTekst && (
-            <p className="mt-4 text-white/50 text-sm leading-relaxed line-clamp-2">
-              &ldquo;{analyseTekst}&rdquo;
-            </p>
+            <div className="mt-4 flex gap-2">
+              <span className="material-symbols-outlined text-primary/60 text-sm flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              <p className="text-white/45 text-sm leading-relaxed line-clamp-2 italic">{analyseTekst}</p>
+            </div>
           )}
+
+          {/* CTA */}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-primary/80 text-xs font-bold">
+              <span className="material-symbols-outlined text-sm">visibility</span>
+              Bekijk profiel
+            </div>
+            <span className="material-symbols-outlined text-white/20 text-sm">arrow_forward_ios</span>
+          </div>
         </div>
       </div>
     </Link>

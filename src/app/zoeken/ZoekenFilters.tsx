@@ -131,7 +131,7 @@ export default function ZoekenFilters({
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none"
               >
                 {ENERGIE.map((e) => (
-                  <option key={e.waarde} value={e.waarde} className="bg-[#33335c]">
+                  <option key={e.waarde} value={e.waarde} className="bg-[#12122a]">
                     {e.label}
                   </option>
                 ))}
@@ -151,11 +151,11 @@ export default function ZoekenFilters({
                 }}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none"
               >
-                <option value="" className="bg-[#33335c]">Alle leeftijden</option>
-                <option value="1" className="bg-[#33335c]">Jonger dan 1 jaar</option>
-                <option value="3" className="bg-[#33335c]">Jonger dan 3 jaar</option>
-                <option value="7" className="bg-[#33335c]">Jonger dan 7 jaar</option>
-                <option value="10" className="bg-[#33335c]">Jonger dan 10 jaar</option>
+                <option value="" className="bg-[#12122a]">Alle leeftijden</option>
+                <option value="1" className="bg-[#12122a]">Jonger dan 1 jaar</option>
+                <option value="3" className="bg-[#12122a]">Jonger dan 3 jaar</option>
+                <option value="7" className="bg-[#12122a]">Jonger dan 7 jaar</option>
+                <option value="10" className="bg-[#12122a]">Jonger dan 10 jaar</option>
               </select>
             </div>
           </div>
@@ -174,9 +174,9 @@ export default function ZoekenFilters({
                 }}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none"
               >
-                <option value="alles" className="bg-[#33335c]">Heel Nederland</option>
+                <option value="alles" className="bg-[#12122a]">Heel Nederland</option>
                 {regios.map((r) => (
-                  <option key={r} value={r} className="bg-[#33335c]">
+                  <option key={r} value={r} className="bg-[#12122a]">
                     {r}
                   </option>
                 ))}

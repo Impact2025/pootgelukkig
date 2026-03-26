@@ -1,12 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { db } from '@/lib/db'
-import { dieren, asielen } from '@/lib/db/schema'
-import { and, eq, lte, ilike, or } from 'drizzle-orm'
+import { dieren, asielen, favorieten } from '@/lib/db/schema'
+import { and, eq, lte } from 'drizzle-orm'
 import BottomNav from '@/components/layout/BottomNav'
 import ZoekenFilters from './ZoekenFilters'
 import Link from 'next/link'
 import Image from 'next/image'
+import { auth } from '@/auth'
+import FavorietKnop from '@/components/animals/FavorietKnop'
 
 interface Props {
   searchParams: Promise<{
@@ -21,6 +23,14 @@ interface Props {
 export default async function ZoekenPage({ searchParams }: Props) {
   const params = await searchParams
   const { q, soort, leeftijdMax, energie, regio } = params
+
+  // Optioneel ingelogd — voor favoriet-knoppen
+  const session = await auth()
+  const userId = session?.user ? parseInt(session.user.id) : null
+  const userFavorieten = userId
+    ? await db.select({ dierId: favorieten.dierId }).from(favorieten).where(eq(favorieten.userId, userId))
+    : []
+  const favorietIds = new Set(userFavorieten.map((f) => f.dierId))
 
   const filters = [eq(dieren.status, 'beschikbaar')]
 
@@ -117,68 +127,77 @@ export default async function ZoekenPage({ searchParams }: Props) {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-5">
             {resultaten.map((dier) => (
               <Link key={dier.id} href={`/animals/${dier.id}`}>
-                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex gap-0 hover:border-white/20 transition-colors">
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden relative hover:border-white/25 hover:shadow-xl hover:shadow-black/20 transition-all duration-200 group">
+                  {/* Favoriet knop */}
+                  {userId && (
+                    <FavorietKnop dierId={dier.id} isGefavoriet={favorietIds.has(dier.id)} />
+                  )}
+
                   {/* Foto */}
-                  <div className="w-28 h-28 bg-white/10 flex-shrink-0 relative">
+                  <div className="h-52 w-full bg-white/10 relative overflow-hidden">
                     {dier.hoofdFotoUrl ? (
                       <Image
                         src={dier.hoofdFotoUrl}
                         alt={dier.naam}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-white/20 text-3xl">
-                          pets
+                        <span className="material-symbols-outlined text-white/20 text-6xl">pets</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#12122a]/80 via-transparent to-transparent" />
+
+                    {/* Energie badge */}
+                    {dier.gedragsProfiel?.energieNiveau && (
+                      <div className="absolute top-4 left-4">
+                        <span className="flex items-center gap-1 text-[10px] bg-primary text-bg-dark px-2.5 py-1 rounded-full font-extrabold shadow-lg">
+                          <span className="material-symbols-outlined text-[10px]">bolt</span>
+                          {energieLabel[dier.gedragsProfiel.energieNiveau] ?? dier.gedragsProfiel.energieNiveau}
                         </span>
                       </div>
                     )}
                   </div>
 
                   {/* Info */}
-                  <div className="p-3 flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-bold text-white text-base leading-tight">{dier.naam}</h3>
-                        <p className="text-white/50 text-xs mt-0.5">
-                          {[dier.ras ?? dier.soort, dier.leeftijdJaren ? `${dier.leeftijdJaren}j` : null]
+                  <div className="p-4">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-xl font-extrabold text-white leading-none">{dier.naam}</h3>
+                        <p className="text-white/50 text-sm mt-1.5">
+                          {[dier.ras ?? dier.soort, dier.leeftijdJaren ? `${dier.leeftijdJaren} jaar` : null, dier.geslacht]
                             .filter(Boolean)
                             .join(' · ')}
                         </p>
                       </div>
-                      <span className="material-symbols-outlined text-white/20 text-base flex-shrink-0">
-                        arrow_forward_ios
-                      </span>
                     </div>
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {dier.gedragsProfiel?.energieNiveau && (
-                        <span className="text-[10px] bg-primary/15 text-primary px-2 py-0.5 rounded-full font-bold">
-                          {energieLabel[dier.gedragsProfiel.energieNiveau]}
-                        </span>
-                      )}
-                      {dier.gedragsProfiel?.kindvriendelijk && (
-                        <span className="text-[10px] bg-white/10 text-white/60 px-2 py-0.5 rounded-full">
-                          Kindvriendelijk
-                        </span>
-                      )}
-                      {dier.gedragsProfiel?.tags?.slice(0, 1).map((tag) => (
-                        <span key={tag} className="text-[10px] bg-white/10 text-white/60 px-2 py-0.5 rounded-full">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    {/* Behavior tags */}
+                    {(dier.gedragsProfiel?.tags?.length ?? 0) > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {(dier.gedragsProfiel?.tags ?? []).slice(0, 3).map((tag) => (
+                          <span key={tag} className="text-[10px] bg-white/8 text-white/50 px-2.5 py-1 rounded-full">
+                            {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                    {/* Asiel */}
-                    <p className="text-white/30 text-[10px] mt-2 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[12px]">home_work</span>
-                      {dier.asielNaam} · {dier.asielStad}
-                    </p>
+                    {/* Asiel + cta */}
+                    <div className="flex items-center justify-between mt-3">
+                      <p className="text-white/30 text-xs flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">home_work</span>
+                        {dier.asielNaam} · {dier.asielStad}
+                      </p>
+                      <div className="flex items-center gap-1 text-primary/80 text-xs font-bold">
+                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        Bekijk
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Link>
