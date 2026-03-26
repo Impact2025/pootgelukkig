@@ -154,116 +154,238 @@ interface AsielStap {
 }
 
 const ASIEL_STAPPEN: AsielStap[] = [
+  // ── 1. Welkom ────────────────────────────────────────────────────────────
   {
-    navIcon: 'grid_view',
-    navLabel: 'Dashboard',
-    navHref: '/admin',
-    kleur: '#E2725B',
-    icon: 'domain',
+    navIcon: 'grid_view', navLabel: 'Dashboard', navHref: '/admin',
+    kleur: '#33335c', icon: 'domain',
     titel: 'Welkom op het asiel portaal',
-    beschrijving: 'Jouw asiel staat nu live. Adoptanten in heel Nederland vinden jouw dieren via AI-matching — volledig automatisch.',
+    beschrijving: 'Jouw asiel staat nu live op PootGelukkig. Adoptanten in heel Nederland vinden jouw dieren via AI-matching — volledig automatisch, 24/7.',
     preview: (
-      <div className="grid grid-cols-3 gap-2 w-full">
-        {[
-          { label: 'Dieren actief', waarde: '35', icon: '🐾' },
-          { label: 'Aanvragen', waarde: '8', icon: '📬' },
-          { label: 'Gesprekken', waarde: '12', icon: '💬' },
-        ].map((s) => (
-          <div key={s.label} className="bg-[#33335c]/[0.05] border border-[#33335c]/10 rounded-xl p-2.5 text-center">
-            <div className="text-lg mb-1">{s.icon}</div>
-            <div className="text-base font-black text-[#33335c]">{s.waarde}</div>
-            <div className="text-[9px] text-[#33335c]/50 leading-tight">{s.label}</div>
-          </div>
-        ))}
-      </div>
-    ),
-  },
-  {
-    navIcon: 'pets',
-    navLabel: 'Dieren',
-    navHref: '/admin/dieren',
-    kleur: '#E2725B',
-    icon: 'add_photo_alternate',
-    titel: 'Voeg dieren toe',
-    beschrijving: "Maak rijke profielen aan: foto's, gedragsprofiel en medisch paspoort. Hoe meer info, hoe beter de AI matcht.",
-    preview: (
-      <div className="bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-2xl p-3 w-full">
-        <div className="flex items-center gap-3">
-          <div className="size-12 rounded-xl bg-[#33335c]/10 flex items-center justify-center text-2xl">🐕</div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="h-2 w-20 bg-[#33335c]/15 rounded-full" />
-              <div className="h-2 w-8 bg-[#f8aa25]/60 rounded-full" />
+      <div className="w-full space-y-2.5">
+        <div className="grid grid-cols-4 gap-1.5">
+          {[
+            { label: 'Beschikbaar', waarde: '35', icon: 'pets', kleur: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Aanvragen', waarde: '8', icon: 'inbox', kleur: 'text-amber-600', bg: 'bg-amber-50' },
+            { label: 'Afspraken', waarde: '4', icon: 'calendar_month', kleur: 'text-blue-600', bg: 'bg-blue-50' },
+            { label: 'Adopties', waarde: '2', icon: 'favorite', kleur: 'text-rose-600', bg: 'bg-rose-50' },
+          ].map((s) => (
+            <div key={s.label} className={`${s.bg} border border-black/[0.04] rounded-xl p-2 text-center`}>
+              <span className={`material-symbols-outlined text-sm ${s.kleur}`} style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
+              <div className={`text-sm font-black ${s.kleur} mt-0.5`}>{s.waarde}</div>
+              <div className="text-[8px] text-[#33335c]/40 leading-tight mt-0.5">{s.label}</div>
             </div>
-            <div className="h-1.5 w-24 bg-[#33335c]/10 rounded-full" />
-          </div>
-        </div>
-        <div className="flex gap-1.5 mt-2.5">
-          {['Speels', 'Rustig', 'Kindvriendelijk'].map((t) => (
-            <span key={t} className="text-[9px] bg-[#33335c]/[0.06] border border-[#33335c]/10 rounded-lg px-1.5 py-0.5 text-[#33335c]/50">{t}</span>
           ))}
         </div>
+        <div className="bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 flex items-center gap-2">
+          <span className="material-symbols-outlined text-amber-500 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>notifications_active</span>
+          <span className="text-[10px] text-amber-700 font-semibold">3 adoptieverzoeken wachten op jouw actie</span>
+        </div>
       </div>
     ),
   },
+  // ── 2. Dieren ────────────────────────────────────────────────────────────
   {
-    navIcon: 'favorite',
-    navLabel: 'Adoptie',
-    navHref: '/admin/adopties',
-    kleur: '#E2725B',
-    icon: 'inbox',
-    titel: 'Beheer adoptieverzoeken',
-    beschrijving: 'Bekijk inkomende aanvragen, keur goed of wijs af en plan kennismakingsgesprekken — op één plek.',
+    navIcon: 'pets', navLabel: 'Dieren', navHref: '/admin/dieren',
+    kleur: '#33335c', icon: 'add_photo_alternate',
+    titel: 'Rijke dierprofielen aanmaken',
+    beschrijving: "Upload een foto en laat de AI automatisch het ras, de leeftijd en het gedragsprofiel herkennen. Hoe completer het profiel, hoe beter de matching.",
     preview: (
-      <div className="space-y-2 w-full">
+      <div className="w-full space-y-2">
+        <div className="bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-2xl p-3">
+          <div className="flex items-center gap-3 mb-2.5">
+            <div className="size-12 rounded-xl bg-[#33335c]/10 flex items-center justify-center text-xl flex-shrink-0">🐕</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="h-2 w-16 bg-[#33335c]/20 rounded-full" />
+                <div className="h-2 w-10 bg-[#f8aa25]/50 rounded-full" />
+              </div>
+              <div className="h-1.5 w-20 bg-[#33335c]/10 rounded-full" />
+            </div>
+            <div className="flex-shrink-0 flex items-center gap-1 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-1">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              <span className="text-[9px] text-emerald-700 font-bold">Beschikbaar</span>
+            </div>
+          </div>
+          <div className="flex gap-1.5">
+            {['Speels', 'Kindvriendelijk', 'Kattenvrij'].map((t) => (
+              <span key={t} className="text-[9px] bg-[#33335c]/[0.06] border border-[#33335c]/10 rounded-lg px-1.5 py-0.5 text-[#33335c]/50">{t}</span>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 px-3 py-2 bg-violet-50 border border-violet-100 rounded-xl">
+          <span className="material-symbols-outlined text-violet-500 text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+          <span className="text-[10px] text-violet-700 font-semibold">AI herkent ras & gedrag automatisch uit de foto</span>
+        </div>
+      </div>
+    ),
+    cta: { label: 'Eerste dier toevoegen →', href: '/admin/dieren/nieuw' },
+  },
+  // ── 3. AI Matching ───────────────────────────────────────────────────────
+  {
+    navIcon: 'auto_awesome', navLabel: 'AI Match', navHref: '/admin',
+    kleur: '#33335c', icon: 'psychology',
+    titel: 'AI matcht voor jou — automatisch',
+    beschrijving: 'Adoptanten doen een leefstijl-intake. Claude AI berekent voor elk dier een persoonlijke matchscore. Jij hoeft niks te doen — betere matches, minder terugplaatsingen.',
+    preview: (
+      <div className="w-full space-y-2">
         {[
-          { naam: 'Sophie V.', dier: 'Buddy', status: 'Aangevraagd', dot: 'bg-amber-400' },
-          { naam: 'Thomas G.', dier: 'Luna', status: 'Goedgekeurd', dot: 'bg-blue-400' },
+          { naam: 'Sophie V.', emoji: '👩', score: 94, kleur: 'bg-emerald-500', tekst: 'text-emerald-700', bg: 'bg-emerald-50' },
+          { naam: 'Thomas G.', emoji: '👨', score: 78, kleur: 'bg-[#f8aa25]', tekst: 'text-amber-700', bg: 'bg-amber-50' },
+          { naam: 'Lena B.',   emoji: '👩', score: 61, kleur: 'bg-gray-300',  tekst: 'text-gray-500',  bg: 'bg-gray-50' },
+        ].map((m) => (
+          <div key={m.naam} className="flex items-center gap-2.5 bg-[#33335c]/[0.03] border border-[#33335c]/08 rounded-xl px-3 py-2">
+            <span className="text-base">{m.emoji}</span>
+            <span className="text-xs text-[#33335c]/70 font-semibold flex-1">{m.naam}</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className={`h-full ${m.kleur} rounded-full`} style={{ width: `${m.score}%` }} />
+              </div>
+              <span className={`text-[10px] font-black ${m.tekst}`}>{m.score}%</span>
+            </div>
+          </div>
+        ))}
+        <p className="text-[9px] text-[#33335c]/30 text-center">Gesorteerd op beste match · automatisch bijgewerkt</p>
+      </div>
+    ),
+  },
+  // ── 4. Adoptieverzoeken ──────────────────────────────────────────────────
+  {
+    navIcon: 'favorite', navLabel: 'Adoptie', navHref: '/admin/adopties',
+    kleur: '#33335c', icon: 'inbox',
+    titel: 'Adoptieverzoeken beheren',
+    beschrijving: 'Inkomende aanvragen in één overzicht. Keur goed, wijs af, of vraag extra info. Alles bijgehouden met statusgeschiedenis.',
+    preview: (
+      <div className="w-full space-y-1.5">
+        {[
+          { naam: 'Sophie V.', dier: 'Buddy 🐕', status: 'Nieuw', dot: 'bg-amber-400', statusKleur: 'text-amber-700 bg-amber-50 border-amber-100' },
+          { naam: 'Thomas G.', dier: 'Luna 🐈', status: 'Goedgekeurd', dot: 'bg-emerald-500', statusKleur: 'text-emerald-700 bg-emerald-50 border-emerald-100' },
+          { naam: 'Maya de V.', dier: 'Noor 🐕', status: 'Thuischeck', dot: 'bg-blue-400', statusKleur: 'text-blue-700 bg-blue-50 border-blue-100' },
         ].map((r) => (
-          <div key={r.naam} className="flex items-center gap-2.5 bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-xl px-3 py-2">
+          <div key={r.naam} className="flex items-center gap-2 bg-[#33335c]/[0.03] border border-[#33335c]/08 rounded-xl px-3 py-2">
             <span className={`size-2 rounded-full flex-shrink-0 ${r.dot}`} />
-            <span className="text-xs text-[#33335c]/65 flex-1">{r.naam} → <span className="text-[#33335c] font-semibold">{r.dier}</span></span>
-            <span className="text-[9px] text-[#33335c]/40">{r.status}</span>
+            <span className="text-[10px] text-[#33335c]/60 flex-1">{r.naam} <span className="text-[#33335c] font-bold">→ {r.dier}</span></span>
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border ${r.statusKleur}`}>{r.status}</span>
           </div>
         ))}
       </div>
     ),
   },
+  // ── 5. Afspraken ─────────────────────────────────────────────────────────
   {
-    navIcon: 'chat',
-    navLabel: 'Berichten',
-    navHref: '/admin/berichten',
-    kleur: '#E2725B',
-    icon: 'chat_bubble',
-    titel: 'Chat met adoptanten',
-    beschrijving: 'Beantwoord vragen, plan afspraken en bouw een band op met potentiële adoptiegezinnen.',
+    navIcon: 'calendar_month', navLabel: 'Afspraken', navHref: '/admin/afspraken',
+    kleur: '#33335c', icon: 'event',
+    titel: 'Afspraken plannen & bevestigen',
+    beschrijving: 'Adoptanten vragen een tijdslot aan. Jij bevestigt met een exacte tijd. Kennismakingen en thuischecks — overzichtelijk op één plek.',
     preview: (
-      <div className="space-y-2 w-full">
-        <div className="flex gap-2">
+      <div className="w-full space-y-1.5">
+        {[
+          { naam: 'Sophie V.', type: 'Kennismaking', tijd: 'vr 28 mrt · ochtend', status: 'Wacht op bevestiging', kleur: 'text-amber-600 bg-amber-50 border-amber-100' },
+          { naam: 'Maya de V.', type: 'Kennismaking', tijd: 'za 29 mrt · 10:30', status: 'Bevestigd', kleur: 'text-emerald-700 bg-emerald-50 border-emerald-100' },
+          { naam: 'Lena B.', type: 'Thuischeck', tijd: 'wo 2 apr · 14:00', status: 'Bevestigd', kleur: 'text-emerald-700 bg-emerald-50 border-emerald-100' },
+        ].map((a) => (
+          <div key={a.naam} className="bg-[#33335c]/[0.03] border border-[#33335c]/08 rounded-xl px-3 py-2">
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[10px] font-bold text-[#33335c]">{a.naam} · <span className="font-normal text-[#33335c]/50">{a.type}</span></span>
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${a.kleur}`}>{a.status}</span>
+            </div>
+            <span className="text-[9px] text-[#33335c]/35">{a.tijd}</span>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  // ── 6. Berichten ─────────────────────────────────────────────────────────
+  {
+    navIcon: 'chat', navLabel: 'Berichten', navHref: '/admin/berichten',
+    kleur: '#33335c', icon: 'chat_bubble',
+    titel: 'Direct chatten met adoptanten',
+    beschrijving: 'Beantwoord vragen, stuur updates en bouw vertrouwen op vóór de kennismaking. Ongelezen berichten worden direct gemeld.',
+    preview: (
+      <div className="w-full space-y-1.5">
+        <div className="flex gap-2 items-end">
           <div className="size-6 rounded-full bg-[#f8aa25]/30 flex-shrink-0" />
           <div className="bg-[#33335c]/[0.07] rounded-2xl rounded-tl-none px-3 py-2 text-[10px] text-[#33335c]/65 max-w-[80%]">
             Hoi! Is Buddy nog beschikbaar? 🐕
           </div>
         </div>
-        <div className="flex gap-2 justify-end">
-          <div className="bg-[#33335c]/10 border border-[#33335c]/15 rounded-2xl rounded-tr-none px-3 py-2 text-[10px] text-[#33335c]/65 max-w-[80%]">
-            Ja! Kom gerust langs voor een kennismaking 😊
+        <div className="flex gap-2 justify-end items-end">
+          <div className="bg-[#33335c] rounded-2xl rounded-tr-none px-3 py-2 text-[10px] text-white max-w-[80%]">
+            Ja, Buddy is nog beschikbaar! Wil je een kennismaking plannen? 😊
           </div>
           <div className="size-6 rounded-full bg-[#33335c]/20 flex-shrink-0" />
         </div>
+        <div className="flex items-center gap-1.5 px-2 py-1.5 bg-[#33335c]/[0.04] rounded-lg">
+          <span className="size-1.5 rounded-full bg-amber-400" />
+          <span className="text-[9px] text-[#33335c]/50 font-medium">3 ongelezen berichten van Sophie V., Thomas G.</span>
+        </div>
       </div>
     ),
-    cta: { label: 'Voeg je eerste dier toe →', href: '/admin/dieren/nieuw' },
+  },
+  // ── 7. Medisch ───────────────────────────────────────────────────────────
+  {
+    navIcon: 'medical_services', navLabel: 'Medisch', navHref: '/admin/medisch',
+    kleur: '#33335c', icon: 'vaccines',
+    titel: 'Medisch paspoort per dier',
+    beschrijving: 'Houd vaccinaties, chip-nummers, sterilisaties en behandelingen bij. Adoptanten zien de medische status — dat schept vertrouwen.',
+    preview: (
+      <div className="w-full space-y-1.5">
+        {[
+          { label: 'Vaccinatie DHPP', datum: '12 jan 2026', status: 'Afgerond', icon: 'check_circle', kleur: 'text-emerald-600' },
+          { label: 'Sterilisatie', datum: '3 feb 2026', status: 'Afgerond', icon: 'check_circle', kleur: 'text-emerald-600' },
+          { label: 'Jaarlijkse check-up', datum: '15 apr 2026', status: 'Gepland', icon: 'schedule', kleur: 'text-amber-500' },
+          { label: 'Rabiësvaccinatie', datum: '20 apr 2026', status: 'Achterstallig', icon: 'warning', kleur: 'text-red-500' },
+        ].map((r) => (
+          <div key={r.label} className="flex items-center gap-2 bg-[#33335c]/[0.03] border border-[#33335c]/08 rounded-lg px-2.5 py-1.5">
+            <span className={`material-symbols-outlined text-sm ${r.kleur}`} style={{ fontVariationSettings: "'FILL' 1" }}>{r.icon}</span>
+            <span className="text-[10px] text-[#33335c]/70 flex-1 font-medium">{r.label}</span>
+            <span className="text-[9px] text-[#33335c]/35">{r.datum}</span>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  // ── 8. Wachtlijst & Rapportage ───────────────────────────────────────────
+  {
+    navIcon: 'bar_chart', navLabel: 'Rapportage', navHref: '/admin/rapportage',
+    kleur: '#33335c', icon: 'insights',
+    titel: 'Wachtlijst, rapportage & instellingen',
+    beschrijving: 'Bekijk wie er op een dier wacht, analyseer adoptietrends per maand en beheer je openingstijden, adoptieprocedure en notificaties.',
+    preview: (
+      <div className="w-full space-y-2">
+        <div className="grid grid-cols-3 gap-1.5">
+          {[
+            { label: 'Wachtlijst', waarde: '8', icon: 'list_alt', kleur: 'text-violet-600', bg: 'bg-violet-50' },
+            { label: 'Pleeggezinnen', waarde: '6', icon: 'home', kleur: 'text-blue-600', bg: 'bg-blue-50' },
+            { label: 'Adopties/mnd', waarde: '3', icon: 'trending_up', kleur: 'text-emerald-600', bg: 'bg-emerald-50' },
+          ].map((s) => (
+            <div key={s.label} className={`${s.bg} border border-black/[0.04] rounded-xl p-2 text-center`}>
+              <span className={`material-symbols-outlined text-sm ${s.kleur}`} style={{ fontVariationSettings: "'FILL' 1" }}>{s.icon}</span>
+              <div className={`text-sm font-black ${s.kleur}`}>{s.waarde}</div>
+              <div className="text-[8px] text-[#33335c]/40 mt-0.5">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-xl px-3 py-2 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#f8aa25] text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>settings</span>
+          <span className="text-[10px] text-[#33335c]/60 font-medium">Instellingen · openingstijden, ANBI, KvK, social media</span>
+        </div>
+      </div>
+    ),
+    cta: { label: 'Aan de slag — voeg je eerste dier toe 🐾', href: '/admin/dieren/nieuw' },
   },
 ]
 
 // ─── MINI SIDEBAR (voor asiel tour) ────────────────────────────────────────
 
 const SIDEBAR_ITEMS = [
-  { icon: 'grid_view', label: 'Dashboard' },
-  { icon: 'pets', label: 'Dieren' },
-  { icon: 'favorite', label: 'Adoptie' },
-  { icon: 'chat', label: 'Berichten' },
+  { icon: 'grid_view',         label: 'Dashboard' },
+  { icon: 'pets',              label: 'Dieren' },
+  { icon: 'auto_awesome',      label: 'AI Match' },
+  { icon: 'favorite',          label: 'Adoptie' },
+  { icon: 'calendar_month',    label: 'Afspraken' },
+  { icon: 'chat',              label: 'Berichten' },
+  { icon: 'medical_services',  label: 'Medisch' },
+  { icon: 'bar_chart',         label: 'Rapportage' },
 ]
 
 function MiniSidebar({ actieveLabel }: { actieveLabel: string }) {
