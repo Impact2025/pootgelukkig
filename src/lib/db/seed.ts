@@ -9,7 +9,7 @@ import {
   matches, gesprekken, berichten, adopties,
   medischeRecords, nazorgDagen,
   pleeggezinnen, pleegplaatsingen,
-  wachtlijst,
+  wachtlijst, afspraken,
 } from './schema'
 import bcryptjs from 'bcryptjs'
 import { sql, eq } from 'drizzle-orm'
@@ -20,6 +20,7 @@ async function seed() {
   // --- Opschonen in juiste volgorde (foreign keys) ---
   await db.execute(sql`DELETE FROM nazorg_dagen`)
   await db.execute(sql`DELETE FROM adopties`)
+  await db.execute(sql`DELETE FROM afspraken`)
   await db.execute(sql`DELETE FROM berichten`)
   await db.execute(sql`DELETE FROM gesprekken`)
   await db.execute(sql`DELETE FROM matches`)
@@ -1389,6 +1390,115 @@ async function seed() {
       { userId: userThomas.id, dierId: dierenVoorAdoptie[7 < dierenVoorAdoptie.length ? 7 : 4].id, asielId: asielAmsterdam.id, status: 'geannuleerd', aangevraagdOp: new Date('2026-01-05T09:00:00') },
     ])
     console.log('✓ 8 adoptieverzoeken aangemaakt (3 open, 5 geschiedenis)')
+  }
+
+  // --- Afspraken ---
+  const dierenVoorAfspraken = await db.select({ id: dieren.id, naam: dieren.naam })
+    .from(dieren).where(eq(dieren.asielId, asielAmsterdam.id)).limit(8)
+
+  const gebruikersVoorAfspraken = [userSophie, userThomas, demoUser, userLena, userAnna, userMark]
+
+  if (dierenVoorAfspraken.length >= 6 && gebruikersVoorAfspraken.length >= 6) {
+    await db.insert(afspraken).values([
+      // Aangevraagd — wachten op bevestiging asiel
+      {
+        userId: userSophie.id,
+        dierId: dierenVoorAfspraken[0].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'aangevraagd',
+        voorkeurDatum: new Date('2026-03-28T00:00:00'),
+        voorkeurTijdslot: 'ochtend',
+        notitieAdoptant: 'Ik wil graag mijn partner meenemen. Vrijdag werkt het beste voor ons.',
+        aangemaaktOp: new Date('2026-03-24T10:15:00'),
+        bijgewerktOp: new Date('2026-03-24T10:15:00'),
+      },
+      {
+        userId: userThomas.id,
+        dierId: dierenVoorAfspraken[1].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'aangevraagd',
+        voorkeurDatum: new Date('2026-03-27T00:00:00'),
+        voorkeurTijdslot: 'middag',
+        notitieAdoptant: 'Ik heb thuis al een kat — wil graag weten of ze goed samen kunnen.',
+        aangemaaktOp: new Date('2026-03-23T14:45:00'),
+        bijgewerktOp: new Date('2026-03-23T14:45:00'),
+      },
+      // Bevestigd — gepland
+      {
+        userId: demoUser.id,
+        dierId: dierenVoorAfspraken[2].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'bevestigd',
+        voorkeurDatum: new Date('2026-03-29T00:00:00'),
+        voorkeurTijdslot: 'ochtend',
+        bevestigdeDatum: new Date('2026-03-29T00:00:00'),
+        bevestigdTijdstip: '10:30',
+        notitieAdoptant: 'Kom ik met mijn dochter van 8.',
+        notitieAsiel: 'Ontvangst bij de receptie, vraag naar Laura.',
+        aangemaaktOp: new Date('2026-03-21T09:00:00'),
+        bijgewerktOp: new Date('2026-03-22T11:00:00'),
+      },
+      {
+        userId: userLena.id,
+        dierId: dierenVoorAfspraken[3].id,
+        asielId: asielAmsterdam.id,
+        type: 'thuischeck',
+        status: 'bevestigd',
+        voorkeurDatum: new Date('2026-04-02T00:00:00'),
+        voorkeurTijdslot: 'middag',
+        bevestigdeDatum: new Date('2026-04-02T00:00:00'),
+        bevestigdTijdstip: '14:00',
+        notitieAsiel: 'Huisbezoek door vrijwilliger Karin. Adres al doorgegeven.',
+        aangemaaktOp: new Date('2026-03-20T16:00:00'),
+        bijgewerktOp: new Date('2026-03-21T09:30:00'),
+      },
+      // Afgerond
+      {
+        userId: userAnna.id,
+        dierId: dierenVoorAfspraken[4].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'afgerond',
+        voorkeurDatum: new Date('2026-03-15T00:00:00'),
+        voorkeurTijdslot: 'ochtend',
+        bevestigdeDatum: new Date('2026-03-15T00:00:00'),
+        bevestigdTijdstip: '11:00',
+        notitieAsiel: 'Kennismaking geslaagd — adoptieaanvraag ingediend.',
+        aangemaaktOp: new Date('2026-03-12T10:00:00'),
+        bijgewerktOp: new Date('2026-03-15T12:00:00'),
+      },
+      {
+        userId: userMark.id,
+        dierId: dierenVoorAfspraken[5].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'afgerond',
+        voorkeurDatum: new Date('2026-03-10T00:00:00'),
+        voorkeurTijdslot: 'middag',
+        bevestigdeDatum: new Date('2026-03-10T00:00:00'),
+        bevestigdTijdstip: '13:30',
+        notitieAsiel: 'Prettige kennismaking, maar dier bleek toch niet geschikt voor de situatie.',
+        aangemaaktOp: new Date('2026-03-07T08:30:00'),
+        bijgewerktOp: new Date('2026-03-10T15:00:00'),
+      },
+      // Geannuleerd
+      {
+        userId: userSophie.id,
+        dierId: dierenVoorAfspraken[6 < dierenVoorAfspraken.length ? 6 : 5].id,
+        asielId: asielAmsterdam.id,
+        type: 'kennismaking',
+        status: 'geannuleerd',
+        voorkeurDatum: new Date('2026-03-05T00:00:00'),
+        voorkeurTijdslot: 'avond',
+        notitieAdoptant: 'Helaas moet ik annuleren door familieomstandigheden.',
+        aangemaaktOp: new Date('2026-03-01T14:00:00'),
+        bijgewerktOp: new Date('2026-03-03T10:00:00'),
+      },
+    ])
+    console.log('✓ 7 afspraken aangemaakt (2 aangevraagd, 2 bevestigd, 2 afgerond, 1 geannuleerd)')
   }
 
   console.log('\n✅ Demo-data succesvol aangemaakt!')
