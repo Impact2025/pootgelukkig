@@ -2,6 +2,7 @@
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { ToastProvider } from '@/components/ui/Toaster'
+import { AIAssistentWidget } from '@/components/AIAssistentWidget'
 
 export const metadata: Metadata = {
   title: 'PootGelukkig — Vind jouw perfecte match',
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className="bg-bg-dark text-white font-display antialiased">
         <Providers>
           <ToastProvider>{children}</ToastProvider>
+          <AIAssistentWidget />
         </Providers>
       </body>
     </html>
