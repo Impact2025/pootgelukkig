@@ -24,7 +24,8 @@ export async function PATCH(
   const body = await request.json()
   const {
     naam, stad, regio, adres, postcode, lat, lng,
-    telefoon, email, website, beschrijving,
+    telefoon, email, website, beschrijving, logoUrl,
+    openingstijden, socialMedia, asielConfig,
   } = body
 
   const updates: Record<string, unknown> = {}
@@ -39,6 +40,10 @@ export async function PATCH(
   if (email !== undefined) updates.email = email
   if (website !== undefined) updates.website = website
   if (beschrijving !== undefined) updates.beschrijving = beschrijving
+  if (logoUrl !== undefined) updates.logoUrl = logoUrl
+  if (openingstijden !== undefined) updates.openingstijden = openingstijden
+  if (socialMedia !== undefined) updates.socialMedia = socialMedia
+  if (asielConfig !== undefined) updates.asielConfig = asielConfig
 
   await db.update(asielen).set(updates).where(eq(asielen.id, asielId))
 

@@ -43,6 +43,10 @@ export default async function InstellingenPage() {
       email: asielen.email,
       website: asielen.website,
       beschrijving: asielen.beschrijving,
+      logoUrl: asielen.logoUrl,
+      openingstijden: asielen.openingstijden,
+      socialMedia: asielen.socialMedia,
+      asielConfig: asielen.asielConfig,
     })
     .from(asielen)
     .where(eq(asielen.id, asielId))

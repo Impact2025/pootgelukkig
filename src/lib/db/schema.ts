@@ -113,6 +113,48 @@ export const asielen = pgTable('asielen', {
   beschrijving: text('beschrijving'),
   actief: boolean('actief').default(true).notNull(),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+
+  // Openingstijden per dag
+  openingstijden: json('openingstijden').$type<{
+    ma: { open: boolean; van: string; tot: string }
+    di: { open: boolean; van: string; tot: string }
+    wo: { open: boolean; van: string; tot: string }
+    do: { open: boolean; van: string; tot: string }
+    vr: { open: boolean; van: string; tot: string }
+    za: { open: boolean; van: string; tot: string }
+    zo: { open: boolean; van: string; tot: string }
+    notitie?: string
+  }>(),
+
+  // Social media
+  socialMedia: json('social_media').$type<{
+    instagram?: string
+    facebook?: string
+    tiktok?: string
+    youtube?: string
+  }>(),
+
+  // Overige configuratie
+  asielConfig: json('asiel_config').$type<{
+    spoedTelefoon?: string
+    kvkNummer?: string
+    anbiStatus?: boolean
+    iban?: string
+    maxCapaciteit?: number
+    specialisaties?: string[]
+    notificaties?: {
+      emailBijAanvraag?: boolean
+      emailBijBericht?: boolean
+      dagelijkseDigest?: boolean
+    }
+    adoptieProcedure?: {
+      minimumLeeftijdAdoptant?: number
+      tuinVereist?: boolean
+      huisbezoekVereist?: boolean
+      wachttijdDagen?: number
+      vereisten?: string
+    }
+  }>(),
 })
 
 // =================== ANIMALS ===================
