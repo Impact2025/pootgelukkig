@@ -8,29 +8,30 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${postcode}&country=NL&format=json&limit=1&addressdetails=1`
+    // PDOK Locatieserver — gratis Nederlandse overheids-API
+    const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${postcode}&fq=type:postcode&rows=1`
     const res = await fetch(url, {
-      headers: { 'User-Agent': 'PootGelukkig/1.0 (info@pootgelukkig.nl)' },
       next: { revalidate: 86400 }, // 24u cache
     })
 
-    if (!res.ok) throw new Error('Nominatim fout')
+    if (!res.ok) throw new Error('PDOK fout')
 
     const data = await res.json()
-    if (!data || data.length === 0) {
+    const doc = data?.response?.docs?.[0]
+
+    if (!doc) {
       return NextResponse.json({ error: 'Postcode niet gevonden' }, { status: 404 })
     }
 
-    const resultaat = data[0]
-    const adres = resultaat.address ?? {}
-    const stad =
-      adres.city ?? adres.town ?? adres.village ?? adres.municipality ?? adres.county ?? ''
+    // Coördinaten zitten als WKT: "POINT(lon lat)"
+    const wkt = doc.centroide_ll ?? ''
+    const match = wkt.match(/POINT\(([\d.]+)\s+([\d.]+)\)/)
+    const lng = match ? parseFloat(match[1]) : 0
+    const lat = match ? parseFloat(match[2]) : 0
 
-    return NextResponse.json({
-      stad,
-      lat: parseFloat(resultaat.lat),
-      lng: parseFloat(resultaat.lon),
-    })
+    const stad = doc.woonplaatsnaam ?? doc.gemeentenaam ?? ''
+
+    return NextResponse.json({ stad, lat, lng })
   } catch {
     return NextResponse.json({ error: 'Postcode opzoeken mislukt' }, { status: 502 })
   }
