@@ -12,8 +12,8 @@ const schema = z.object({
   email: z.string().email('Ongeldig e-mailadres'),
   wachtwoord: z.string().min(1, 'Wachtwoord is verplicht'),
   rol: z.enum(['adoptant', 'asiel']).optional().default('adoptant'),
+  postcode: z.string().optional(),
   asielNaam: z.string().optional(),
-  asielPostcode: z.string().optional(),
 })
 
 async function haalCoordinatenOp(postcode: string): Promise<{ stad: string; lat: number; lng: number } | null> {
@@ -42,22 +42,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
     }
 
-    const { naam, email, wachtwoord, rol, asielNaam, asielPostcode } = parsed.data
+    const { naam, email, wachtwoord, rol, postcode, asielNaam } = parsed.data
     const hash = await bcrypt.hash(wachtwoord, 4)
+
+    // Locatie ophalen via postcode
+    const locatie = postcode ? await haalCoordinatenOp(postcode) : null
 
     // Asiel-record aanmaken (voor nieuwe asielen)
     let asielId: number | undefined
 
     if (rol === 'asiel' && asielNaam) {
-      const locatie = asielPostcode ? await haalCoordinatenOp(asielPostcode) : null
-
       const [nieuwAsiel] = await db
         .insert(asielen)
         .values({
           naam: asielNaam,
           stad: locatie?.stad ?? '',
           regio: '',
-          postcode: asielPostcode ?? null,
+          postcode: postcode ?? null,
           lat: locatie?.lat ?? null,
           lng: locatie?.lng ?? null,
         })
@@ -73,18 +74,20 @@ export async function POST(req: Request) {
       .where(eq(users.email, email.toLowerCase()))
       .limit(1)
 
+    const locatieVelden = postcode ? { postcode, stad: locatie?.stad ?? undefined } : {}
+
     let newUser
     if (existing) {
       const [updated] = await db
         .update(users)
-        .set({ naam, wachtwoordHash: hash, rol, ...(asielId ? { asielId } : {}) })
+        .set({ naam, wachtwoordHash: hash, rol, ...locatieVelden, ...(asielId ? { asielId } : {}) })
         .where(eq(users.email, email.toLowerCase()))
         .returning({ id: users.id, naam: users.naam, email: users.email })
       newUser = updated
     } else {
       const [inserted] = await db
         .insert(users)
-        .values({ naam, email: email.toLowerCase(), wachtwoordHash: hash, rol, asielId: asielId ?? null })
+        .values({ naam, email: email.toLowerCase(), wachtwoordHash: hash, rol, ...locatieVelden, asielId: asielId ?? null })
         .returning({ id: users.id, naam: users.naam, email: users.email })
       newUser = inserted
     }

@@ -86,17 +86,19 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [wachtwoord, setWachtwoord] = useState('')
 
+  // Locatie velden (adoptant + asiel)
+  const [postcode, setPostcode] = useState('')
+  const [stad, setStad] = useState('')
+  const [postcodeStatus, setPostcodeStatus] = useState<'idle' | 'laden' | 'gevonden' | 'fout'>('idle')
+
   // Asiel-specifieke velden
   const [asielNaam, setAsielNaam] = useState('')
-  const [asielPostcode, setAsielPostcode] = useState('')
-  const [asielStad, setAsielStad] = useState('')
-  const [postcodeStatus, setPostcodeStatus] = useState<'idle' | 'laden' | 'gevonden' | 'fout'>('idle')
 
   const [fout, setFout] = useState<string | null>(null)
   const [laden, setLaden] = useState(false)
   const router = useRouter()
 
-  const geformatteerdePostcode = asielPostcode.replace(/\s/g, '').toUpperCase()
+  const geformatteerdePostcode = postcode.replace(/\s/g, '').toUpperCase()
   const postcodeGeldig = /^\d{4}[A-Z]{2}$/.test(geformatteerdePostcode)
 
   async function zoekPostcode() {
@@ -109,7 +111,7 @@ export default function RegisterPage() {
         setPostcodeStatus('fout')
         return
       }
-      setAsielStad(data.stad)
+      setStad(data.stad)
       setPostcodeStatus('gevonden')
     } catch {
       setPostcodeStatus('fout')
@@ -129,8 +131,8 @@ export default function RegisterPage() {
           email,
           wachtwoord,
           rol: geselecteerdeRol,
+          postcode: geformatteerdePostcode || undefined,
           asielNaam: geselecteerdeRol === 'asiel' ? asielNaam : undefined,
-          asielPostcode: geselecteerdeRol === 'asiel' ? geformatteerdePostcode : undefined,
         }),
       })
 
@@ -314,59 +316,59 @@ export default function RegisterPage() {
                       required
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">
-                      Postcode asiel
-                    </label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <input
-                          type="text"
-                          value={asielPostcode}
-                          onChange={(e) => {
-                            setAsielPostcode(e.target.value)
-                            setPostcodeStatus('idle')
-                            setAsielStad('')
-                          }}
-                          onBlur={zoekPostcode}
-                          placeholder="1234 AB"
-                          maxLength={7}
-                          className={`${inputKlasse} font-mono uppercase tracking-widest pr-10`}
-                        />
-                        {postcodeStatus === 'gevonden' && (
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary text-base">
-                            check_circle
-                          </span>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={zoekPostcode}
-                        disabled={!postcodeGeldig || postcodeStatus === 'laden'}
-                        className="px-3 rounded-2xl border border-white/10 bg-white/5 text-white/60 hover:bg-white/10 transition-colors disabled:opacity-40 flex items-center"
-                      >
-                        {postcodeStatus === 'laden' ? (
-                          <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
-                        ) : (
-                          <span className="material-symbols-outlined text-base">search</span>
-                        )}
-                      </button>
-                    </div>
-                    {asielStad && (
-                      <div className="flex items-center gap-1.5 mt-2 px-3 py-2 bg-white/5 border border-white/8 rounded-xl">
-                        <span className="material-symbols-outlined text-primary text-sm">location_city</span>
-                        <span className="text-white/80 text-sm font-semibold">{asielStad}</span>
-                      </div>
-                    )}
-                    {postcodeStatus === 'fout' && (
-                      <p className="text-red-400 text-xs mt-1.5 pl-1">Postcode niet gevonden</p>
-                    )}
-                  </div>
-
                   <div className="h-px bg-white/[0.06] my-1" />
                 </>
               )}
+
+              {/* Postcode veld (adoptant + asiel) */}
+              <div>
+                <label className="block text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">
+                  {isAsiel ? 'Postcode asiel' : 'Jouw postcode'}
+                </label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={postcode}
+                      onChange={(e) => {
+                        setPostcode(e.target.value)
+                        setPostcodeStatus('idle')
+                        setStad('')
+                      }}
+                      onBlur={zoekPostcode}
+                      placeholder="1234 AB"
+                      maxLength={7}
+                      className={`${inputKlasse} font-mono uppercase tracking-widest pr-10`}
+                    />
+                    {postcodeStatus === 'gevonden' && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary text-base">
+                        check_circle
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={zoekPostcode}
+                    disabled={!postcodeGeldig || postcodeStatus === 'laden'}
+                    className="px-3 rounded-2xl border border-white/10 bg-white/5 text-white/60 hover:bg-white/10 transition-colors disabled:opacity-40 flex items-center"
+                  >
+                    {postcodeStatus === 'laden' ? (
+                      <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                    ) : (
+                      <span className="material-symbols-outlined text-base">search</span>
+                    )}
+                  </button>
+                </div>
+                {stad && (
+                  <div className="flex items-center gap-1.5 mt-2 px-3 py-2 bg-white/5 border border-white/8 rounded-xl">
+                    <span className="material-symbols-outlined text-primary text-sm">location_city</span>
+                    <span className="text-white/80 text-sm font-semibold">{stad}</span>
+                  </div>
+                )}
+                {postcodeStatus === 'fout' && (
+                  <p className="text-red-400 text-xs mt-1.5 pl-1">Postcode niet gevonden</p>
+                )}
+              </div>
 
               <div>
                 <label className="block text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">

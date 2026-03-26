@@ -3,13 +3,13 @@ export const dynamic = 'force-dynamic'
 import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { dieren, asielen, matches, adopties, favorieten } from '@/lib/db/schema'
+import { dieren, asielen, matches, adopties, favorieten, afspraken } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import BottomNav from '@/components/layout/BottomNav'
-import AdopteerKnop from './AdopteerKnop'
+import AfspraakFlow from './AfspraakFlow'
 import FotoCarousel from './FotoCarousel'
 import MatchBreakdown from './MatchBreakdown'
 import TopActies from './TopActies'
@@ -92,6 +92,12 @@ export default async function AnimalProfilePage({
   let budgetScore: number | null = null
   let adoptieStatus: string | undefined = undefined
   let isGefavoriet = false
+  let afspraakData: {
+    id: number; status: string; type: string
+    voorkeurDatum: string; voorkeurTijdslot: string
+    bevestigdeDatum: string | null; bevestigdTijdstip: string | null
+    notitieAsiel: string | null
+  } | null = null
 
   if (session?.user?.id) {
     const userId = parseInt(session.user.id)
@@ -129,6 +135,30 @@ export default async function AnimalProfilePage({
       .limit(1)
 
     adoptieStatus = adoptie?.status ?? undefined
+
+    const [afspraakRij] = await db
+      .select({
+        id: afspraken.id,
+        status: afspraken.status,
+        type: afspraken.type,
+        voorkeurDatum: afspraken.voorkeurDatum,
+        voorkeurTijdslot: afspraken.voorkeurTijdslot,
+        bevestigdeDatum: afspraken.bevestigdeDatum,
+        bevestigdTijdstip: afspraken.bevestigdTijdstip,
+        notitieAsiel: afspraken.notitieAsiel,
+      })
+      .from(afspraken)
+      .where(and(eq(afspraken.userId, userId), eq(afspraken.dierId, dierId)))
+      .orderBy(afspraken.aangemaaktOp)
+      .limit(1)
+
+    afspraakData = afspraakRij
+      ? {
+          ...afspraakRij,
+          voorkeurDatum: afspraakRij.voorkeurDatum.toISOString(),
+          bevestigdeDatum: afspraakRij.bevestigdeDatum?.toISOString() ?? null,
+        }
+      : null
 
     const [favoriet] = await db
       .select({ id: favorieten.id })
@@ -329,18 +359,23 @@ export default async function AnimalProfilePage({
       </div>
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-bg-dark via-bg-dark to-transparent z-30 max-w-[430px] mx-auto space-y-3">
-        <AdopteerKnop
-          dierId={dier.id}
-          dierNaam={dier.naam}
-          bestaandeStatus={adoptieStatus}
-        />
-        <Link href={`/chat/dier/${dier.id}`}>
-          <button className="w-full bg-white/5 border border-white/15 text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
-            <span className="material-symbols-outlined text-primary">chat</span>
-            Stel een vraag aan het asiel
-          </button>
-        </Link>
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-bg-dark via-bg-dark to-transparent z-30 max-w-[430px] mx-auto">
+        {dier.asielId ? (
+          <AfspraakFlow
+            dierId={dier.id}
+            dierNaam={dier.naam}
+            asielId={dier.asielId}
+            afspraak={afspraakData}
+            adoptieStatus={adoptieStatus}
+          />
+        ) : (
+          <Link href={`/chat/dier/${dier.id}`}>
+            <button className="w-full bg-white/5 border border-white/15 text-white font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
+              <span className="material-symbols-outlined text-primary">chat</span>
+              Stel een vraag aan het asiel
+            </button>
+          </Link>
+        )}
       </div>
 
       <BottomNav />

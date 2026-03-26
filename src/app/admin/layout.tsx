@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
-import { adopties, berichten, gesprekken, medischeRecords, wachtlijst } from '@/lib/db/schema'
+import { adopties, berichten, gesprekken, medischeRecords, wachtlijst, afspraken } from '@/lib/db/schema'
 import { and, eq, count, lt } from 'drizzle-orm'
 import AdminSidebar from './AdminSidebar'
 
@@ -48,6 +48,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .from(wachtlijst)
     .where(eq(wachtlijst.actief, true))
 
+  // Aangevraagde afspraken
+  const [afsprakenResult] = await db
+    .select({ aantal: count() })
+    .from(afspraken)
+    .where(
+      asielId
+        ? and(eq(afspraken.status, 'aangevraagd'), eq(afspraken.asielId, asielId))
+        : eq(afspraken.status, 'aangevraagd')
+    )
+
   return (
     <div className="min-h-screen bg-[#f6f8f6] flex">
       <AdminSidebar
@@ -57,6 +67,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         ongelezen={Number(onglezenResult?.aantal ?? 0)}
         medischAlert={Number(medischResult?.aantal ?? 0)}
         wachtlijstAantal={Number(wachtlijstResult?.aantal ?? 0)}
+        afsprakenAangevraagd={Number(afsprakenResult?.aantal ?? 0)}
       />
       <main className="ml-64 flex-1 min-w-0 min-h-screen">{children}</main>
     </div>

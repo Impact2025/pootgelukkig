@@ -1,6 +1,24 @@
 import { chatCompletion } from './client'
 import type { AdopterProfiel } from './matching'
 
+// =================== RISICO & CROSS-SPECIES TYPES ===================
+
+export type RisicoNiveau = 'info' | 'waarschuwing' | 'kritiek'
+
+export type Risico = {
+  niveau: RisicoNiveau
+  icoon: string
+  titel: string
+  boodschap: string
+}
+
+export type CrossSpeciesSuggestie = {
+  soort: string
+  emoji: string
+  label: string
+  reden: string
+}
+
 export const INTAKE_STAPPEN = [
   {
     stap: 1,
@@ -184,6 +202,134 @@ function mapAntwoordenNaarProfiel(antwoorden: Record<string, string>): AdopterPr
   }
 }
 
+// =================== RISICOSIGNALERING (deterministisch) ===================
+
+export function berekenRisicos(profiel: AdopterProfiel): Risico[] {
+  const risicos: Risico[] = []
+  const wilHond =
+    profiel.diersoortVoorkeur.includes('hond') || profiel.diersoortVoorkeur.length === 0
+
+  if (wilHond) {
+    // Lang alleen thuis + hond → kritiek
+    if (profiel.werkUrenPerDag >= 8) {
+      risicos.push({
+        niveau: 'kritiek',
+        icoon: 'schedule',
+        titel: 'Lang alleen thuis',
+        boodschap:
+          'Honden zijn sociale dieren. Bij 8+ uur afwezigheid per dag is dagopvang of een hondenuitlaatservice sterk aan te raden.',
+      })
+    }
+
+    // Appartement + geen tuin + laag activiteitsniveau
+    if (
+      profiel.woningType === 'appartement' &&
+      !profiel.heeftTuin &&
+      profiel.activiteitNiveau === 'laag'
+    ) {
+      risicos.push({
+        niveau: 'waarschuwing',
+        icoon: 'home',
+        titel: 'Beperkte woonomgeving',
+        boodschap:
+          'Een appartement zonder tuin gecombineerd met een rustig leefritme beperkt de keuze. We tonen alleen kleine, rustige rassen die hier goed in gedijen.',
+      })
+    }
+
+    // Eerste hond, geen ervaring
+    if (profiel.ervaringNiveau === 'geen') {
+      risicos.push({
+        niveau: 'info',
+        icoon: 'school',
+        titel: 'Eerste huisdier',
+        boodschap:
+          'Voor beginners raden we een volwassen hond aan in plaats van een pup — het karakter is al gevormd en de training is verder.',
+      })
+    }
+
+    // Jonge kinderen
+    if (profiel.aantalKinderen > 0 && (profiel.jongsteKindLeeftijd ?? 10) < 6) {
+      risicos.push({
+        niveau: 'info',
+        icoon: 'child_care',
+        titel: 'Jonge kinderen thuis',
+        boodschap:
+          'We filteren automatisch op honden die bewezen kindvriendelijk zijn. Houd altijd toezicht bij contact met kinderen onder de 6 jaar.',
+      })
+    }
+  }
+
+  // Beperkt budget (altijd relevant)
+  if (profiel.budgetDierenarts === 'beperkt') {
+    risicos.push({
+      niveau: 'info',
+      icoon: 'medical_services',
+      titel: 'Dierenartszkosten',
+      boodschap:
+        'Bij een beperkt budget matchen we bij voorkeur met jonge, gezonde dieren zonder bekende aandoeningen, zodat onverwachte kosten minimaal zijn.',
+    })
+  }
+
+  return risicos
+}
+
+// =================== CROSS-SPECIES MATCHING (deterministisch) ===================
+
+export function berekenCrossSpeciesSuggestie(
+  profiel: AdopterProfiel
+): CrossSpeciesSuggestie | null {
+  // Alleen suggereren als gebruiker expliciet voor hond koos
+  if (!profiel.diersoortVoorkeur.includes('hond')) return null
+
+  const isFulltime = profiel.werkUrenPerDag >= 8
+  const isAppartement = profiel.woningType === 'appartement'
+  const isRustig =
+    profiel.activiteitNiveau === 'laag' || profiel.activiteitNiveau === 'normaal'
+  const isBeperktBudget = profiel.budgetDierenarts === 'beperkt'
+
+  if (isFulltime && isAppartement) {
+    return {
+      soort: 'kat',
+      emoji: '🐱',
+      label: 'Kat',
+      reden:
+        'Je werkt fulltime en woont in een appartement. Katten zijn van nature zelfstandig en redden zich prima alleen — ideaal voor een druk leven, zonder dat het ten koste gaat van hun welzijn.',
+    }
+  }
+
+  if (isFulltime && isRustig) {
+    return {
+      soort: 'kat',
+      emoji: '🐱',
+      label: 'Kat',
+      reden:
+        'Je bent veel weg en houdt van rust. Een kat past perfect bij jouw leefritme: aanwezig en knuffelbaar als je thuis bent, zelfstandig als je weg bent.',
+    }
+  }
+
+  if (isAppartement && isRustig) {
+    return {
+      soort: 'kat',
+      emoji: '🐱',
+      label: 'Kat',
+      reden:
+        'Appartement + rustig leven = ideale kat-omgeving. Geen dagelijkse uitloopplicht, maar evenveel gezelschap en knuffelmomenten.',
+    }
+  }
+
+  if (isBeperktBudget) {
+    return {
+      soort: 'konijn',
+      emoji: '🐰',
+      label: 'Konijn',
+      reden:
+        'Konijnen zijn liefdevol en sociaal, maar hebben significant lagere dierenartszkosten dan honden. Een verstandige keuze die ook een mooi leven biedt voor een asieldier.',
+    }
+  }
+
+  return null
+}
+
 // =================== AANBEVELING VIA AI ===================
 
 async function genereerAanbeveling(profiel: AdopterProfiel): Promise<string> {
@@ -215,8 +361,15 @@ Geef alleen de aanbevelingstekst, geen JSON.`
 
 export async function verwerkIntakeAntwoorden(
   antwoorden: Record<string, string>
-): Promise<{ profiel: AdopterProfiel; aanbeveling: string }> {
+): Promise<{
+  profiel: AdopterProfiel
+  aanbeveling: string
+  risicos: Risico[]
+  crossSpeciesSuggestie: CrossSpeciesSuggestie | null
+}> {
   const profiel = mapAntwoordenNaarProfiel(antwoorden)
-  const aanbeveling = await genereerAanbeveling(profiel)
-  return { profiel, aanbeveling }
+  const [aanbeveling] = await Promise.all([genereerAanbeveling(profiel)])
+  const risicos = berekenRisicos(profiel)
+  const crossSpeciesSuggestie = berekenCrossSpeciesSuggestie(profiel)
+  return { profiel, aanbeveling, risicos, crossSpeciesSuggestie }
 }

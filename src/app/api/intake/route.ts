@@ -182,6 +182,8 @@ export async function POST(request: NextRequest) {
           data: {
             profiel,
             aanbeveling: resultaat.aanbeveling,
+            risicos: resultaat.risicos,
+            crossSpeciesSuggestie: resultaat.crossSpeciesSuggestie,
             succes: true,
             vanCache: true,
           },
@@ -279,7 +281,13 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      data: { profiel, aanbeveling: resultaat.aanbeveling, succes: true },
+      data: {
+        profiel,
+        aanbeveling: resultaat.aanbeveling,
+        risicos: resultaat.risicos,
+        crossSpeciesSuggestie: resultaat.crossSpeciesSuggestie,
+        succes: true,
+      },
     })
   } catch (error) {
     console.error('Intake API fout:', error)

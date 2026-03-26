@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
+type RisicoNiveau = 'info' | 'waarschuwing' | 'kritiek'
+type Risico = { niveau: RisicoNiveau; icoon: string; titel: string; boodschap: string }
+type CrossSpeciesSuggestie = { soort: string; emoji: string; label: string; reden: string }
+type IntakeResultaat = {
+  aanbeveling: string
+  risicos: Risico[]
+  crossSpeciesSuggestie: CrossSpeciesSuggestie | null
+}
+
 const STAPPEN = [
   {
     stap: 1,
@@ -89,6 +98,7 @@ export default function IntakePage() {
   const [geselecteerd, setGeselecteerd] = useState<string | null>(null)
   const [isLaden, setIsLaden] = useState(false)
   const [fout, setFout] = useState<string | null>(null)
+  const [resultaat, setResultaat] = useState<IntakeResultaat | null>(null)
 
   const stap = STAPPEN[huidigStap]
   const voortgang = ((huidigStap + 1) / STAPPEN.length) * 100
@@ -132,12 +142,17 @@ export default function IntakePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ antwoorden: alleAntwoorden }),
       })
-      if (response.ok) {
-        router.push('/dashboard?intake=voltooid')
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setFout(data.error ?? `Er ging iets mis (${response.status}). Probeer het opnieuw.`)
         return
       }
-      const data = await response.json().catch(() => ({}))
-      setFout(data.error ?? `Er ging iets mis (${response.status}). Probeer het opnieuw.`)
+      // Toon Dr. Poot Analyse scherm vóór doorsturen naar dashboard
+      setResultaat({
+        aanbeveling: data.data?.aanbeveling ?? '',
+        risicos: data.data?.risicos ?? [],
+        crossSpeciesSuggestie: data.data?.crossSpeciesSuggestie ?? null,
+      })
     } catch {
       setFout('Geen verbinding. Controleer je internet en probeer opnieuw.')
     } finally {
@@ -183,6 +198,168 @@ export default function IntakePage() {
             Ga naar dashboard
           </button>
         </div>
+      </div>
+    )
+  }
+
+  // ── Dr. Poot Analyse scherm ─────────────────────────────────────────────────
+  if (resultaat) {
+    const heeftKritiek = resultaat.risicos.some((r) => r.niveau === 'kritiek')
+    const heeftWaarschuwing = resultaat.risicos.some((r) => r.niveau === 'waarschuwing')
+
+    return (
+      <div className="mobile-container bg-bg-dark flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-10 ios-blur bg-bg-dark/80 border-b border-white/[0.06] px-4 py-4 flex items-center justify-between">
+          <div className="size-10" />
+          <h1 className="text-base font-bold text-white">Jouw analyse</h1>
+          <div className="size-10" />
+        </header>
+
+        <main className="flex-1 overflow-y-auto px-4 py-6 pb-32 space-y-4">
+          {/* Hero */}
+          <div className="text-center pt-2 pb-4">
+            <div className="inline-flex items-center justify-center size-20 rounded-3xl bg-primary/15 border border-primary/25 mb-5 shadow-2xl">
+              <span
+                className="material-symbols-outlined text-4xl text-primary"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                pets
+              </span>
+            </div>
+            <h2 className="text-2xl font-extrabold text-white tracking-tight">
+              Dr. Poot heeft gesproken
+            </h2>
+            <p className="text-white/45 text-sm mt-1.5">
+              Jouw persoonlijke analyse is klaar
+            </p>
+          </div>
+
+          {/* Aanbeveling */}
+          <div className="bg-primary/10 border border-primary/20 rounded-2xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span
+                className="material-symbols-outlined text-primary text-base"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                auto_awesome
+              </span>
+              <p className="text-primary text-[11px] font-bold uppercase tracking-widest">
+                Aanbeveling van Dr. Poot
+              </p>
+            </div>
+            <p className="text-white text-sm leading-relaxed">{resultaat.aanbeveling}</p>
+          </div>
+
+          {/* Cross-species suggestie */}
+          {resultaat.crossSpeciesSuggestie && (
+            <div className="bg-amber-500/10 border border-amber-400/30 rounded-2xl p-5">
+              <div className="flex items-start gap-3">
+                <div className="size-14 rounded-2xl bg-amber-400/15 flex items-center justify-center text-3xl flex-shrink-0 border border-amber-400/20">
+                  {resultaat.crossSpeciesSuggestie.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span
+                      className="material-symbols-outlined text-amber-400 text-sm"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      lightbulb
+                    </span>
+                    <p className="text-amber-400 text-[11px] font-bold uppercase tracking-widest">
+                      Cross-species tip
+                    </p>
+                  </div>
+                  <p className="text-white font-bold text-sm mb-1.5">
+                    Overweeg ook een {resultaat.crossSpeciesSuggestie.label}
+                  </p>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    {resultaat.crossSpeciesSuggestie.reden}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Risico's */}
+          {resultaat.risicos.length > 0 && (
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2 px-1">
+                <p className="text-white/35 text-[11px] font-bold uppercase tracking-widest">
+                  Aandachtspunten
+                </p>
+                {(heeftKritiek || heeftWaarschuwing) && (
+                  <span className={`size-1.5 rounded-full ${heeftKritiek ? 'bg-red-400' : 'bg-orange-400'}`} />
+                )}
+              </div>
+              {resultaat.risicos.map((risico, i) => (
+                <div
+                  key={i}
+                  className={`rounded-2xl p-4 flex items-start gap-3 border ${
+                    risico.niveau === 'kritiek'
+                      ? 'bg-red-500/8 border-red-500/20'
+                      : risico.niveau === 'waarschuwing'
+                        ? 'bg-orange-500/8 border-orange-400/20'
+                        : 'bg-white/4 border-white/8'
+                  }`}
+                >
+                  <span
+                    className={`material-symbols-outlined text-lg mt-0.5 flex-shrink-0 ${
+                      risico.niveau === 'kritiek'
+                        ? 'text-red-400'
+                        : risico.niveau === 'waarschuwing'
+                          ? 'text-orange-400'
+                          : 'text-white/40'
+                    }`}
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {risico.icoon}
+                  </span>
+                  <div>
+                    <p
+                      className={`font-bold text-sm leading-snug ${
+                        risico.niveau === 'kritiek'
+                          ? 'text-red-300'
+                          : risico.niveau === 'waarschuwing'
+                            ? 'text-orange-300'
+                            : 'text-white'
+                      }`}
+                    >
+                      {risico.titel}
+                    </p>
+                    <p className="text-white/55 text-sm mt-1 leading-relaxed">
+                      {risico.boodschap}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Geen aandachtspunten */}
+          {resultaat.risicos.length === 0 && !resultaat.crossSpeciesSuggestie && (
+            <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 flex items-center gap-3">
+              <span
+                className="material-symbols-outlined text-primary text-xl flex-shrink-0"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                check_circle
+              </span>
+              <p className="text-white/70 text-sm">
+                Geen aandachtspunten — jouw situatie past goed bij jouw keuze.
+              </p>
+            </div>
+          )}
+        </main>
+
+        {/* Footer CTA */}
+        <footer className="sticky bottom-0 p-6 bg-gradient-to-t from-bg-dark via-bg-dark/95 to-transparent">
+          <button onClick={() => router.push('/dashboard?intake=voltooid')} className="btn-primary">
+            <span>Bekijk mijn matches</span>
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </button>
+          <div className="ios-indicator" />
+        </footer>
       </div>
     )
   }

@@ -42,6 +42,12 @@ export const medischStatusEnum = pgEnum('medisch_status', [
   'aankomend', 'voltooid', 'gemist', 'geannuleerd'
 ])
 
+export const afspraakTypeEnum = pgEnum('afspraak_type', ['kennismaking', 'thuischeck'])
+
+export const afspraakStatusEnum = pgEnum('afspraak_status', [
+  'aangevraagd', 'bevestigd', 'afgerond', 'geannuleerd'
+])
+
 // =================== USERS (Adoptanten) ===================
 
 export const userRolEnum = pgEnum('user_rol', ['adoptant', 'asiel', 'admin'])
@@ -265,6 +271,25 @@ export const favorieten = pgTable('favorieten', {
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   dierId: integer('dier_id').notNull().references(() => dieren.id, { onDelete: 'cascade' }),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+// =================== AFSPRAKEN ===================
+
+export const afspraken = pgTable('afspraken', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  dierId: integer('dier_id').notNull().references(() => dieren.id),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id),
+  type: afspraakTypeEnum('type').notNull().default('kennismaking'),
+  status: afspraakStatusEnum('status').notNull().default('aangevraagd'),
+  voorkeurDatum: timestamp('voorkeur_datum').notNull(),
+  voorkeurTijdslot: varchar('voorkeur_tijdslot', { length: 20 }).notNull(), // 'ochtend' | 'middag' | 'avond'
+  bevestigdeDatum: timestamp('bevestigde_datum'),
+  bevestigdTijdstip: varchar('bevestigd_tijdstip', { length: 10 }), // "10:30"
+  notitieAdoptant: text('notitie_adoptant'),
+  notitieAsiel: text('notitie_asiel'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
 })
 
 // =================== WACHTLIJST ===================

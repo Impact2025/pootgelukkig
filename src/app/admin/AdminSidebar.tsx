@@ -8,6 +8,7 @@ const navItems = [
   { href: '/admin', icon: 'grid_view', label: 'Dashboard', exact: true },
   { href: '/admin/dieren', icon: 'pets', label: 'Dieren' },
   { href: '/admin/adopties', icon: 'favorite', label: 'Adoptie' },
+  { href: '/admin/afspraken', icon: 'calendar_month', label: 'Afspraken' },
   { href: '/admin/berichten', icon: 'chat', label: 'Berichten' },
 ]
 
@@ -26,6 +27,7 @@ interface Props {
   ongelezen?: number
   medischAlert?: number
   wachtlijstAantal?: number
+  afsprakenAangevraagd?: number
 }
 
 export default function AdminSidebar({
@@ -35,6 +37,7 @@ export default function AdminSidebar({
   ongelezen = 0,
   medischAlert = 0,
   wachtlijstAantal = 0,
+  afsprakenAangevraagd = 0,
 }: Props) {
   const pathname = usePathname()
 
@@ -89,6 +92,11 @@ export default function AdminSidebar({
               {item.href === '/admin/adopties' && openstaand > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
                   {openstaand}
+                </span>
+              )}
+              {item.href === '/admin/afspraken' && afsprakenAangevraagd > 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
+                  {afsprakenAangevraagd}
                 </span>
               )}
               {item.href === '/admin/berichten' && ongelezen > 0 && (
