@@ -118,7 +118,10 @@ export function AIAssistentWidget() {
 
   if (status === 'loading') return null
   if (!session?.user) return null
-  if (pathname.startsWith('/admin') || pathname.startsWith('/auth') || pathname === '/') return null
+
+  // Verberg op pagina's met eigen sticky CTA / gefocuste flows
+  const verborgenRoutes = ['/admin', '/auth', '/animals/', '/afspraken', '/intake', '/chat/']
+  if (pathname === '/' || verborgenRoutes.some((r) => pathname.startsWith(r))) return null
 
   const voornaam = session.user.name?.split(' ')[0] ?? 'daar'
 
@@ -139,7 +142,7 @@ export function AIAssistentWidget() {
       `}</style>
 
       {/* ── Floating button ──────────────────────────────────────────────── */}
-      <div className="fixed bottom-24 right-4 z-50">
+      <div className="fixed bottom-[88px] right-4 z-50">
         {/* Pulse ring — alleen als nog niet gezien */}
         {!gezien && !open && (
           <span className="pg-pulse-ring absolute inset-0 rounded-full border-2 border-[#f8aa25]/60 pointer-events-none" />
@@ -188,7 +191,7 @@ export function AIAssistentWidget() {
       {/* ── Chat panel ───────────────────────────────────────────────────── */}
       {open && (
         <div
-          className="pg-chat-panel fixed bottom-24 right-4 z-50 flex flex-col rounded-3xl overflow-hidden border"
+          className="pg-chat-panel fixed bottom-[88px] right-4 z-50 flex flex-col rounded-3xl overflow-hidden border"
           style={{
             width: 'min(calc(100vw - 2rem), 390px)',
             height: 'min(560px, calc(100dvh - 120px))',

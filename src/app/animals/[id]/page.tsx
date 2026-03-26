@@ -13,6 +13,7 @@ import AfspraakFlow from './AfspraakFlow'
 import FotoCarousel from './FotoCarousel'
 import MatchBreakdown from './MatchBreakdown'
 import TopActies from './TopActies'
+import AIAssistentInline from './AIAssistentInline'
 
 export async function generateMetadata({
   params,
@@ -335,6 +336,11 @@ export default async function AnimalProfilePage({
             <h2 className="text-xl font-bold">Verhaal van {dier.naam}</h2>
             <p className="text-sm leading-relaxed text-white/60">{dier.verhaal}</p>
           </section>
+        )}
+
+        {/* AI Assistent */}
+        {session?.user && (
+          <AIAssistentInline dierId={dier.id} dierNaam={dier.naam} />
         )}
 
         {/* Asiel info */}
