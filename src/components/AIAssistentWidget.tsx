@@ -182,9 +182,18 @@ export function AIAssistentWidget() {
                 {animalId ? `Over dit dier` : 'Stel je vraag'}
               </p>
             </div>
-            <div className="ml-auto flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#13ec13] animate-pulse" />
-              <span className="text-[#9db99d] text-xs">Online</span>
+            <div className="ml-auto flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#13ec13] animate-pulse" />
+                <span className="text-[#9db99d] text-xs">Online</span>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Sluiten"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#9db99d] hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
             </div>
           </div>
 
