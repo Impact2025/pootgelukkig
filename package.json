@@ -15,6 +15,7 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
     "@neondatabase/serverless": "^0.10.4",
+    "@react-email/components": "^1.0.10",
     "@vercel/blob": "^0.27.1",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.38.4",
@@ -22,6 +23,7 @@
     "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-email": "^5.2.10",
     "resend": "^6.9.4",
     "zod": "^3.24.1"
   },

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { adopties, dieren, users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { stuurEmail, adoptieStatusHtml } from '@/lib/email'
+import { stuurAdoptieStatusUpdate } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,10 +59,11 @@ export async function PATCH(
       .limit(1)
 
     if (userInfo?.email && ['goedgekeurd', 'afgewezen', 'afgerond'].includes(status)) {
-      stuurEmail({
-        naar: userInfo.email,
-        onderwerp: `Update over jouw adoptie van ${dierInfo?.naam}`,
-        html: adoptieStatusHtml(dierInfo?.naam ?? 'een dier', status, userInfo.naam),
+      stuurAdoptieStatusUpdate({
+        adoptantEmail: userInfo.email,
+        adoptantNaam: userInfo.naam,
+        dierNaam: dierInfo?.naam ?? 'een dier',
+        isGoedgekeurd: ['goedgekeurd', 'afgerond'].includes(status),
       })
     }
   }

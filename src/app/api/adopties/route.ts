@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { adopties, dieren, users, asielen } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
-import { stuurEmail, adoptieAangevraagdHtml } from '@/lib/email'
+import { stuurMatchAlert } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,16 +67,21 @@ export async function POST(request: NextRequest) {
     .limit(1)
 
   const [dierInfo] = await db
-    .select({ naam: dieren.naam })
+    .select({ naam: dieren.naam, soort: dieren.soort })
     .from(dieren)
     .where(eq(dieren.id, dierId))
     .limit(1)
 
   if (asiel?.email) {
-    stuurEmail({
-      naar: asiel.email,
-      onderwerp: `Nieuw adoptieverzoek voor ${dierInfo?.naam}`,
-      html: adoptieAangevraagdHtml(dierInfo?.naam ?? 'een dier', user?.naam ?? 'Een adoptant'),
+    stuurMatchAlert({
+      asielEmail: asiel.email,
+      asielNaam: 'Asiel',
+      dierNaam: dierInfo?.naam ?? 'een dier',
+      dierSoort: dierInfo?.soort ?? 'overig',
+      dierSlug: dierId,
+      adoptantNaam: user?.naam ?? 'Een adoptant',
+      matchScore: 80,
+      analyseTekst: 'Deze adoptant heeft een adoptieverzoek ingediend.',
     })
   }
 

@@ -1,71 +1,236 @@
-﻿import { Resend } from 'resend'
+import { Resend } from 'resend'
+import { render } from '@react-email/components'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
 const VAN = 'PootGelukkig <no-reply@pootgelukkig.nl>'
 
-export async function stuurEmail({
-  naar,
-  onderwerp,
-  html,
-}: {
-  naar: string
-  onderwerp: string
-  html: string
-}) {
+// ─── Basis verzend functie ────────────────────────────────────────────────────
+
+async function stuurEmail({ naar, onderwerp, html }: { naar: string; onderwerp: string; html: string }) {
   if (!resend) {
-    console.log(`[Email] ${onderwerp} → ${naar} (RESEND_API_KEY niet geconfigureerd)`)
-    return
+    console.log(`[Email] ${onderwerp} → ${naar} (geen RESEND_API_KEY)`)
+    return { ok: false }
   }
   try {
-    await resend.emails.send({ from: VAN, to: naar, subject: onderwerp, html })
+    const result = await resend.emails.send({ from: VAN, to: naar, subject: onderwerp, html })
+    return { ok: true, id: result.data?.id }
   } catch (err) {
     console.error('[Email] Versturen mislukt:', err)
+    return { ok: false }
   }
 }
 
-export function adoptieAangevraagdHtml(dierNaam: string, userName: string) {
-  return `
-    <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-      <h2 style="color:#33335c">Nieuw adoptieverzoek voor ${dierNaam}</h2>
-      <p>${userName} heeft een adoptieverzoek ingediend.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/adopties"
-         style="background:#33335c;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
-        Bekijk verzoek
-      </a></p>
-    </div>`
+// ─── Match alert voor asiel ───────────────────────────────────────────────────
+
+export async function stuurMatchAlert({
+  asielEmail,
+  asielNaam,
+  dierNaam,
+  dierSoort,
+  dierSlug,
+  adoptantNaam,
+  matchScore,
+  analyseTekst,
+}: {
+  asielEmail: string
+  asielNaam: string
+  dierNaam: string
+  dierSoort: string
+  dierSlug: string | number
+  adoptantNaam: string
+  matchScore: number
+  analyseTekst: string
+}) {
+  const { MatchAlert } = await import('@/emails/MatchAlert')
+  const html = await render(
+    MatchAlert({
+      asielNaam,
+      dierNaam,
+      dierSoort,
+      adoptantNaam,
+      matchScore,
+      analyseTekst,
+      dierUrl: `${APP_URL}/admin/dieren/${dierSlug}`,
+    })
+  )
+  return stuurEmail({
+    naar: asielEmail,
+    onderwerp: `🐾 ${adoptantNaam} matcht ${Math.round(matchScore)}% met ${dierNaam}`,
+    html,
+  })
 }
 
-export function adoptieStatusHtml(dierNaam: string, status: string, userName: string) {
-  const isGoedgekeurd = status === 'goedgekeurd' || status === 'afgerond'
-  return `
-    <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-      <h2 style="color:#33335c">Update over jouw adoptie van ${dierNaam}</h2>
-      <p>Hallo ${userName},</p>
-      <p>${
-        isGoedgekeurd
-          ? `Goed nieuws! Je adoptie van <strong>${dierNaam}</strong> is <strong>goedgekeurd</strong>. Het asiel neemt snel contact met je op voor de overdracht.`
-          : `Je adoptie van <strong>${dierNaam}</strong> is helaas niet doorgegaan. Neem contact op met het asiel voor meer informatie.`
-      }</p>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/dossier"
-         style="background:#f8aa25;color:#33335c;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:bold">
-        Bekijk je dossier
-      </a></p>
-    </div>`
+// ─── Welkomstmail asiel ───────────────────────────────────────────────────────
+
+export async function stuurWelkomAsiel({
+  asielEmail,
+  asielNaam,
+  contactpersoonNaam,
+}: {
+  asielEmail: string
+  asielNaam: string
+  contactpersoonNaam: string
+}) {
+  const { WelkomAsiel } = await import('@/emails/WelkomAsiel')
+  const html = await render(
+    WelkomAsiel({
+      asielNaam,
+      contactpersoonNaam,
+      loginUrl: `${APP_URL}/auth/login`,
+    })
+  )
+  return stuurEmail({
+    naar: asielEmail,
+    onderwerp: `Welkom bij PootGelukkig, ${asielNaam}! 🎉`,
+    html,
+  })
 }
 
-export function nieuwBerichtHtml(dierNaam: string, bericht: string, userName: string) {
-  return `
-    <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-      <h2 style="color:#33335c">Nieuw bericht over ${dierNaam}</h2>
-      <p>Hallo ${userName},</p>
-      <p>Je hebt een nieuw bericht ontvangen:</p>
-      <blockquote style="border-left:3px solid #f8aa25;padding-left:12px;color:#555">
-        ${bericht}
-      </blockquote>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard"
-         style="background:#E2725B;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">
-        Open chat
-      </a></p>
+// ─── Wekelijkse digest ────────────────────────────────────────────────────────
+
+export async function stuurWeekelijkseDigest({
+  asielEmail,
+  asielNaam,
+  contactpersoonNaam,
+  stats,
+  topMatches,
+}: {
+  asielEmail: string
+  asielNaam: string
+  contactpersoonNaam: string
+  stats: { nieuweMatches: number; nieuweBeichten: number; actieveDieren: number; adopties: number }
+  topMatches: Array<{ dierNaam: string; adoptantNaam: string; score: number }>
+}) {
+  const { WeekelijkseDigest } = await import('@/emails/WeekelijkseDigest')
+  const weekNummer = Math.ceil(new Date().getDate() / 7)
+  const html = await render(
+    WeekelijkseDigest({
+      asielNaam,
+      contactpersoonNaam,
+      week: `Week ${weekNummer}`,
+      stats,
+      topMatches,
+      portaalUrl: `${APP_URL}/admin`,
+    })
+  )
+  return stuurEmail({
+    naar: asielEmail,
+    onderwerp: `📊 Weekoverzicht ${asielNaam} — ${stats.nieuweMatches} nieuwe matches`,
+    html,
+  })
+}
+
+// ─── Afspraak herinnering ─────────────────────────────────────────────────────
+
+export async function stuurAfspraakHerinnering({
+  email,
+  naam,
+  dierNaam,
+  dierSoort,
+  asielNaam,
+  asielAdres,
+  afspraakDatum,
+  rol,
+}: {
+  email: string
+  naam: string
+  dierNaam: string
+  dierSoort: string
+  asielNaam: string
+  asielAdres: string
+  afspraakDatum: Date
+  rol: 'adoptant' | 'asiel'
+}) {
+  const { AfspraakHerinnering } = await import('@/emails/AfspraakHerinnering')
+  const html = await render(
+    AfspraakHerinnering({
+      ontvangerNaam: naam,
+      dierNaam,
+      dierSoort,
+      asielNaam,
+      asielAdres,
+      afspraakDatum,
+      portaalUrl: rol === 'asiel' ? `${APP_URL}/admin/berichten` : `${APP_URL}/dashboard`,
+      rol,
+    })
+  )
+  return stuurEmail({
+    naar: email,
+    onderwerp: `⏰ Morgen: kennismaking met ${dierNaam} bij ${asielNaam}`,
+    html,
+  })
+}
+
+// ─── Nazorg emails (3-3-3 regel) ──────────────────────────────────────────────
+
+export async function stuurNazorgEmail({
+  adoptantEmail,
+  adoptantNaam,
+  dierNaam,
+  dierSoort,
+  fase,
+  aiTips,
+}: {
+  adoptantEmail: string
+  adoptantNaam: string
+  dierNaam: string
+  dierSoort: string
+  fase: 'dag3' | 'week3' | 'maand3'
+  aiTips: string[]
+}) {
+  const { NazorgEmail } = await import('@/emails/NazorgEmail')
+  const faseLabels = { dag3: 'Dag 3', week3: 'Week 3', maand3: 'Maand 3' }
+  const html = await render(
+    NazorgEmail({
+      adoptantNaam,
+      dierNaam,
+      dierSoort,
+      fase,
+      aiTips,
+      nazorgUrl: `${APP_URL}/nazorg`,
+    })
+  )
+  return stuurEmail({
+    naar: adoptantEmail,
+    onderwerp: `${faseLabels[fase]} met ${dierNaam} — hoe gaat het? 🐾`,
+    html,
+  })
+}
+
+// ─── Adoptie status update ────────────────────────────────────────────────────
+
+export async function stuurAdoptieStatusUpdate({
+  adoptantEmail,
+  adoptantNaam,
+  dierNaam,
+  isGoedgekeurd,
+}: {
+  adoptantEmail: string
+  adoptantNaam: string
+  dierNaam: string
+  isGoedgekeurd: boolean
+}) {
+  const html = `
+    <div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #ebebf0">
+      <div style="background:linear-gradient(135deg,#33335c,#1a1a3e);padding:28px 32px">
+        <p style="margin:0;font-size:20px;font-weight:800;color:#fff">🐾 PootGelukkig</p>
+      </div>
+      <div style="padding:32px">
+        <h2 style="color:#1a1a2e;font-size:20px;margin:0 0 12px">Update over jouw adoptie van ${dierNaam}</h2>
+        <p style="color:#555;font-size:14px;line-height:1.6;margin:0 0 24px">Hallo ${adoptantNaam},<br/><br/>
+          ${isGoedgekeurd
+            ? `Goed nieuws! Je adoptie van <strong>${dierNaam}</strong> is <strong style="color:#22c55e">goedgekeurd</strong>. Het asiel neemt snel contact met je op voor de overdracht.`
+            : `Je adoptie van <strong>${dierNaam}</strong> is helaas niet doorgegaan. Neem contact op met het asiel voor meer informatie.`}
+        </p>
+        <a href="${APP_URL}/dossier" style="display:inline-block;background:#f8aa25;color:#33335c;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:14px">
+          Bekijk je dossier →
+        </a>
+      </div>
     </div>`
+  return stuurEmail({
+    naar: adoptantEmail,
+    onderwerp: isGoedgekeurd ? `🎉 Adoptie van ${dierNaam} goedgekeurd!` : `Update over je adoptie van ${dierNaam}`,
+    html,
+  })
 }
