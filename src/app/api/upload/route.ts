@@ -32,19 +32,35 @@ export async function POST(request: NextRequest) {
 
   // Vercel Blob (productie)
   if (ECHTE_BLOB_TOKEN) {
-    const { put } = await import('@vercel/blob')
-    const blob = await put(`dieren/${bestandsnaam}`, file, { access: 'public' })
-    return NextResponse.json({ url: blob.url })
+    try {
+      const { put } = await import('@vercel/blob')
+      const blob = await put(`dieren/${bestandsnaam}`, file, { access: 'public' })
+      return NextResponse.json({ url: blob.url })
+    } catch (err) {
+      console.error('Vercel Blob upload mislukt:', err)
+      return NextResponse.json({ error: 'Foto upload mislukt (blob fout)' }, { status: 500 })
+    }
+  }
+
+  // Op Vercel zonder blob token: schrijven naar filesystem werkt niet
+  if (process.env.VERCEL) {
+    console.error('BLOB_READ_WRITE_TOKEN is niet ingesteld in Vercel environment variables')
+    return NextResponse.json({ error: 'Foto upload niet geconfigureerd — stel BLOB_READ_WRITE_TOKEN in' }, { status: 500 })
   }
 
   // Lokale opslag (development zonder Vercel Blob token)
-  const uploadDir = path.join(process.cwd(), 'public', 'dieren')
-  await fs.mkdir(uploadDir, { recursive: true })
+  try {
+    const uploadDir = path.join(process.cwd(), 'public', 'dieren')
+    await fs.mkdir(uploadDir, { recursive: true })
 
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-  await fs.writeFile(path.join(uploadDir, bestandsnaam), buffer)
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    await fs.writeFile(path.join(uploadDir, bestandsnaam), buffer)
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 8700}`
-  return NextResponse.json({ url: `${baseUrl}/dieren/${bestandsnaam}` })
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `http://localhost:${process.env.PORT ?? 8700}`
+    return NextResponse.json({ url: `${baseUrl}/dieren/${bestandsnaam}` })
+  } catch (err) {
+    console.error('Lokale upload mislukt:', err)
+    return NextResponse.json({ error: 'Foto upload mislukt (lokale opslag)' }, { status: 500 })
+  }
 }

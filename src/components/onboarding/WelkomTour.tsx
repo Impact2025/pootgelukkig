@@ -169,10 +169,10 @@ const ASIEL_STAPPEN: AsielStap[] = [
           { label: 'Aanvragen', waarde: '8', icon: '📬' },
           { label: 'Gesprekken', waarde: '12', icon: '💬' },
         ].map((s) => (
-          <div key={s.label} className="bg-white/8 border border-white/10 rounded-xl p-2.5 text-center">
+          <div key={s.label} className="bg-[#33335c]/[0.05] border border-[#33335c]/10 rounded-xl p-2.5 text-center">
             <div className="text-lg mb-1">{s.icon}</div>
-            <div className="text-base font-black text-white">{s.waarde}</div>
-            <div className="text-[9px] text-white/40 leading-tight">{s.label}</div>
+            <div className="text-base font-black text-[#33335c]">{s.waarde}</div>
+            <div className="text-[9px] text-[#33335c]/50 leading-tight">{s.label}</div>
           </div>
         ))}
       </div>
@@ -187,20 +187,20 @@ const ASIEL_STAPPEN: AsielStap[] = [
     titel: 'Voeg dieren toe',
     beschrijving: "Maak rijke profielen aan: foto's, gedragsprofiel en medisch paspoort. Hoe meer info, hoe beter de AI matcht.",
     preview: (
-      <div className="bg-white/8 border border-white/10 rounded-2xl p-3 w-full">
+      <div className="bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-2xl p-3 w-full">
         <div className="flex items-center gap-3">
-          <div className="size-12 rounded-xl bg-[#E2725B]/20 flex items-center justify-center text-2xl">🐕</div>
+          <div className="size-12 rounded-xl bg-[#33335c]/10 flex items-center justify-center text-2xl">🐕</div>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <div className="h-2 w-20 bg-white/20 rounded-full" />
-              <div className="h-2 w-8 bg-[#E2725B]/40 rounded-full" />
+              <div className="h-2 w-20 bg-[#33335c]/15 rounded-full" />
+              <div className="h-2 w-8 bg-[#f8aa25]/60 rounded-full" />
             </div>
-            <div className="h-1.5 w-24 bg-white/10 rounded-full" />
+            <div className="h-1.5 w-24 bg-[#33335c]/10 rounded-full" />
           </div>
         </div>
         <div className="flex gap-1.5 mt-2.5">
           {['Speels', 'Rustig', 'Kindvriendelijk'].map((t) => (
-            <span key={t} className="text-[9px] bg-white/8 border border-white/10 rounded-lg px-1.5 py-0.5 text-white/50">{t}</span>
+            <span key={t} className="text-[9px] bg-[#33335c]/[0.06] border border-[#33335c]/10 rounded-lg px-1.5 py-0.5 text-[#33335c]/50">{t}</span>
           ))}
         </div>
       </div>
@@ -220,10 +220,10 @@ const ASIEL_STAPPEN: AsielStap[] = [
           { naam: 'Sophie V.', dier: 'Buddy', status: 'Aangevraagd', dot: 'bg-amber-400' },
           { naam: 'Thomas G.', dier: 'Luna', status: 'Goedgekeurd', dot: 'bg-blue-400' },
         ].map((r) => (
-          <div key={r.naam} className="flex items-center gap-2.5 bg-white/8 border border-white/10 rounded-xl px-3 py-2">
+          <div key={r.naam} className="flex items-center gap-2.5 bg-[#33335c]/[0.04] border border-[#33335c]/10 rounded-xl px-3 py-2">
             <span className={`size-2 rounded-full flex-shrink-0 ${r.dot}`} />
-            <span className="text-xs text-white/70 flex-1">{r.naam} → <span className="text-white font-semibold">{r.dier}</span></span>
-            <span className="text-[9px] text-white/40">{r.status}</span>
+            <span className="text-xs text-[#33335c]/65 flex-1">{r.naam} → <span className="text-[#33335c] font-semibold">{r.dier}</span></span>
+            <span className="text-[9px] text-[#33335c]/40">{r.status}</span>
           </div>
         ))}
       </div>
@@ -240,16 +240,16 @@ const ASIEL_STAPPEN: AsielStap[] = [
     preview: (
       <div className="space-y-2 w-full">
         <div className="flex gap-2">
-          <div className="size-6 rounded-full bg-[#E2725B]/30 flex-shrink-0" />
-          <div className="bg-white/10 rounded-2xl rounded-tl-none px-3 py-2 text-[10px] text-white/70 max-w-[80%]">
+          <div className="size-6 rounded-full bg-[#f8aa25]/30 flex-shrink-0" />
+          <div className="bg-[#33335c]/[0.07] rounded-2xl rounded-tl-none px-3 py-2 text-[10px] text-[#33335c]/65 max-w-[80%]">
             Hoi! Is Buddy nog beschikbaar? 🐕
           </div>
         </div>
         <div className="flex gap-2 justify-end">
-          <div className="bg-[#E2725B]/20 border border-[#E2725B]/30 rounded-2xl rounded-tr-none px-3 py-2 text-[10px] text-white/70 max-w-[80%]">
+          <div className="bg-[#33335c]/10 border border-[#33335c]/15 rounded-2xl rounded-tr-none px-3 py-2 text-[10px] text-[#33335c]/65 max-w-[80%]">
             Ja! Kom gerust langs voor een kennismaking 😊
           </div>
-          <div className="size-6 rounded-full bg-[#33335c]/50 flex-shrink-0" />
+          <div className="size-6 rounded-full bg-[#33335c]/20 flex-shrink-0" />
         </div>
       </div>
     ),
@@ -268,13 +268,13 @@ const SIDEBAR_ITEMS = [
 
 function MiniSidebar({ actieveLabel }: { actieveLabel: string }) {
   return (
-    <div className="w-28 bg-white/5 border-r border-white/10 rounded-l-2xl flex flex-col py-3 gap-0.5 flex-shrink-0">
+    <div className="w-28 bg-[#33335c]/[0.04] border-r border-[#33335c]/10 rounded-l-2xl flex flex-col py-3 gap-0.5 flex-shrink-0">
       {/* Mini logo */}
-      <div className="flex items-center gap-1.5 px-3 pb-2 mb-1 border-b border-white/10">
+      <div className="flex items-center gap-1.5 px-3 pb-2 mb-1 border-b border-[#33335c]/10">
         <div className="size-5 rounded-md bg-[#33335c] flex items-center justify-center">
           <span className="material-symbols-outlined text-[#f8aa25]" style={{ fontSize: '0.65rem', fontVariationSettings: "'FILL' 1" }}>pets</span>
         </div>
-        <span className="text-[9px] font-bold text-white/60">Portaal</span>
+        <span className="text-[9px] font-bold text-[#33335c]/50">Portaal</span>
       </div>
       {SIDEBAR_ITEMS.map((item) => {
         const isActief = item.label === actieveLabel
@@ -283,13 +283,13 @@ function MiniSidebar({ actieveLabel }: { actieveLabel: string }) {
             key={item.label}
             className={`flex items-center gap-2 mx-2 px-2 py-2 rounded-lg transition-all duration-300 ${
               isActief
-                ? 'bg-[#E2725B]/20 border border-[#E2725B]/40'
+                ? 'bg-[#33335c]/10 border border-[#33335c]/25'
                 : 'opacity-30'
             }`}
           >
             {isActief && (
               <span
-                className="size-1.5 rounded-full bg-[#E2725B] flex-shrink-0"
+                className="size-1.5 rounded-full bg-[#f8aa25] flex-shrink-0"
                 style={{ animation: 'pulse 1.5s ease-in-out infinite' }}
               />
             )}
@@ -298,12 +298,12 @@ function MiniSidebar({ actieveLabel }: { actieveLabel: string }) {
               style={{
                 fontSize: '0.85rem',
                 fontVariationSettings: "'FILL' 1",
-                color: isActief ? '#E2725B' : 'rgba(255,255,255,0.4)',
+                color: isActief ? '#33335c' : 'rgba(51,53,92,0.35)',
               }}
             >
               {item.icon}
             </span>
-            <span className={`text-[9px] font-semibold leading-none ${isActief ? 'text-[#E2725B]' : 'text-white/30'}`}>
+            <span className={`text-[9px] font-semibold leading-none ${isActief ? 'text-[#33335c]' : 'text-[#33335c]/30'}`}>
               {item.label}
             </span>
           </div>
@@ -572,12 +572,12 @@ function AsielTour({
   naarStap, volgende, sluiten,
 }: AsielTourProps) {
   const stap = stappen[huidigeStap]
-  const accentKleur = '#E2725B'
+  const accentKleur = '#33335c'
 
   return (
     <div
       className={`fixed inset-0 z-[100] flex items-center justify-center transition-all duration-350 ${verlatend ? 'opacity-0' : 'opacity-100'}`}
-      style={{ background: 'rgba(30,24,24,0.80)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(200,210,230,0.60)', backdropFilter: 'blur(12px)' }}
       onClick={(e) => e.target === e.currentTarget && sluiten()}
     >
       <div
@@ -594,14 +594,14 @@ function AsielTour({
               onClick={() => naarStap(i)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
                 i === huidigeStap
-                  ? 'text-white border border-white/20'
-                  : 'text-white/30 hover:text-white/50'
+                  ? 'text-[#33335c] border border-[#33335c]/20'
+                  : 'text-[#33335c]/35 hover:text-[#33335c]/60'
               }`}
-              style={i === huidigeStap ? { background: `${accentKleur}25`, borderColor: `${accentKleur}50` } : {}}
+              style={i === huidigeStap ? { background: `${accentKleur}12`, borderColor: `${accentKleur}35` } : {}}
             >
               <span
                 className="material-symbols-outlined"
-                style={{ fontSize: '0.8rem', fontVariationSettings: "'FILL' 1", color: i === huidigeStap ? accentKleur : undefined }}
+                style={{ fontSize: '0.8rem', fontVariationSettings: "'FILL' 1", color: i === huidigeStap ? accentKleur : 'rgba(51,53,92,0.3)' }}
               >
                 {s.navIcon}
               </span>
@@ -612,8 +612,8 @@ function AsielTour({
 
         {/* Kaart met mini sidebar + content */}
         <div
-          className="flex rounded-3xl overflow-hidden shadow-2xl border border-white/10"
-          style={{ background: '#1a0f0e', width: '680px', maxWidth: '95vw' }}
+          className="flex rounded-3xl overflow-hidden shadow-xl border border-black/[0.06]"
+          style={{ background: '#ffffff', width: '680px', maxWidth: '95vw' }}
         >
           {/* Mini sidebar */}
           <MiniSidebar actieveLabel={stap.navLabel} />
@@ -629,7 +629,7 @@ function AsielTour({
               <div className="flex items-center gap-3">
                 <div
                   className="size-11 rounded-2xl flex items-center justify-center border flex-shrink-0"
-                  style={{ background: `${accentKleur}15`, borderColor: `${accentKleur}30`, boxShadow: `0 0 20px ${accentKleur}15` }}
+                  style={{ background: `${accentKleur}0d`, borderColor: `${accentKleur}25`, boxShadow: `0 0 20px ${accentKleur}10` }}
                 >
                   <span
                     className="material-symbols-outlined"
@@ -640,22 +640,22 @@ function AsielTour({
                 </div>
                 <div>
                   {huidigeStap === 0 && (
-                    <p className="text-xs font-bold mb-0.5" style={{ color: accentKleur }}>
+                    <p className="text-xs font-bold mb-0.5" style={{ color: '#f8aa25' }}>
                       Hoi {voornaam}!
                     </p>
                   )}
-                  <h2 className="text-lg font-extrabold text-white leading-tight">{stap.titel}</h2>
+                  <h2 className="text-lg font-extrabold text-[#33335c] leading-tight">{stap.titel}</h2>
                 </div>
               </div>
               <button
                 onClick={() => sluiten()}
-                className="text-white/20 hover:text-white/50 transition-colors ml-4 flex-shrink-0 mt-1"
+                className="text-[#33335c]/25 hover:text-[#33335c]/55 transition-colors ml-4 flex-shrink-0 mt-1"
               >
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>
 
-            <p className="text-white/55 text-sm leading-relaxed mb-5">{stap.beschrijving}</p>
+            <p className="text-[#33335c]/60 text-sm leading-relaxed mb-5">{stap.beschrijving}</p>
 
             {/* Preview */}
             {stap.preview && (
@@ -667,7 +667,7 @@ function AsielTour({
               {huidigeStap > 0 && (
                 <button
                   onClick={() => naarStap(huidigeStap - 1)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white/40 border border-white/10 hover:border-white/20 hover:text-white/60 transition-all"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#33335c]/40 border border-[#33335c]/10 hover:border-[#33335c]/20 hover:text-[#33335c]/60 transition-all"
                 >
                   ← Terug
                 </button>
@@ -678,7 +678,7 @@ function AsielTour({
                 style={{
                   background: accentKleur,
                   color: '#fff',
-                  boxShadow: `0 6px 20px ${accentKleur}35`,
+                  boxShadow: `0 4px 16px ${accentKleur}30`,
                 }}
               >
                 {isLaatste && stap.cta ? stap.cta.label : isLaatste ? '🎉 Aan de slag!' : `Volgende: ${stappen[huidigeStap + 1]?.navLabel} →`}
@@ -694,7 +694,7 @@ function AsielTour({
                   className="h-1 rounded-full transition-all duration-300"
                   style={{
                     width: i === huidigeStap ? '20px' : '6px',
-                    background: i <= huidigeStap ? accentKleur : 'rgba(255,255,255,0.15)',
+                    background: i <= huidigeStap ? accentKleur : 'rgba(51,53,92,0.12)',
                     opacity: i < huidigeStap ? 0.5 : 1,
                   }}
                 />
@@ -704,7 +704,7 @@ function AsielTour({
         </div>
 
         {/* Hint */}
-        <p className="text-center text-white/15 text-[10px] mt-4">
+        <p className="text-center text-[#33335c]/30 text-[10px] mt-4">
           Klik buiten de kaart om de tour te sluiten · Je kunt hem later terugvinden via Help
         </p>
       </div>
