@@ -9,6 +9,7 @@ interface Props {
   initLeeftijdMax: string
   initEnergie: string
   initRegio: string
+  initPostcode: string
   regios: string[]
 }
 
@@ -34,6 +35,7 @@ export default function ZoekenFilters({
   initLeeftijdMax,
   initEnergie,
   initRegio,
+  initPostcode,
   regios,
 }: Props) {
   const router = useRouter()
@@ -45,22 +47,24 @@ export default function ZoekenFilters({
   const [leeftijdMax, setLeeftijdMax] = useState(initLeeftijdMax)
   const [energie, setEnergie] = useState(initEnergie)
   const [regio, setRegio] = useState(initRegio)
-  const [toonGeavanceerd, setToonGeavanceerd] = useState(!!(initLeeftijdMax || initEnergie !== 'alles' || initRegio !== 'alles'))
+  const [postcode, setPostcode] = useState(initPostcode)
+  const [toonGeavanceerd, setToonGeavanceerd] = useState(!!(initLeeftijdMax || initEnergie !== 'alles' || initRegio !== 'alles' || initPostcode))
 
   const zoek = useCallback(
-    (overrides: Partial<{ q: string; soort: string; leeftijdMax: string; energie: string; regio: string }> = {}) => {
-      const huidig = { q, soort, leeftijdMax, energie, regio, ...overrides }
+    (overrides: Partial<{ q: string; soort: string; leeftijdMax: string; energie: string; regio: string; postcode: string }> = {}) => {
+      const huidig = { q, soort, leeftijdMax, energie, regio, postcode, ...overrides }
       const params = new URLSearchParams()
       if (huidig.q) params.set('q', huidig.q)
       if (huidig.soort !== 'alles') params.set('soort', huidig.soort)
       if (huidig.leeftijdMax) params.set('leeftijdMax', huidig.leeftijdMax)
       if (huidig.energie !== 'alles') params.set('energie', huidig.energie)
       if (huidig.regio !== 'alles') params.set('regio', huidig.regio)
+      if (huidig.postcode) params.set('postcode', huidig.postcode)
       startTransition(() => {
         router.push(`${pathname}?${params.toString()}`)
       })
     },
-    [q, soort, leeftijdMax, energie, regio, router, pathname]
+    [q, soort, leeftijdMax, energie, regio, postcode, router, pathname]
   )
 
   return (
@@ -160,29 +164,54 @@ export default function ZoekenFilters({
             </div>
           </div>
 
-          {/* Regio */}
-          {regios.length > 0 && (
-            <div>
-              <label className="text-[10px] text-white/40 font-bold uppercase tracking-wider block mb-1.5">
-                Regio
-              </label>
-              <select
-                value={regio}
-                onChange={(e) => {
-                  setRegio(e.target.value)
-                  zoek({ regio: e.target.value })
-                }}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none"
-              >
-                <option value="alles" className="bg-[#12122a]">Heel Nederland</option>
-                {regios.map((r) => (
-                  <option key={r} value={r} className="bg-[#12122a]">
-                    {r}
-                  </option>
-                ))}
-              </select>
+          {/* Locatie: postcode OF regio */}
+          <div>
+            <label className="text-[10px] text-white/40 font-bold uppercase tracking-wider block mb-1.5">
+              Locatie
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Postcode */}
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-white/30 text-sm">
+                  location_on
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={postcode}
+                  maxLength={4}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 4)
+                    setPostcode(val)
+                    if (val.length === 0 || val.length === 4) zoek({ postcode: val, regio: 'alles' })
+                  }}
+                  placeholder="1234"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder:text-white/25 outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Regio */}
+              {regios.length > 0 && (
+                <select
+                  value={regio}
+                  onChange={(e) => {
+                    setRegio(e.target.value)
+                    setPostcode('')
+                    zoek({ regio: e.target.value, postcode: '' })
+                  }}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none"
+                >
+                  <option value="alles" className="bg-[#12122a]">Provincie</option>
+                  {regios.map((r) => (
+                    <option key={r} value={r} className="bg-[#12122a]">
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
-          )}
+            <p className="text-white/20 text-[10px] mt-1.5">Vul 4 cijfers in voor postcode, of kies een provincie</p>
+          </div>
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { db } from '@/lib/db'
 import { dieren, asielen, favorieten } from '@/lib/db/schema'
-import { and, eq, lte } from 'drizzle-orm'
+import { and, eq, lte, like } from 'drizzle-orm'
 import BottomNav from '@/components/layout/BottomNav'
 import ZoekenFilters from './ZoekenFilters'
 import Link from 'next/link'
@@ -17,12 +17,13 @@ interface Props {
     leeftijdMax?: string
     energie?: string
     regio?: string
+    postcode?: string
   }>
 }
 
 export default async function ZoekenPage({ searchParams }: Props) {
   const params = await searchParams
-  const { q, soort, leeftijdMax, energie, regio } = params
+  const { q, soort, leeftijdMax, energie, regio, postcode } = params
 
   // Optioneel ingelogd — voor favoriet-knoppen
   const session = await auth()
@@ -44,6 +45,10 @@ export default async function ZoekenPage({ searchParams }: Props) {
 
   if (regio && regio !== 'alles') {
     filters.push(eq(asielen.regio, regio))
+  }
+
+  if (postcode && /^\d{4}$/.test(postcode)) {
+    filters.push(like(asielen.postcode, `${postcode}%`))
   }
 
   let resultaten = await db
@@ -106,6 +111,7 @@ export default async function ZoekenPage({ searchParams }: Props) {
           initLeeftijdMax={leeftijdMax ?? ''}
           initEnergie={energie ?? 'alles'}
           initRegio={regio ?? 'alles'}
+          initPostcode={postcode ?? ''}
           regios={regios.map((r) => r.regio)}
         />
       </nav>
