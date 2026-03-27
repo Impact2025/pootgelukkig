@@ -38,9 +38,11 @@ export default async function ZoekenPage({ searchParams }: Props) {
   ])
   const favorietIds = new Set(userFavorieten.map((f) => f.dierId))
 
-  // Gebruik profielpostcode als default als er geen filter in de URL staat
+  // Profielpostcode alleen als UI-hint tonen, niet automatisch als filter toepassen
   const gebruikerPostcode = userRow[0]?.postcode?.replace(/\D/g, '').slice(0, 4) ?? ''
-  const effectiefPostcode = postcode ?? (regio ? '' : gebruikerPostcode)
+  const uiPostcode = postcode ?? (regio ? '' : gebruikerPostcode)
+  // Alleen filteren op postcode als de gebruiker dit expliciet heeft ingevuld (in URL)
+  const filterPostcode = postcode ?? ''
 
   const filters = [eq(dieren.status, 'beschikbaar')]
 
@@ -56,8 +58,8 @@ export default async function ZoekenPage({ searchParams }: Props) {
     filters.push(eq(asielen.regio, regio))
   }
 
-  if (effectiefPostcode && /^\d{4}$/.test(effectiefPostcode)) {
-    filters.push(like(asielen.postcode, `${effectiefPostcode}%`))
+  if (filterPostcode && /^\d{4}$/.test(filterPostcode)) {
+    filters.push(like(asielen.postcode, `${filterPostcode}%`))
   }
 
   let resultaten = await db
@@ -120,7 +122,7 @@ export default async function ZoekenPage({ searchParams }: Props) {
           initLeeftijdMax={leeftijdMax ?? ''}
           initEnergie={energie ?? 'alles'}
           initRegio={regio ?? 'alles'}
-          initPostcode={effectiefPostcode}
+          initPostcode={uiPostcode}
           regios={regios.map((r) => r.regio)}
         />
       </nav>
