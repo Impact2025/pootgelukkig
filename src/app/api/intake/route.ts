@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { and, desc, eq, gt } from 'drizzle-orm'
+import { and, desc, eq, gt, inArray, isNotNull } from 'drizzle-orm'
 import { auth } from '@/auth'
 import { verwerkIntakeAntwoorden } from '@/lib/ai/intake'
-import { berekenFallbackScore, genereerMatchAnalyse, hashProfiel, type AdopterProfiel, type DierProfiel } from '@/lib/ai/matching'
+import { berekenMatchesBatch, hashProfiel, type AdopterProfiel } from '@/lib/ai/matching'
 import { db } from '@/lib/db'
 import { adopterProfielen, dieren, matches } from '@/lib/db/schema'
 import { checkRateLimit, getRateLimitKey } from '@/lib/rate-limit'
@@ -112,9 +112,8 @@ async function haalSuccesContext(
     .innerJoin(dieren, eq(matches.dierId, dieren.id))
     .where(
       and(
-        eq(matches.userId, relevanteProfielenSubquery as unknown as number),
-        // Alleen matches met geregistreerde uitkomst
-        gt(matches.uitkomstOp, new Date(0))
+        inArray(matches.userId, relevanteProfielenSubquery),
+        isNotNull(matches.uitkomstOp)
       )
     )
 
@@ -210,29 +209,30 @@ export async function POST(request: NextRequest) {
 
       const beschikbareDieren = await db.select().from(dieren).where(eq(dieren.status, 'beschikbaar'))
 
-      // Matches berekenen via snelle rule-based scoring (geen AI-calls)
-      const matchResultaten = beschikbareDieren.map((dier) => {
-        try {
-          return berekenFallbackScore(profiel, {
-            id: dier.id,
-            naam: dier.naam,
-            soort: dier.soort,
-            ras: dier.ras ?? null,
-            leeftijdJaren: dier.leeftijdJaren ?? null,
-            gewichtKg: dier.gewichtKg ?? null,
-            gedragsProfiel: dier.gedragsProfiel ?? null,
-            medischPaspoort: dier.medischPaspoort ?? null,
-          })
-        } catch {
-          return null
-        }
-      })
+      // Laad historische succescontext voor de AI (zachte indicator)
+      const historischeContext = await haalSuccesContext(profiel)
 
-      // Opslaan: oude matches weg, nieuwe erin
+      // Wereldklasse AI batch matching: één Claude-call scoort alle dieren tegelijk
+      const matchResultaten = await berekenMatchesBatch(
+        profiel,
+        beschikbareDieren.map((dier) => ({
+          id: dier.id,
+          naam: dier.naam,
+          soort: dier.soort,
+          ras: dier.ras ?? null,
+          leeftijdJaren: dier.leeftijdJaren ?? null,
+          gewichtKg: dier.gewichtKg ?? null,
+          gedragsProfiel: dier.gedragsProfiel ?? null,
+          medischPaspoort: dier.medischPaspoort ?? null,
+        })),
+        historischeContext
+      )
+
+      // Opslaan: oude matches weg, nieuwe erin (met AI-gegenereerde analyse voor elk dier)
       await db.delete(matches).where(eq(matches.userId, userId))
 
       const teOpslaan = matchResultaten
-        .filter((m): m is NonNullable<typeof m> => m !== null && m.score > 0)
+        .filter((m) => m.score > 0)
         .map((m) => ({
           userId,
           dierId: m.dierId,
@@ -250,34 +250,6 @@ export async function POST(request: NextRequest) {
       if (teOpslaan.length > 0) {
         await db.insert(matches).values(teOpslaan)
       }
-
-      // Genereer rijke AI-motivatietekst voor de top 3 matches (parallel)
-      const top3 = [...teOpslaan].sort((a, b) => b.score - a.score).slice(0, 3)
-
-      await Promise.allSettled(
-        top3.map(async (match) => {
-          const dier = beschikbareDieren.find((d) => d.id === match.dierId)
-          if (!dier) return
-
-          const dierProfiel: DierProfiel = {
-            id: dier.id,
-            naam: dier.naam,
-            soort: dier.soort,
-            ras: dier.ras ?? null,
-            leeftijdJaren: dier.leeftijdJaren ?? null,
-            gewichtKg: dier.gewichtKg ?? null,
-            gedragsProfiel: dier.gedragsProfiel ?? null,
-            medischPaspoort: dier.medischPaspoort ?? null,
-          }
-
-          const rijkeTekst = await genereerMatchAnalyse(profiel, dierProfiel, match.score)
-
-          await db
-            .update(matches)
-            .set({ analyseTekst: rijkeTekst })
-            .where(and(eq(matches.userId, userId), eq(matches.dierId, match.dierId)))
-        })
-      )
     }
 
     return NextResponse.json({

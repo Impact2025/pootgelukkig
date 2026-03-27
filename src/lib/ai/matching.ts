@@ -276,6 +276,199 @@ export async function berekenMatch(
   }
 }
 
+// =================== BATCH AI MATCHING ===================
+
+// Maximaal aantal dieren per AI-batch; bij grotere catalogi pre-filteren op rule-based score
+const MAX_BATCH_GROOTTE = 30
+
+function bouwBatchMatchingPrompt(
+  adopter: AdopterProfiel,
+  dieren: DierProfiel[],
+  historischeContext?: Record<string, string>
+): string {
+  const thuisUren = 24 - adopter.werkUrenPerDag
+  const kinderContext =
+    adopter.aantalKinderen > 0
+      ? `${adopter.aantalKinderen} kind(eren), jongste: ${adopter.jongsteKindLeeftijd ?? 'onbekend'} jaar`
+      : 'geen kinderen'
+  const woningContext = [
+    adopter.woningType ?? 'onbekend',
+    adopter.heeftTuin ? `tuin (${adopter.tuinOppervlakte ?? 'normaal'})` : 'geen tuin',
+  ].join(', ')
+
+  const dierenLijst = dieren
+    .map((dier) => {
+      const g = dier.gedragsProfiel
+      const m = dier.medischPaspoort
+      return (
+        `ID:${dier.id} ${dier.naam} (${dier.soort}${dier.ras ? `, ${dier.ras}` : ''}, ` +
+        `${dier.leeftijdJaren ?? '?'}jr${dier.gewichtKg ? `, ${dier.gewichtKg}kg` : ''})\n` +
+        `  energie:${g?.energieNiveau ?? '?'} | alleenThuis:${g?.alleenThuis ?? '?'} | ` +
+        `kindvriendelijk:${g?.kindvriendelijk ?? '?'} | trainbaarheid:${g?.trainbaarheid ?? '?'}\n` +
+        `  medisch: gevaccineerd=${m?.gevaccineerd ?? '?'}, aandoeningen=${m?.allergieën?.join(', ') || 'geen'}`
+      )
+    })
+    .join('\n\n')
+
+  let historisch = ''
+  if (historischeContext && Object.keys(historischeContext).length > 0) {
+    historisch =
+      '\n\nHISTORISCHE SUCCESDATA (zachte indicator):\n' +
+      Object.values(historischeContext).join('\n')
+  }
+
+  return `Analyseer de compatibiliteit van de adoptant met alle onderstaande dieren.
+
+ADOPTANT:
+- Woning: ${woningContext}
+- Bewoners: ${adopter.aantalVolwassenen} volwassene(n), ${kinderContext}
+- Activiteit: ${adopter.activiteitNiveau ?? 'onbekend'}
+- Thuis: ~${thuisUren} uur/dag (werkt ${adopter.werkUrenPerDag} uur/dag)
+- Andere dieren: ${adopter.andereDieren.join(', ') || 'geen'}
+- Ervaring: ${adopter.ervaringNiveau ?? 'onbekend'}
+- Budget dierenarts: ${adopter.budgetDierenarts ?? 'normaal'}
+- Leeftijdvoorkeur dier: ${adopter.leeftijdVoorkeur ?? 'maakt niet uit'}${historisch}
+
+DIEREN (${dieren.length} stuks — score elk afzonderlijk):
+${dierenLijst}
+
+SCORINGSRUBRIC (pas strikt toe voor elk dier):
+
+woning_score: appartement+hond>20kg+geen tuin→15-35 | appartement+hond+energie hoog/zeer_hoog+geen tuin→25-45 | appartement+hond+energie laag/normaal+geen tuin→50-70 | appartement+kat/konijn→70-90 | huis+tuin+hond→75-95 | boerderij+actief dier→90-100
+energie_score: exact match→90-100 | 1 niveau verschil→65-82 | 2 niveaus verschil→35-60 | 3 niveaus verschil→10-35 (niveaus: laag=1, normaal=2, hoog=3, zeer_hoog=4)
+gezin_score: kinderen<6jr+niet kindvriendelijk→0-15 | kinderen<6jr+kindvriendelijk→82-100 | kinderen 6-12jr+niet kindvriendelijk→20-45 | geen kinderen→75-90
+alleen_thuis_score: ≥8u+slecht→10-30 | ≥8u+matig→40-60 | ≥8u+goed→65-80 | 4-7u+matig/goed→70-85 | 0-3u thuiswerker→85-100
+ervaring_score: onervaren+trainbaar laag+energie hoog/zeer_hoog→20-45 | onervaren+trainbaar normaal/hoog+energie laag/normaal→70-88 | gemiddeld/veel ervaring→75-100
+budget_score: beperkt+dier≥10jr→45-65 | beperkt+aandoeningen→35-60 | beperkt+jong gezond dier→75-90 | normaal/ruim→82-100
+OVERALL = energie×0.25 + gezin×0.22 + alleenThuis×0.20 + woning×0.15 + ervaring×0.13 + budget×0.05 (afronden op geheel getal)
+LEEFTIJDBONUS: als leeftijdvoorkeur overeenkomt met de werkelijke leeftijdscategorie van het dier → voeg max 5 punten toe aan overall
+
+ANALYSE per dier: 1-2 zinnen warm, persoonlijk Nederlands. Noem het dier bij naam. Benoem de sterkste reden voor de score en eventueel één aandachtspunt.
+
+Returneer UITSLUITEND een JSON array, geen markdown, geen uitleg:
+[{"dierId":<id>,"score":<0-100>,"analyse":"<tekst>","woning_score":<0-100>,"energie_score":<0-100>,"gezin_score":<0-100>,"ervaring_score":<0-100>,"alleen_thuis_score":<0-100>,"budget_score":<0-100>},...]`
+}
+
+function parseerBatchJsonAntwoord(tekst: string): Map<number, {
+  score: number
+  analyse: string
+  woning_score: number
+  energie_score: number
+  gezin_score: number
+  ervaring_score: number
+  alleen_thuis_score: number
+  budget_score: number
+}> {
+  const start = tekst.indexOf('[')
+  const end = tekst.lastIndexOf(']')
+  if (start === -1 || end === -1) throw new Error('Geen JSON array gevonden in AI antwoord')
+
+  type BatchItem = {
+    dierId: number
+    score: number
+    analyse: string
+    woning_score: number
+    energie_score: number
+    gezin_score: number
+    ervaring_score: number
+    alleen_thuis_score: number
+    budget_score: number
+  }
+
+  const parsed = JSON.parse(tekst.slice(start, end + 1)) as BatchItem[]
+
+  const map = new Map<number, BatchItem>()
+  for (const r of parsed) {
+    if (typeof r.dierId === 'number') {
+      map.set(r.dierId, r)
+    }
+  }
+  return map
+}
+
+/**
+ * Scoort alle dieren in één AI-batch call (wereldklasse matching).
+ * - Past harde filters toe vóór de AI-call
+ * - Stuurt alle geschikte dieren in één prompt naar Claude
+ * - Valt terug op rule-based scoring bij AI-fouten of gemiste dieren
+ * - Pre-filtert op rule-based score als de catalogus groter is dan MAX_BATCH_GROOTTE
+ */
+export async function berekenMatchesBatch(
+  adopter: AdopterProfiel,
+  dieren: DierProfiel[],
+  historischeContext?: Record<string, string>
+): Promise<MatchResultaat[]> {
+  // Stap 1: Harde filters — meteen afwijzen
+  const gefilterd: DierProfiel[] = []
+  const hardAfgewezen: MatchResultaat[] = []
+
+  for (const dier of dieren) {
+    const reden = hardFilter(adopter, dier)
+    if (reden) {
+      hardAfgewezen.push(nulScore(dier.id, reden))
+    } else {
+      gefilterd.push(dier)
+    }
+  }
+
+  if (gefilterd.length === 0) return hardAfgewezen
+
+  // Stap 2: Bij grote catalogi: pre-filter op rule-based score zodat de batch beheersbaar blijft
+  let teScorenDieren = gefilterd
+  let ruleBasedOverschot: MatchResultaat[] = []
+
+  if (gefilterd.length > MAX_BATCH_GROOTTE) {
+    const voorgescoord = gefilterd
+      .map((d) => ({ dier: d, fallback: berekenFallbackScore(adopter, d) }))
+      .sort((a, b) => b.fallback.score - a.fallback.score)
+
+    teScorenDieren = voorgescoord.slice(0, MAX_BATCH_GROOTTE).map((x) => x.dier)
+    ruleBasedOverschot = voorgescoord.slice(MAX_BATCH_GROOTTE).map((x) => x.fallback)
+  }
+
+  // Stap 3: Eén AI-batch call voor alle geselecteerde dieren
+  const prompt = bouwBatchMatchingPrompt(adopter, teScorenDieren, historischeContext)
+
+  try {
+    const tekst = await chatCompletion(
+      [
+        { role: 'system', content: MATCHING_SYSTEEM_PROMPT },
+        { role: 'user', content: prompt },
+      ],
+      { maxTokens: 4000 }
+    )
+
+    const aiMap = parseerBatchJsonAntwoord(tekst)
+
+    // Gebruik AI-scores; val terug op rule-based bij dieren die AI overslaat
+    const aiResultaten: MatchResultaat[] = teScorenDieren.map((dier) => {
+      const r = aiMap.get(dier.id)
+      if (r) {
+        return {
+          dierId: dier.id,
+          score: clamp(r.score),
+          analyseTekst:
+            r.analyse ??
+            `${dier.naam} heeft een compatibiliteitsscore van ${clamp(r.score)}%.`,
+          woningScore: clamp(r.woning_score),
+          energieScore: clamp(r.energie_score),
+          gezinScore: clamp(r.gezin_score),
+          ervaringScore: clamp(r.ervaring_score),
+          alleenThuisScore: clamp(r.alleen_thuis_score),
+          budgetScore: clamp(r.budget_score),
+        }
+      }
+      return berekenFallbackScore(adopter, dier)
+    })
+
+    return [...aiResultaten, ...ruleBasedOverschot, ...hardAfgewezen]
+  } catch (error) {
+    console.error('Batch AI matching fout, fallback naar rule-based:', error)
+    const fallback = teScorenDieren.map((d) => berekenFallbackScore(adopter, d))
+    return [...fallback, ...ruleBasedOverschot, ...hardAfgewezen]
+  }
+}
+
 // =================== FALLBACK ===================
 
 const ENERGIE_MAP: Record<string, number> = { laag: 1, normaal: 2, hoog: 3, zeer_hoog: 4 }
