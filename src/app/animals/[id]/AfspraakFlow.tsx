@@ -319,7 +319,7 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
       {/* ── Afspraak Modal ──────────────────────────────────────────────────── */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-[70] flex items-end justify-center"
+          className="fixed inset-0 z-[70] flex items-end justify-center pb-[68px]"
           style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
           onClick={(e) => { if (e.target === e.currentTarget) setModalOpen(false) }}
         >
