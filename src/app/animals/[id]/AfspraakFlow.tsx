@@ -193,9 +193,10 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
           <>
             <button
               onClick={openModal}
-              className="w-full bg-primary text-bg-dark font-extrabold py-4 rounded-2xl shadow-2xl shadow-primary/30 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-base"
+              className="w-full bg-primary text-bg-dark font-extrabold py-[18px] rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 text-lg hover:brightness-110"
+              style={{ boxShadow: '0 0 0 4px rgba(19,236,19,0.12), 0 0 40px rgba(19,236,19,0.25), 0 8px 24px rgba(0,0,0,0.5)' }}
             >
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>calendar_add_on</span>
+              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>calendar_add_on</span>
               Plan een afspraak
             </button>
             {localAfspraak?.status === 'geannuleerd' && (
@@ -356,58 +357,68 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
 
             {/* Stap 1 — Type kiezen */}
             {stap === 1 && (
-              <div className="px-6 py-6 space-y-4 overflow-y-auto">
-                <div>
-                  <h3 className="text-white font-extrabold text-xl mb-1">Wat voor afspraak?</h3>
-                  <p className="text-white/40 text-sm">Kies hoe je {dierNaam} wilt leren kennen</p>
+              <div className="px-6 py-6 space-y-5 overflow-y-auto">
+                {/* Hero heading */}
+                <div className="text-center pb-1">
+                  <div className="size-14 rounded-2xl bg-primary/15 flex items-center justify-center mx-auto mb-4">
+                    <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+                  </div>
+                  <h3 className="text-white font-extrabold text-2xl leading-tight mb-2">
+                    Hoe wil je<br />{dierNaam} ontmoeten?
+                  </h3>
+                  <p className="text-white/40 text-sm">Kies het type afspraak dat bij jou past</p>
                 </div>
-                <div className="space-y-3 pt-1">
-                  {[
-                    {
-                      waarde: 'kennismaking' as AfspraakType,
-                      icon: 'home_work',
-                      titel: 'Kennismakingsbezoek',
-                      beschrijving: 'Ik bezoek het dier bij het asiel. De meest gangbare eerste stap.',
-                      aanbevolen: true,
-                    },
-                    {
-                      waarde: 'thuischeck' as AfspraakType,
-                      icon: 'house',
-                      titel: 'Thuischeck',
-                      beschrijving: 'Het asiel bezoekt mijn woning. Handig om te zien of de omgeving past.',
-                      aanbevolen: false,
-                    },
-                  ].map((optie) => (
-                    <button
-                      key={optie.waarde}
-                      onClick={() => { setType(optie.waarde); setStap(2) }}
-                      className={`w-full text-left p-5 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                        type === optie.waarde
-                          ? 'border-primary bg-primary/10'
-                          : 'border-white/8 bg-white/4 hover:border-white/20'
-                      }`}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="size-12 rounded-2xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-                          <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                            {optie.icon}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-white font-bold text-sm">{optie.titel}</p>
-                            {optie.aanbevolen && (
-                              <span className="text-[10px] font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-full">
-                                Aanbevolen
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-white/50 text-xs mt-1 leading-relaxed">{optie.beschrijving}</p>
+
+                <div className="space-y-3">
+                  {/* Optie 1: Kennismakingsbezoek */}
+                  <button
+                    onClick={() => { setType('kennismaking'); setStap(2) }}
+                    className="w-full text-left p-5 rounded-2xl border-2 border-primary/40 bg-primary/8 active:scale-[0.98] transition-all relative overflow-hidden"
+                  >
+                    <span className="absolute top-3 right-3 text-[10px] font-extrabold text-bg-dark bg-primary px-2.5 py-1 rounded-full">
+                      Meest gekozen
+                    </span>
+                    <div className="flex items-start gap-4">
+                      <div className="size-14 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>home_work</span>
+                      </div>
+                      <div className="flex-1 pr-14">
+                        <p className="text-white font-extrabold text-base mb-1">Kennismakingsbezoek</p>
+                        <p className="text-white/55 text-sm leading-relaxed mb-3">
+                          Jij bezoekt {dierNaam} in het asiel. Ontmoet elkaar in een vertrouwde omgeving.
+                        </p>
+                        <div className="flex items-center gap-1.5 text-primary text-xs font-bold">
+                          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>directions_walk</span>
+                          Jij gaat naar het asiel
                         </div>
                       </div>
-                    </button>
-                  ))}
+                    </div>
+                  </button>
+
+                  {/* Optie 2: Thuischeck */}
+                  <button
+                    onClick={() => { setType('thuischeck'); setStap(2) }}
+                    className="w-full text-left p-5 rounded-2xl border-2 border-white/10 bg-white/4 active:scale-[0.98] transition-all hover:border-white/20"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="size-14 rounded-2xl bg-white/8 flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-white/60 text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>house</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-extrabold text-base mb-1">Thuischeck</p>
+                        <p className="text-white/55 text-sm leading-relaxed mb-3">
+                          Een asielmedewerker bezoekt jouw woning om te zien of de omgeving past.
+                        </p>
+                        <div className="flex items-center gap-1.5 text-white/40 text-xs font-bold">
+                          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
+                          Asiel komt naar jou
+                        </div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
+
+                <p className="text-center text-white/25 text-xs">Je kiest daarna nog een datum en tijdstip</p>
               </div>
             )}
 
