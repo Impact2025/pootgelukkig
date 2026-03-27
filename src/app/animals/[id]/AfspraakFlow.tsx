@@ -207,7 +207,7 @@ export default function AfspraakFlow({ dierId, dierNaam, asielId, afspraak, adop
 
         {/* Aangevraagd → status card */}
         {localAfspraak?.status === 'aangevraagd' && (
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4">
+          <div className="bg-[#1a1200] border border-amber-500/30 rounded-2xl p-4">
             <div className="flex items-start gap-3">
               <span className="material-symbols-outlined text-amber-400 text-xl mt-0.5 flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
                 pending
