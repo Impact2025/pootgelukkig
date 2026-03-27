@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { db } from '@/lib/db'
-import { dieren, asielen, favorieten } from '@/lib/db/schema'
+import { dieren, asielen, favorieten, users } from '@/lib/db/schema'
 import { and, eq, lte, like } from 'drizzle-orm'
 import BottomNav from '@/components/layout/BottomNav'
 import ZoekenFilters from './ZoekenFilters'
@@ -25,13 +25,22 @@ export default async function ZoekenPage({ searchParams }: Props) {
   const params = await searchParams
   const { q, soort, leeftijdMax, energie, regio, postcode } = params
 
-  // Optioneel ingelogd — voor favoriet-knoppen
+  // Optioneel ingelogd — voor favoriet-knoppen en postcode default
   const session = await auth()
   const userId = session?.user ? parseInt(session.user.id) : null
-  const userFavorieten = userId
-    ? await db.select({ dierId: favorieten.dierId }).from(favorieten).where(eq(favorieten.userId, userId))
-    : []
+  const [userFavorieten, userRow] = await Promise.all([
+    userId
+      ? db.select({ dierId: favorieten.dierId }).from(favorieten).where(eq(favorieten.userId, userId))
+      : Promise.resolve([]),
+    userId
+      ? db.select({ postcode: users.postcode }).from(users).where(eq(users.id, userId)).limit(1)
+      : Promise.resolve([]),
+  ])
   const favorietIds = new Set(userFavorieten.map((f) => f.dierId))
+
+  // Gebruik profielpostcode als default als er geen filter in de URL staat
+  const gebruikerPostcode = userRow[0]?.postcode?.replace(/\D/g, '').slice(0, 4) ?? ''
+  const effectiefPostcode = postcode ?? (regio ? '' : gebruikerPostcode)
 
   const filters = [eq(dieren.status, 'beschikbaar')]
 
@@ -47,8 +56,8 @@ export default async function ZoekenPage({ searchParams }: Props) {
     filters.push(eq(asielen.regio, regio))
   }
 
-  if (postcode && /^\d{4}$/.test(postcode)) {
-    filters.push(like(asielen.postcode, `${postcode}%`))
+  if (effectiefPostcode && /^\d{4}$/.test(effectiefPostcode)) {
+    filters.push(like(asielen.postcode, `${effectiefPostcode}%`))
   }
 
   let resultaten = await db
@@ -111,7 +120,7 @@ export default async function ZoekenPage({ searchParams }: Props) {
           initLeeftijdMax={leeftijdMax ?? ''}
           initEnergie={energie ?? 'alles'}
           initRegio={regio ?? 'alles'}
-          initPostcode={postcode ?? ''}
+          initPostcode={effectiefPostcode}
           regios={regios.map((r) => r.regio)}
         />
       </nav>
