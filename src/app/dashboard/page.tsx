@@ -7,7 +7,6 @@ import { eq, desc } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import BottomNav from '@/components/layout/BottomNav'
 import MatchesGrid from './MatchesGrid'
-import WelkomTour from '@/components/onboarding/WelkomTour'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -90,7 +89,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="mobile-container bg-bg-dark">
-      <WelkomTour naam={session.user.name ?? 'daar'} rol={session.user.rol} />
 
       {/* Navigatie */}
       <nav className="sticky top-0 z-50 ios-blur border-b border-white/10 px-4 py-4 flex items-center justify-between bg-bg-dark/80">
