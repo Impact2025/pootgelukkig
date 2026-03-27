@@ -6,6 +6,7 @@ import { signOut } from 'next-auth/react'
 
 const navItems = [
   { href: '/admin', icon: 'grid_view', label: 'Dashboard', exact: true },
+  { href: '/admin/copilot', icon: 'auto_awesome', label: 'AI Copilot', highlight: true },
   { href: '/admin/dieren', icon: 'pets', label: 'Dieren' },
   { href: '/admin/adopties', icon: 'favorite', label: 'Adoptie' },
   { href: '/admin/afspraken', icon: 'calendar_month', label: 'Afspraken' },
@@ -79,12 +80,17 @@ export default function AdminSidebar({
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 active
                   ? 'bg-[#33335c] text-white shadow-md shadow-[#33335c]/20'
+                  : item.highlight
+                  ? 'bg-[#f8aa25]/10 text-[#33335c] hover:bg-[#f8aa25]/20'
                   : 'text-[#33335c]/50 hover:bg-gray-50 hover:text-[#33335c]'
               }`}
             >
               <span
                 className="material-symbols-outlined text-xl flex-shrink-0"
-                style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
+                style={{
+                  fontVariationSettings: active || item.highlight ? "'FILL' 1" : "'FILL' 0",
+                  color: !active && item.highlight ? '#f8aa25' : undefined,
+                }}
               >
                 {item.icon}
               </span>
