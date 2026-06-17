@@ -1,0 +1,1990 @@
+{
+  "id": "37b95f32-2263-4adf-a7dd-2ffa467295ae",
+  "prevId": "cb5d15f8-4672-4578-891f-ca4f31936db8",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.adopter_profielen": {
+      "name": "adopter_profielen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woning_type": {
+          "name": "woning_type",
+          "type": "woning_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heeft_tuin": {
+          "name": "heeft_tuin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "tuin_oppervlakte": {
+          "name": "tuin_oppervlakte",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activiteit_niveau": {
+          "name": "activiteit_niveau",
+          "type": "activiteit_niveau",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aantal_volwassenen": {
+          "name": "aantal_volwassenen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "aantal_kinderen": {
+          "name": "aantal_kinderen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "jongste_kind_leeftijd": {
+          "name": "jongste_kind_leeftijd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "andere_dieren": {
+          "name": "andere_dieren",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "werk_uren_per_dag": {
+          "name": "werk_uren_per_dag",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 8
+        },
+        "ervaring_niveau": {
+          "name": "ervaring_niveau",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budget_dierenarts": {
+          "name": "budget_dierenarts",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "allergieën": {
+          "name": "allergieën",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "diersoort_voorkeur": {
+          "name": "diersoort_voorkeur",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "leeftijd_voorkeur": {
+          "name": "leeftijd_voorkeur",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extra_wensen": {
+          "name": "extra_wensen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profiel_hash": {
+          "name": "profiel_hash",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "adopter_profielen_user_id_users_id_fk": {
+          "name": "adopter_profielen_user_id_users_id_fk",
+          "tableFrom": "adopter_profielen",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.adopties": {
+      "name": "adopties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "adoptie_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangevraagd'"
+        },
+        "adoptie_datum": {
+          "name": "adoptie_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "overeenkomst_url": {
+          "name": "overeenkomst_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ir_registratie_url": {
+          "name": "ir_registratie_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verzekering_maatschappij": {
+          "name": "verzekering_maatschappij",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verzekering_polisnummer": {
+          "name": "verzekering_polisnummer",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangevraagd_op": {
+          "name": "aangevraagd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "adopties_user_id_users_id_fk": {
+          "name": "adopties_user_id_users_id_fk",
+          "tableFrom": "adopties",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "adopties_dier_id_dieren_id_fk": {
+          "name": "adopties_dier_id_dieren_id_fk",
+          "tableFrom": "adopties",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "adopties_asiel_id_asielen_id_fk": {
+          "name": "adopties_asiel_id_asielen_id_fk",
+          "tableFrom": "adopties",
+          "tableTo": "asielen",
+          "columnsFrom": [
+            "asiel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.afspraken": {
+      "name": "afspraken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "afspraak_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'kennismaking'"
+        },
+        "status": {
+          "name": "status",
+          "type": "afspraak_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangevraagd'"
+        },
+        "voorkeur_datum": {
+          "name": "voorkeur_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "voorkeur_tijdslot": {
+          "name": "voorkeur_tijdslot",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bevestigde_datum": {
+          "name": "bevestigde_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bevestigd_tijdstip": {
+          "name": "bevestigd_tijdstip",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notitie_adoptant": {
+          "name": "notitie_adoptant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notitie_asiel": {
+          "name": "notitie_asiel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "afspraken_user_id_users_id_fk": {
+          "name": "afspraken_user_id_users_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "afspraken_dier_id_dieren_id_fk": {
+          "name": "afspraken_dier_id_dieren_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "afspraken_asiel_id_asielen_id_fk": {
+          "name": "afspraken_asiel_id_asielen_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "asielen",
+          "columnsFrom": [
+            "asiel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.asielen": {
+      "name": "asielen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "regio": {
+          "name": "regio",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "adres": {
+          "name": "adres",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postcode": {
+          "name": "postcode",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "website": {
+          "name": "website",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "bron": {
+          "name": "bron",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'handmatig'"
+        },
+        "werving_status": {
+          "name": "werving_status",
+          "type": "werving_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangesloten'"
+        },
+        "uitnodiging_verstuurd_op": {
+          "name": "uitnodiging_verstuurd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "openingstijden": {
+          "name": "openingstijden",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_media": {
+          "name": "social_media",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "asiel_config": {
+          "name": "asiel_config",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.berichten": {
+      "name": "berichten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "gesprek_id": {
+          "name": "gesprek_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verzender_type": {
+          "name": "verzender_type",
+          "type": "bericht_verzender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verzender_id": {
+          "name": "verzender_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inhoud": {
+          "name": "inhoud",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gelezen": {
+          "name": "gelezen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "verstuurd_op": {
+          "name": "verstuurd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "berichten_gesprek_id_gesprekken_id_fk": {
+          "name": "berichten_gesprek_id_gesprekken_id_fk",
+          "tableFrom": "berichten",
+          "tableTo": "gesprekken",
+          "columnsFrom": [
+            "gesprek_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dieren": {
+      "name": "dieren",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "soort": {
+          "name": "soort",
+          "type": "animal_species",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ras": {
+          "name": "ras",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leeftijd_jaren": {
+          "name": "leeftijd_jaren",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leeftijd_maanden": {
+          "name": "leeftijd_maanden",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geslacht": {
+          "name": "geslacht",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gewicht_kg": {
+          "name": "gewicht_kg",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kleur": {
+          "name": "kleur",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verhaal": {
+          "name": "verhaal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "animal_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'beschikbaar'"
+        },
+        "hoofd_foto_url": {
+          "name": "hoofd_foto_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foto_urls": {
+          "name": "foto_urls",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "gedragsrofiel": {
+          "name": "gedragsrofiel",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "medisch_paspoort": {
+          "name": "medisch_paspoort",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vaste_verzorger_id": {
+          "name": "vaste_verzorger_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "binnengekomen_op": {
+          "name": "binnengekomen_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "dieren_asiel_id_asielen_id_fk": {
+          "name": "dieren_asiel_id_asielen_id_fk",
+          "tableFrom": "dieren",
+          "tableTo": "asielen",
+          "columnsFrom": [
+            "asiel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "dieren_vaste_verzorger_id_users_id_fk": {
+          "name": "dieren_vaste_verzorger_id_users_id_fk",
+          "tableFrom": "dieren",
+          "tableTo": "users",
+          "columnsFrom": [
+            "vaste_verzorger_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.favorieten": {
+      "name": "favorieten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "favorieten_user_id_users_id_fk": {
+          "name": "favorieten_user_id_users_id_fk",
+          "tableFrom": "favorieten",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "favorieten_dier_id_dieren_id_fk": {
+          "name": "favorieten_dier_id_dieren_id_fk",
+          "tableFrom": "favorieten",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.gesprekken": {
+      "name": "gesprekken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "afspraak_datum": {
+          "name": "afspraak_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "afspraak_bevestigd": {
+          "name": "afspraak_bevestigd",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "laatste_bericht_op": {
+          "name": "laatste_bericht_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "gesprekken_user_id_users_id_fk": {
+          "name": "gesprekken_user_id_users_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "gesprekken_dier_id_dieren_id_fk": {
+          "name": "gesprekken_dier_id_dieren_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "gesprekken_asiel_id_asielen_id_fk": {
+          "name": "gesprekken_asiel_id_asielen_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "asielen",
+          "columnsFrom": [
+            "asiel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.matches": {
+      "name": "matches",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "analyse_tekst": {
+          "name": "analyse_tekst",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "woning_score": {
+          "name": "woning_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "energie_score": {
+          "name": "energie_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gezin_score": {
+          "name": "gezin_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ervaring_score": {
+          "name": "ervaring_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alleen_thuis_score": {
+          "name": "alleen_thuis_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budget_score": {
+          "name": "budget_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_aanbevolen": {
+          "name": "is_aanbevolen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "uitkomst": {
+          "name": "uitkomst",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uitkomst_op": {
+          "name": "uitkomst_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "berekend_op": {
+          "name": "berekend_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "matches_user_id_users_id_fk": {
+          "name": "matches_user_id_users_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "matches_dier_id_dieren_id_fk": {
+          "name": "matches_dier_id_dieren_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medische_records": {
+      "name": "medische_records",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datum": {
+          "name": "datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "medisch_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'voltooid'"
+        },
+        "uitvoerder": {
+          "name": "uitvoerder",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rapport_url": {
+          "name": "rapport_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "volgende_datum": {
+          "name": "volgende_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medische_records_dier_id_dieren_id_fk": {
+          "name": "medische_records_dier_id_dieren_id_fk",
+          "tableFrom": "medische_records",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nazorg_dagen": {
+      "name": "nazorg_dagen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "adoptie_id": {
+          "name": "adoptie_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dag_nummer": {
+          "name": "dag_nummer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "focus_onderwerp": {
+          "name": "focus_onderwerp",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tips": {
+          "name": "tips",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "checklist": {
+          "name": "checklist",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "checklist_voltooid": {
+          "name": "checklist_voltooid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "aantekeningen_gebruiker": {
+          "name": "aantekeningen_gebruiker",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nazorg_dagen_adoptie_id_adopties_id_fk": {
+          "name": "nazorg_dagen_adoptie_id_adopties_id_fk",
+          "tableFrom": "nazorg_dagen",
+          "tableTo": "adopties",
+          "columnsFrom": [
+            "adoptie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pleeggezinnen": {
+      "name": "pleeggezinnen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adres": {
+          "name": "adres",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soort_voorkeur": {
+          "name": "soort_voorkeur",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "max_dieren": {
+          "name": "max_dieren",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "ervaring_niveau": {
+          "name": "ervaring_niveau",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'geen'"
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pleeggezinnen_asiel_id_asielen_id_fk": {
+          "name": "pleeggezinnen_asiel_id_asielen_id_fk",
+          "tableFrom": "pleeggezinnen",
+          "tableTo": "asielen",
+          "columnsFrom": [
+            "asiel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pleegplaatsingen": {
+      "name": "pleegplaatsingen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pleeggezin_id": {
+          "name": "pleeggezin_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startdatum": {
+          "name": "startdatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einddatum": {
+          "name": "einddatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pleegplaatsingen_dier_id_dieren_id_fk": {
+          "name": "pleegplaatsingen_dier_id_dieren_id_fk",
+          "tableFrom": "pleegplaatsingen",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pleegplaatsingen_pleeggezin_id_pleeggezinnen_id_fk": {
+          "name": "pleegplaatsingen_pleeggezin_id_pleeggezinnen_id_fk",
+          "tableFrom": "pleegplaatsingen",
+          "tableTo": "pleeggezinnen",
+          "columnsFrom": [
+            "pleeggezin_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wachtwoord_hash": {
+          "name": "wachtwoord_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postcode": {
+          "name": "postcode",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rol": {
+          "name": "rol",
+          "type": "user_rol",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'adoptant'"
+        },
+        "asiel_id": {
+          "name": "asiel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profiel_voltooid": {
+          "name": "profiel_voltooid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wachtlijst": {
+      "name": "wachtlijst",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "soort": {
+          "name": "soort",
+          "type": "animal_species",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ras": {
+          "name": "ras",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leeftijd_voorkeur": {
+          "name": "leeftijd_voorkeur",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "wachtlijst_user_id_users_id_fk": {
+          "name": "wachtlijst_user_id_users_id_fk",
+          "tableFrom": "wachtlijst",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wachtwoord_resets": {
+      "name": "wachtwoord_resets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verloopt_op": {
+          "name": "verloopt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gebruikt_op": {
+          "name": "gebruikt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "wachtwoord_resets_user_id_users_id_fk": {
+          "name": "wachtwoord_resets_user_id_users_id_fk",
+          "tableFrom": "wachtwoord_resets",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.welzijn_logs": {
+      "name": "welzijn_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dier_id": {
+          "name": "dier_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "medewerker_id": {
+          "name": "medewerker_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voeding": {
+          "name": "voeding",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gedrag": {
+          "name": "gedrag",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gezondheid": {
+          "name": "gezondheid",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notitie": {
+          "name": "notitie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gelogd_op": {
+          "name": "gelogd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "welzijn_logs_dier_id_dieren_id_fk": {
+          "name": "welzijn_logs_dier_id_dieren_id_fk",
+          "tableFrom": "welzijn_logs",
+          "tableTo": "dieren",
+          "columnsFrom": [
+            "dier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "welzijn_logs_medewerker_id_users_id_fk": {
+          "name": "welzijn_logs_medewerker_id_users_id_fk",
+          "tableFrom": "welzijn_logs",
+          "tableTo": "users",
+          "columnsFrom": [
+            "medewerker_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.activiteit_niveau": {
+      "name": "activiteit_niveau",
+      "schema": "public",
+      "values": [
+        "laag",
+        "normaal",
+        "hoog",
+        "zeer_hoog"
+      ]
+    },
+    "public.adoptie_status": {
+      "name": "adoptie_status",
+      "schema": "public",
+      "values": [
+        "aangevraagd",
+        "goedgekeurd",
+        "afgerond",
+        "afgewezen",
+        "geannuleerd"
+      ]
+    },
+    "public.afspraak_status": {
+      "name": "afspraak_status",
+      "schema": "public",
+      "values": [
+        "aangevraagd",
+        "bevestigd",
+        "afgerond",
+        "geannuleerd"
+      ]
+    },
+    "public.afspraak_type": {
+      "name": "afspraak_type",
+      "schema": "public",
+      "values": [
+        "kennismaking",
+        "thuischeck"
+      ]
+    },
+    "public.animal_species": {
+      "name": "animal_species",
+      "schema": "public",
+      "values": [
+        "hond",
+        "kat",
+        "vogel",
+        "konijn",
+        "cavia",
+        "hamster",
+        "overig"
+      ]
+    },
+    "public.animal_status": {
+      "name": "animal_status",
+      "schema": "public",
+      "values": [
+        "beschikbaar",
+        "in_behandeling",
+        "geadopteerd",
+        "niet_beschikbaar"
+      ]
+    },
+    "public.bericht_verzender": {
+      "name": "bericht_verzender",
+      "schema": "public",
+      "values": [
+        "adoptant",
+        "asiel",
+        "systeem"
+      ]
+    },
+    "public.medisch_status": {
+      "name": "medisch_status",
+      "schema": "public",
+      "values": [
+        "aankomend",
+        "voltooid",
+        "gemist",
+        "geannuleerd"
+      ]
+    },
+    "public.user_rol": {
+      "name": "user_rol",
+      "schema": "public",
+      "values": [
+        "adoptant",
+        "asiel",
+        "admin"
+      ]
+    },
+    "public.werving_status": {
+      "name": "werving_status",
+      "schema": "public",
+      "values": [
+        "nieuw",
+        "uitgenodigd",
+        "overgeslagen",
+        "aangesloten"
+      ]
+    },
+    "public.woning_type": {
+      "name": "woning_type",
+      "schema": "public",
+      "values": [
+        "appartement",
+        "huis_zonder_tuin",
+        "huis_met_tuin",
+        "boerderij"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -9,6 +9,8 @@ export default {
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL_UNPOOLED!,
+    // Bij voorkeur de directe (unpooled) connectie voor migraties; val terug op
+    // de gewone DATABASE_URL als die niet apart is ingesteld.
+    url: (process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL)!,
   },
 } satisfies Config

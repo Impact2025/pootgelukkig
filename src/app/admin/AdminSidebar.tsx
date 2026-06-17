@@ -17,6 +17,7 @@ const navItemsExtra = [
   { href: '/admin/medisch', icon: 'medical_services', label: 'Medisch' },
   { href: '/admin/wachtlijst', icon: 'format_list_bulleted', label: 'Wachtlijst' },
   { href: '/admin/pleeggezinnen', icon: 'house', label: 'Pleeggezinnen' },
+  { href: '/admin/asielen-werving', icon: 'domain_add', label: 'Asielen werving' },
   { href: '/admin/rapportage', icon: 'bar_chart', label: 'Rapportage' },
   { href: '/admin/instellingen', icon: 'settings', label: 'Instellingen' },
 ]

@@ -48,6 +48,14 @@ export const afspraakStatusEnum = pgEnum('afspraak_status', [
   'aangevraagd', 'bevestigd', 'afgerond', 'geannuleerd'
 ])
 
+// Wervingsstatus voor geïmporteerde asielen (cold-outreach flow)
+export const wervingStatusEnum = pgEnum('werving_status', [
+  'nieuw',        // gevonden door import, nog niet benaderd
+  'uitgenodigd',  // uitnodigingsmail verstuurd
+  'overgeslagen', // handmatig overgeslagen, niet mailen
+  'aangesloten',  // asiel heeft zich aangemeld op het platform
+])
+
 // =================== USERS (Adoptanten) ===================
 
 export const userRolEnum = pgEnum('user_rol', ['adoptant', 'asiel', 'admin'])
@@ -112,6 +120,12 @@ export const asielen = pgTable('asielen', {
   logoUrl: text('logo_url'),
   beschrijving: text('beschrijving'),
   actief: boolean('actief').default(true).notNull(),
+
+  // Werving / herkomst — gevuld door de asielen-import cron
+  bron: varchar('bron', { length: 50 }).default('handmatig').notNull(), // 'handmatig' | 'import'
+  wervingStatus: wervingStatusEnum('werving_status').default('aangesloten').notNull(),
+  uitnodigingVerstuurdOp: timestamp('uitnodiging_verstuurd_op'),
+
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
 
   // Openingstijden per dag
@@ -386,6 +400,17 @@ export const pleegplaatsingen = pgTable('pleegplaatsingen', {
   einddatum: timestamp('einddatum'),
   notities: text('notities'),
   actief: boolean('actief').default(true).notNull(),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+// =================== WACHTWOORD RESETS ===================
+export const wachtwoordResets = pgTable('wachtwoord_resets', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  // SHA-256 hash van het reset-token (de ruwe token zit alleen in de e-maillink)
+  tokenHash: varchar('token_hash', { length: 64 }).notNull(),
+  verlooptOp: timestamp('verloopt_op').notNull(),
+  gebruiktOp: timestamp('gebruikt_op'),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
 })
 

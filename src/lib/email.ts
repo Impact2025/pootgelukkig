@@ -198,6 +198,63 @@ export async function stuurNazorgEmail({
   })
 }
 
+// ─── Uitnodiging voor nieuw asiel (cold outreach) ─────────────────────────────
+
+export async function stuurUitnodigingAsiel({
+  asielEmail,
+  asielNaam,
+  stad,
+  asielId,
+}: {
+  asielEmail: string
+  asielNaam: string
+  stad: string
+  asielId: number
+}) {
+  const { UitnodigingAsiel } = await import('@/emails/UitnodigingAsiel')
+  const html = await render(
+    UitnodigingAsiel({
+      asielNaam,
+      stad,
+      aanmeldUrl: `${APP_URL}/auth/register?type=asiel&asielId=${asielId}`,
+      afmeldUrl: `${APP_URL}/asiel-afmelden?asielId=${asielId}`,
+    })
+  )
+  return stuurEmail({
+    naar: asielEmail,
+    onderwerp: `${asielNaam}, help dieren sneller aan het juiste thuis 🐾`,
+    html,
+  })
+}
+
+// ─── Wachtwoord vergeten / reset ──────────────────────────────────────────────
+
+export async function stuurWachtwoordReset({
+  email,
+  naam,
+  token,
+  geldigMinuten,
+}: {
+  email: string
+  naam: string
+  token: string
+  geldigMinuten: number
+}) {
+  const { WachtwoordReset } = await import('@/emails/WachtwoordReset')
+  const html = await render(
+    WachtwoordReset({
+      naam,
+      resetUrl: `${APP_URL}/auth/wachtwoord-reset?token=${token}`,
+      geldigMinuten,
+    })
+  )
+  return stuurEmail({
+    naar: email,
+    onderwerp: 'Stel je PootGelukkig-wachtwoord opnieuw in 🔑',
+    html,
+  })
+}
+
 // ─── Adoptie status update ────────────────────────────────────────────────────
 
 export async function stuurAdoptieStatusUpdate({

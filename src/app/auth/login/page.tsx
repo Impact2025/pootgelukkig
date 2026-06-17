@@ -82,9 +82,17 @@ function LoginForm() {
             </div>
 
             <div>
-              <label className="block text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">
-                Wachtwoord
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-white/40 text-xs font-semibold uppercase tracking-wider">
+                  Wachtwoord
+                </label>
+                <Link
+                  href="/auth/wachtwoord-vergeten"
+                  className="text-primary/70 text-xs font-semibold hover:text-primary transition-colors"
+                >
+                  Wachtwoord vergeten?
+                </Link>
+              </div>
               <input
                 type="password"
                 value={wachtwoord}
