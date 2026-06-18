@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server'
 
 const { auth } = NextAuth(authConfig)
 
-const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/pitch']
-const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode']
+const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/pitch', '/auth/wachtwoord-vergeten', '/auth/wachtwoord-reset']
+const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron']
 const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
 const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/animals', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
