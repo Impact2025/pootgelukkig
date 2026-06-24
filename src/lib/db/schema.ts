@@ -56,6 +56,20 @@ export const wervingStatusEnum = pgEnum('werving_status', [
   'aangesloten',  // asiel heeft zich aangemeld op het platform
 ])
 
+// Status van een verzonden e-mail (mail_log)
+export const mailStatusEnum = pgEnum('mail_status', ['verzonden', 'gefaald', 'geopend', 'gebounced'])
+
+// CRM
+export const crmContactTypeEnum = pgEnum('crm_contact_type', ['lead', 'asiel', 'adoptant', 'partner', 'overig'])
+export const crmDealFaseEnum = pgEnum('crm_deal_fase', ['nieuw', 'contact', 'onderhandeling', 'gewonnen', 'verloren'])
+export const crmActiviteitTypeEnum = pgEnum('crm_activiteit_type', ['notitie', 'mail', 'bel', 'taak', 'afspraak'])
+
+// Blog
+export const blogStatusEnum = pgEnum('blog_status', ['concept', 'gepubliceerd', 'gearchiveerd'])
+
+// Coupons (marketingcodes)
+export const couponTypeEnum = pgEnum('coupon_type', ['procent', 'vast'])
+
 // =================== USERS (Adoptanten) ===================
 
 export const userRolEnum = pgEnum('user_rol', ['adoptant', 'asiel', 'admin'])
@@ -412,6 +426,148 @@ export const wachtwoordResets = pgTable('wachtwoord_resets', {
   verlooptOp: timestamp('verloopt_op').notNull(),
   gebruiktOp: timestamp('gebruikt_op'),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+// =================== AI-GEBRUIK (kostentracking) ===================
+
+export const aiGebruik = pgTable('ai_gebruik', {
+  id: serial('id').primaryKey(),
+  module: varchar('module', { length: 50 }).notNull(), // 'matching' | 'copilot' | 'blog' | ...
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  asielId: integer('asiel_id'),
+  model: varchar('model', { length: 100 }).notNull(),
+  promptTokens: integer('prompt_tokens').default(0).notNull(),
+  completionTokens: integer('completion_tokens').default(0).notNull(),
+  totaalTokens: integer('totaal_tokens').default(0).notNull(),
+  kostenEuro: real('kosten_euro').default(0).notNull(),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+// =================== MAIL LOG (verzendgeschiedenis) ===================
+
+export const mailLog = pgTable('mail_log', {
+  id: serial('id').primaryKey(),
+  naar: varchar('naar', { length: 255 }).notNull(),
+  van: varchar('van', { length: 255 }),
+  onderwerp: text('onderwerp').notNull(),
+  template: varchar('template', { length: 80 }), // welke stuur*-functie / template
+  status: mailStatusEnum('status').default('verzonden').notNull(),
+  resendId: varchar('resend_id', { length: 100 }),
+  contactId: integer('contact_id'),
+  asielId: integer('asiel_id'),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  fout: text('fout'),
+  verzondenOp: timestamp('verzonden_op').defaultNow().notNull(),
+})
+
+// =================== APP INSTELLINGEN (key/value) ===================
+
+export const appInstellingen = pgTable('app_instellingen', {
+  sleutel: varchar('sleutel', { length: 100 }).primaryKey(),
+  waarde: json('waarde'),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+// =================== CRM ===================
+
+export const crmContacten = pgTable('crm_contacten', {
+  id: serial('id').primaryKey(),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  telefoon: varchar('telefoon', { length: 30 }),
+  bedrijf: varchar('bedrijf', { length: 255 }),
+  type: crmContactTypeEnum('type').default('lead').notNull(),
+  bron: varchar('bron', { length: 80 }).default('handmatig').notNull(),
+  stad: varchar('stad', { length: 100 }),
+  eigenaar: varchar('eigenaar', { length: 120 }), // beheerder die het contact bezit
+  tags: json('tags').$type<string[]>().default([]),
+  notitie: text('notitie'),
+  asielId: integer('asiel_id'),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+export const crmDeals = pgTable('crm_deals', {
+  id: serial('id').primaryKey(),
+  contactId: integer('contact_id').notNull().references(() => crmContacten.id, { onDelete: 'cascade' }),
+  titel: varchar('titel', { length: 255 }).notNull(),
+  fase: crmDealFaseEnum('fase').default('nieuw').notNull(),
+  waarde: real('waarde').default(0),
+  eigenaar: varchar('eigenaar', { length: 120 }),
+  sluitingsdatum: timestamp('sluitingsdatum'),
+  volgorde: integer('volgorde').default(0).notNull(), // positie binnen kolom
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+export const crmActiviteiten = pgTable('crm_activiteiten', {
+  id: serial('id').primaryKey(),
+  contactId: integer('contact_id').notNull().references(() => crmContacten.id, { onDelete: 'cascade' }),
+  dealId: integer('deal_id').references(() => crmDeals.id, { onDelete: 'set null' }),
+  type: crmActiviteitTypeEnum('type').default('notitie').notNull(),
+  inhoud: text('inhoud').notNull(),
+  auteur: varchar('auteur', { length: 120 }),
+  voltooid: boolean('voltooid').default(false).notNull(),
+  deadline: timestamp('deadline'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+// =================== BLOG ===================
+
+export const blogCategorieen = pgTable('blog_categorieen', {
+  id: serial('id').primaryKey(),
+  naam: varchar('naam', { length: 120 }).notNull(),
+  slug: varchar('slug', { length: 140 }).notNull().unique(),
+})
+
+export const blogPosts = pgTable('blog_posts', {
+  id: serial('id').primaryKey(),
+  titel: varchar('titel', { length: 255 }).notNull(),
+  slug: varchar('slug', { length: 280 }).notNull().unique(),
+  inhoudMd: text('inhoud_md').notNull(),
+  excerpt: text('excerpt'),
+  coverUrl: text('cover_url'),
+  categorieId: integer('categorie_id').references(() => blogCategorieen.id, { onDelete: 'set null' }),
+  status: blogStatusEnum('status').default('concept').notNull(),
+  metaTitle: varchar('meta_title', { length: 255 }),
+  metaDescription: varchar('meta_description', { length: 320 }),
+  focusKeyword: varchar('focus_keyword', { length: 120 }),
+  seoScore: integer('seo_score').default(0).notNull(),
+  interneLinks: json('interne_links').$type<{ tekst: string; url: string }[]>().default([]),
+  externeLinks: json('externe_links').$type<{ tekst: string; url: string }[]>().default([]),
+  auteurId: integer('auteur_id').references(() => users.id, { onDelete: 'set null' }),
+  gepubliceerdOp: timestamp('gepubliceerd_op'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+// =================== COUPONS (marketingcodes) ===================
+
+export const coupons = pgTable('coupons', {
+  id: serial('id').primaryKey(),
+  code: varchar('code', { length: 60 }).notNull().unique(),
+  omschrijving: varchar('omschrijving', { length: 255 }),
+  type: couponTypeEnum('type').default('procent').notNull(),
+  waarde: real('waarde').notNull(), // procent (0-100) of vast bedrag in euro
+  maxGebruik: integer('max_gebruik'), // null = ongelimiteerd
+  gebruiktAantal: integer('gebruikt_aantal').default(0).notNull(),
+  perKlantLimiet: integer('per_klant_limiet'),
+  minBesteding: real('min_besteding'),
+  campagne: varchar('campagne', { length: 120 }),
+  actief: boolean('actief').default(true).notNull(),
+  startOp: timestamp('start_op'),
+  vervalOp: timestamp('verval_op'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+})
+
+export const couponInwisselingen = pgTable('coupon_inwisselingen', {
+  id: serial('id').primaryKey(),
+  couponId: integer('coupon_id').notNull().references(() => coupons.id, { onDelete: 'cascade' }),
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
+  email: varchar('email', { length: 255 }),
+  bedragKorting: real('bedrag_korting').default(0).notNull(),
+  ingewisseldOp: timestamp('ingewisseld_op').defaultNow().notNull(),
 })
 
 // =================== RELATIONS ===================

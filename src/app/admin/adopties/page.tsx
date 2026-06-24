@@ -1,10 +1,11 @@
-﻿export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { adopties, dieren, users } from '@/lib/db/schema'
 import { and, eq, desc } from 'drizzle-orm'
 import Image from 'next/image'
+import { PageHeader, EmptyState, StatusBadge, Card } from '@/components/admin/ui'
 import AdminAdoptieActies from './AdminAdoptieActies'
 
 function relatiefTijd(datum: Date | string) {
@@ -15,44 +16,6 @@ function relatiefTijd(datum: Date | string) {
   if (uren < 24) return `${uren}u geleden`
   if (dagen === 1) return 'gisteren'
   return `${dagen} dagen geleden`
-}
-
-const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string; border: string }> = {
-  aangevraagd: {
-    label: 'Aangevraagd',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    dot: 'bg-amber-500',
-    border: 'border-amber-200',
-  },
-  goedgekeurd: {
-    label: 'Goedgekeurd',
-    bg: 'bg-blue-50',
-    text: 'text-blue-700',
-    dot: 'bg-blue-500',
-    border: 'border-blue-200',
-  },
-  afgerond: {
-    label: 'Afgerond',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-700',
-    dot: 'bg-emerald-500',
-    border: 'border-emerald-200',
-  },
-  afgewezen: {
-    label: 'Afgewezen',
-    bg: 'bg-red-50',
-    text: 'text-red-700',
-    dot: 'bg-red-500',
-    border: 'border-red-200',
-  },
-  geannuleerd: {
-    label: 'Geannuleerd',
-    bg: 'bg-gray-50',
-    text: 'text-gray-500',
-    dot: 'bg-gray-400',
-    border: 'border-gray-200',
-  },
 }
 
 export default async function AdminAdoptiesPage() {
@@ -85,24 +48,27 @@ export default async function AdminAdoptiesPage() {
   const overig = alleAdopties.filter((a) => a.status !== 'aangevraagd')
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-[#33335c]">Adoptieverzoeken</h1>
-        <div className="flex items-center gap-3 mt-2">
-          {aangevraagd.length > 0 && (
-            <span className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-3 py-1.5 rounded-full">
-              <span className="size-1.5 rounded-full bg-amber-500" />
-              {aangevraagd.length} wacht op actie
-            </span>
-          )}
-          <span className="text-[#33335c]/40 text-sm font-medium">{alleAdopties.length} in totaal</span>
-        </div>
-      </div>
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
+      <PageHeader
+        title="Adoptieverzoeken"
+        icon="favorite"
+        description={
+          aangevraagd.length > 0
+            ? `${aangevraagd.length} wacht op actie · ${alleAdopties.length} in totaal`
+            : `${alleAdopties.length} in totaal`
+        }
+      />
 
-      {/* Openstaande verzoeken */}
+      {alleAdopties.length === 0 && (
+        <EmptyState
+          icon="favorite"
+          title="Nog geen adoptieverzoeken"
+          description="Verzoeken verschijnen hier zodra adoptanten interesse tonen"
+        />
+      )}
+
       {aangevraagd.length > 0 && (
-        <section className="mb-10">
+        <section>
           <div className="flex items-center gap-2 mb-4">
             <div className="size-6 rounded-lg bg-amber-100 flex items-center justify-center">
               <span
@@ -112,9 +78,7 @@ export default async function AdminAdoptiesPage() {
                 notifications_active
               </span>
             </div>
-            <h2 className="text-sm font-extrabold text-[#33335c]/60 uppercase tracking-wider">
-              Actie vereist
-            </h2>
+            <h2 className="text-sm font-extrabold text-[#33335c]/60 uppercase tracking-wider">Actie vereist</h2>
           </div>
           <div className="space-y-3">
             {aangevraagd.map((adoptie) => (
@@ -145,9 +109,7 @@ export default async function AdminAdoptiesPage() {
                   </p>
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <span className="size-1.5 rounded-full bg-amber-500" />
-                    <span className="text-xs text-amber-600 font-semibold">
-                      {relatiefTijd(adoptie.aangevraagdOp)}
-                    </span>
+                    <span className="text-xs text-amber-600 font-semibold">{relatiefTijd(adoptie.aangevraagdOp)}</span>
                     <span className="text-[#33335c]/20 text-xs">·</span>
                     <span className="text-xs text-[#33335c]/40">
                       {new Date(adoptie.aangevraagdOp).toLocaleDateString('nl-NL', {
@@ -165,92 +127,62 @@ export default async function AdminAdoptiesPage() {
         </section>
       )}
 
-      {/* Geschiedenis */}
       {overig.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-4">
             <div className="size-6 rounded-lg bg-gray-100 flex items-center justify-center">
               <span className="material-symbols-outlined text-gray-400 text-sm">history</span>
             </div>
-            <h2 className="text-sm font-extrabold text-[#33335c]/60 uppercase tracking-wider">
-              Geschiedenis
-            </h2>
+            <h2 className="text-sm font-extrabold text-[#33335c]/60 uppercase tracking-wider">Geschiedenis</h2>
           </div>
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <Card padding={false}>
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-50 bg-gray-50/60">
-                  <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                <tr className="border-b border-[#33335c]/5 bg-gray-50/60">
+                  <th className="text-left px-5 py-3.5 text-xs font-bold text-[#33335c]/40 uppercase tracking-wider">
                     Dier
                   </th>
-                  <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  <th className="text-left px-5 py-3.5 text-xs font-bold text-[#33335c]/40 uppercase tracking-wider">
                     Adoptant
                   </th>
-                  <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  <th className="text-left px-5 py-3.5 text-xs font-bold text-[#33335c]/40 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  <th className="text-left px-5 py-3.5 text-xs font-bold text-[#33335c]/40 uppercase tracking-wider">
                     Datum
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {overig.map((adoptie, i) => {
-                  const cfg = statusConfig[adoptie.status] ?? statusConfig.geannuleerd
-                  return (
-                    <tr
-                      key={adoptie.id}
-                      className={`${i < overig.length - 1 ? 'border-b border-gray-50' : ''} hover:bg-gray-50/50 transition-colors`}
-                    >
-                      <td className="px-5 py-4">
-                        <span className="font-bold text-[#33335c] text-sm">{adoptie.dierNaam}</span>
-                        <span className="text-gray-400 text-xs ml-1.5">
-                          {adoptie.dierRas ?? adoptie.dierSoort}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <p className="text-[#33335c] text-sm font-medium">{adoptie.userName}</p>
-                        <p className="text-gray-400 text-xs">{adoptie.userEmail}</p>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div
-                          className={`inline-flex items-center gap-1.5 ${cfg.bg} border ${cfg.border} px-2.5 py-1 rounded-full`}
-                        >
-                          <span className={`size-1.5 rounded-full ${cfg.dot}`} />
-                          <span className={`text-xs font-bold ${cfg.text}`}>{cfg.label}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4 text-gray-400 text-sm">
-                        {new Date(adoptie.aangevraagdOp).toLocaleDateString('nl-NL', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </td>
-                    </tr>
-                  )
-                })}
+                {overig.map((adoptie, i) => (
+                  <tr
+                    key={adoptie.id}
+                    className={`${i < overig.length - 1 ? 'border-b border-[#33335c]/5' : ''} hover:bg-gray-50/50 transition-colors`}
+                  >
+                    <td className="px-5 py-4">
+                      <span className="font-bold text-[#33335c] text-sm">{adoptie.dierNaam}</span>
+                      <span className="text-gray-400 text-xs ml-1.5">{adoptie.dierRas ?? adoptie.dierSoort}</span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <p className="text-[#33335c] text-sm font-medium">{adoptie.userName}</p>
+                      <p className="text-gray-400 text-xs">{adoptie.userEmail}</p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={adoptie.status} />
+                    </td>
+                    <td className="px-5 py-4 text-gray-400 text-sm">
+                      {new Date(adoptie.aangevraagdOp).toLocaleDateString('nl-NL', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         </section>
-      )}
-
-      {alleAdopties.length === 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-          <div className="size-16 rounded-3xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
-            <span
-              className="material-symbols-outlined text-3xl text-blue-400"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              favorite
-            </span>
-          </div>
-          <p className="text-[#33335c] font-bold text-base">Nog geen adoptieverzoeken</p>
-          <p className="text-gray-400 text-sm mt-1">
-            Verzoeken verschijnen hier zodra adoptanten interesse tonen
-          </p>
-        </div>
       )}
     </div>
   )

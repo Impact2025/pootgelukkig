@@ -38,7 +38,7 @@ Geef ALLEEN de tekst terug, geen aanhalingstekens of uitleg.`
   try {
     const verhaal = await chatCompletion([
       { role: 'user', content: prompt }
-    ], { maxTokens: 150 })
+    ], { maxTokens: 150, meta: { module: 'verhaal' } })
 
     return NextResponse.json({ data: { verhaal: verhaal.trim() } })
   } catch (err) {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/admin/Toast'
 
 interface Afspraak {
   id: number
@@ -29,6 +30,7 @@ interface Props {
 
 export default function AfspraakBeheer({ afspraak }: Props) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [bezig, setBezig] = useState(false)
   const [actieOpen, setActieOpen] = useState<'bevestig' | 'annuleer' | null>(null)
 
@@ -56,11 +58,17 @@ export default function AfspraakBeheer({ afspraak }: Props) {
       })
 
       if (!res.ok) {
-        const { error } = await res.json()
-        alert(error ?? 'Er ging iets mis')
+        const { error } = await res.json().catch(() => ({}))
+        showToast(error ?? 'Er ging iets mis. Probeer het opnieuw.', 'error')
         return
       }
 
+      const labels: Record<string, string> = {
+        bevestig: 'Afspraak bevestigd',
+        afgerond: 'Bezoek afgerond',
+        annuleer: 'Afspraak geannuleerd',
+      }
+      showToast(labels[actie] ?? 'Opgeslagen', actie === 'annuleer' ? 'info' : 'success')
       setActieOpen(null)
       router.refresh()
     } finally {

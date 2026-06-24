@@ -82,7 +82,7 @@ Alles in het NEDERLANDS. Wees specifiek voor dit dier.`
 
     const antwoord = await chatCompletion(
       [{ role: 'user', content: prompt }],
-      { maxTokens: 4000 }
+      { maxTokens: 4000, meta: { module: 'nazorg' } }
     )
 
     const match = antwoord.match(/\[[\s\S]*\]/)

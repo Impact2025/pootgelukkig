@@ -350,7 +350,7 @@ Profiel:
 Geef alleen de aanbevelingstekst, geen JSON.`
 
   try {
-    return await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 150 })
+    return await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 150, meta: { module: 'intake' } })
   } catch {
     const soort = profiel.diersoortVoorkeur[0] ?? 'dier'
     return `Op basis van jouw profiel zoeken we de beste ${soort === 'alles' ? 'match' : soort} voor je.`

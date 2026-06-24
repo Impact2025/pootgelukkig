@@ -230,7 +230,7 @@ Regels:
 - Material icon namen: notifications_active, medical_services, chat, pets, calendar_month, trending_up, warning, check_circle, schedule, favorite
 - Alle tekst in het Nederlands`
 
-    const antwoord = await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 1200 })
+    const antwoord = await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 1200, meta: { module: 'copilot' } })
 
     // Parse JSON
     const jsonMatch = antwoord.match(/\{[\s\S]*\}/)

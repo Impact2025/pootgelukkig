@@ -225,7 +225,8 @@ export async function POST(request: NextRequest) {
           gedragsProfiel: dier.gedragsProfiel ?? null,
           medischPaspoort: dier.medischPaspoort ?? null,
         })),
-        historischeContext
+        historischeContext,
+        userId
       )
 
       // Opslaan: oude matches weg, nieuwe erin (met AI-gegenereerde analyse voor elk dier)

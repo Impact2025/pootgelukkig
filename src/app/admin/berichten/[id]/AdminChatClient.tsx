@@ -105,7 +105,7 @@ export default function AdminChatClient({
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4 flex-shrink-0">
+      <header className="bg-white border-b border-[#33335c]/8 px-6 py-4 flex items-center gap-4 flex-shrink-0">
         <Link href="/admin/berichten" className="text-[#33335c]/40 hover:text-[#33335c] transition-colors">
           <span className="material-symbols-outlined">arrow_back</span>
         </Link>
@@ -158,7 +158,7 @@ export default function AdminChatClient({
             if (vanSysteem) {
               return (
                 <div key={bericht.id} className="flex justify-center">
-                  <span className="text-[11px] text-[#33335c]/40 bg-white border border-gray-100 px-3 py-1 rounded-full">
+                  <span className="text-[11px] text-[#33335c]/40 bg-white border border-[#33335c]/8 px-3 py-1 rounded-full">
                     {bericht.inhoud}
                   </span>
                 </div>
@@ -170,7 +170,7 @@ export default function AdminChatClient({
                   <div
                     className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                       vanAdoptant
-                        ? 'bg-white text-[#33335c] border border-gray-100 rounded-tl-sm'
+                        ? 'bg-white text-[#33335c] border border-[#33335c]/8 rounded-tl-sm'
                         : 'bg-[#33335c] text-white rounded-tr-sm'
                     }`}
                   >
@@ -188,7 +188,7 @@ export default function AdminChatClient({
       </main>
 
       {/* Input */}
-      <footer className="bg-white border-t border-gray-100 px-6 py-4 flex-shrink-0">
+      <footer className="bg-white border-t border-[#33335c]/8 px-6 py-4 flex-shrink-0">
         <div className="flex items-end gap-3">
           <textarea
             ref={inputRef}

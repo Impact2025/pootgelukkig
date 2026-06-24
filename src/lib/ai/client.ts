@@ -1,6 +1,8 @@
 // OpenRouter client — compatibel met OpenAI API formaat
 // Docs: https://openrouter.ai/docs
 
+import { logAiGebruik, type AiMeta, type AiUsage } from './usage'
+
 const OPENROUTER_BASE = 'https://openrouter.ai/api/v1'
 
 function getApiKey(): string {
@@ -23,18 +25,24 @@ interface ChatMessage {
   content: string | { type: 'text'; text: string }[] | Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }>
 }
 
+interface ChatOptions {
+  model?: string
+  maxTokens?: number
+  // Optioneel: koppelt deze call aan een module/gebruiker voor kostentracking.
+  meta?: AiMeta
+}
+
 interface OpenRouterResponse {
   choices: { message: { content: string } }[]
+  usage?: AiUsage
 }
 
 export async function chatCompletion(
   messages: ChatMessage[],
-  options: {
-    model?: string
-    maxTokens?: number
-  } = {}
+  options: ChatOptions = {}
 ): Promise<string> {
   const apiKey = getApiKey()
+  const model = options.model ?? DEFAULT_MODEL
 
   const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
     method: 'POST',
@@ -45,9 +53,10 @@ export async function chatCompletion(
       'X-Title': 'PootGelukkig',
     },
     body: JSON.stringify({
-      model: options.model ?? DEFAULT_MODEL,
+      model,
       max_tokens: options.maxTokens ?? 500,
       messages,
+      usage: { include: true },
     }),
   })
 
@@ -63,18 +72,19 @@ export async function chatCompletion(
     throw new Error('Leeg antwoord van OpenRouter')
   }
 
+  // Niet-blokkerend loggen van tokengebruik + kosten
+  void logAiGebruik(options.meta, model, data.usage)
+
   return content
 }
 
 // Streaming variant — geeft een ReadableStream terug voor live typing-effect
 export async function chatStream(
   messages: ChatMessage[],
-  options: {
-    model?: string
-    maxTokens?: number
-  } = {}
+  options: ChatOptions = {}
 ): Promise<ReadableStream<Uint8Array>> {
   const apiKey = getApiKey()
+  const model = options.model ?? DEFAULT_MODEL
 
   const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
     method: 'POST',
@@ -85,9 +95,11 @@ export async function chatStream(
       'X-Title': 'PootGelukkig',
     },
     body: JSON.stringify({
-      model: options.model ?? DEFAULT_MODEL,
+      model,
       max_tokens: options.maxTokens ?? 600,
       stream: true,
+      stream_options: { include_usage: true },
+      usage: { include: true },
       messages,
     }),
   })
@@ -108,6 +120,7 @@ export async function chatStream(
   return new ReadableStream({
     async start(controller) {
       const reader = response.body!.getReader()
+      let laatsteUsage: AiUsage | undefined
       try {
         while (true) {
           const { done, value } = await reader.read()
@@ -124,7 +137,9 @@ export async function chatStream(
             try {
               const parsed = JSON.parse(data) as {
                 choices: { delta: { content?: string } }[]
+                usage?: AiUsage
               }
+              if (parsed.usage) laatsteUsage = parsed.usage
               const content = parsed.choices[0]?.delta?.content
               if (content) {
                 controller.enqueue(encoder.encode(content))
@@ -137,6 +152,8 @@ export async function chatStream(
       } finally {
         reader.releaseLock()
         controller.close()
+        // Niet-blokkerend loggen van tokengebruik + kosten (usage komt in de laatste chunk)
+        void logAiGebruik(options.meta, model, laatsteUsage)
       }
     },
   })

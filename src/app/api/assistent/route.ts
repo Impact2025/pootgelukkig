@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
   ]
 
   try {
-    const stream = await chatStream(messages, { maxTokens: 600 })
+    const stream = await chatStream(messages, { maxTokens: 600, meta: { module: 'assistent' } })
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',

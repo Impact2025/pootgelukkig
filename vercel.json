@@ -11,6 +11,14 @@
     {
       "path": "/api/cron/asielen-import",
       "schedule": "0 6 1 * *"
+    },
+    {
+      "path": "/api/cron/management-dag",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/management-maand",
+      "schedule": "0 7 1 * *"
     }
   ]
 }

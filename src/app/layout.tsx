@@ -4,7 +4,10 @@ import { Providers } from '@/components/providers'
 import { ToastProvider } from '@/components/ui/Toaster'
 import { AIAssistentWidget } from '@/components/AIAssistentWidget'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: 'PootGelukkig — Vind jouw perfecte match',
   description: 'AI-gestuurde matching tussen mensen en asieldieren. Bedacht door Maya van Munster.',
   keywords: ['dierenasiel', 'adoptie', 'hond', 'kat', 'matching', 'AI'],

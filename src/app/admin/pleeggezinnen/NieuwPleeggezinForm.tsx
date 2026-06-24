@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/admin/Toast'
 
 const SOORTEN = ['hond', 'kat', 'vogel', 'konijn', 'cavia', 'hamster', 'overig']
 const SOORT_EMOJI: Record<string, string> = {
@@ -21,8 +22,8 @@ const ERVARING_OPTIES = [
 
 export default function NieuwPleeggezinForm() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [bezig, setBezig] = useState(false)
-  const [fout, setFout] = useState('')
 
   const [naam, setNaam] = useState('')
   const [email, setEmail] = useState('')
@@ -43,11 +44,10 @@ export default function NieuwPleeggezinForm() {
   async function opslaan(e: React.FormEvent) {
     e.preventDefault()
     if (!naam.trim()) {
-      setFout('Naam is verplicht')
+      showToast('Naam is verplicht', 'warning')
       return
     }
     setBezig(true)
-    setFout('')
     try {
       const res = await fetch('/api/admin/pleeggezinnen', {
         method: 'POST',
@@ -66,13 +66,14 @@ export default function NieuwPleeggezinForm() {
       })
       const json = (await res.json()) as { data?: { id: number }; error?: string }
       if (!res.ok || !json.data) {
-        setFout(json.error ?? 'Er is een fout opgetreden')
+        showToast(json.error ?? 'Er is een fout opgetreden', 'error')
         return
       }
+      showToast(`${naam} toegevoegd`, 'success')
       router.push('/admin/pleeggezinnen')
       router.refresh()
     } catch {
-      setFout('Verbindingsfout. Probeer opnieuw.')
+      showToast('Verbindingsfout. Probeer opnieuw.', 'error')
     } finally {
       setBezig(false)
     }
@@ -80,13 +81,7 @@ export default function NieuwPleeggezinForm() {
 
   return (
     <form onSubmit={opslaan} className="max-w-2xl space-y-5">
-      {fout && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-sm text-red-700 font-medium">
-          {fout}
-        </div>
-      )}
-
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-[#33335c]/8 p-6 space-y-4">
         <h2 className="font-bold text-[#33335c] text-sm uppercase tracking-wide">Contactgegevens</h2>
 
         <div>
@@ -157,7 +152,7 @@ export default function NieuwPleeggezinForm() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
+      <div className="bg-white rounded-2xl border border-[#33335c]/8 p-6 space-y-4">
         <h2 className="font-bold text-[#33335c] text-sm uppercase tracking-wide">Voorkeur &amp; ervaring</h2>
 
         <div>
@@ -175,7 +170,7 @@ export default function NieuwPleeggezinForm() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold border-2 transition-all ${
                     geselecteerd
                       ? 'bg-[#33335c] text-white border-transparent'
-                      : 'bg-gray-50 text-[#33335c]/50 border-gray-100 hover:border-gray-200'
+                      : 'bg-gray-50 text-[#33335c]/50 border-[#33335c]/8 hover:border-gray-200'
                   }`}
                 >
                   {SOORT_EMOJI[soort]} {soort.charAt(0).toUpperCase() + soort.slice(1)}

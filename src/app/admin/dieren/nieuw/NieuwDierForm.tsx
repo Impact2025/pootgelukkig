@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useToast } from '@/components/admin/Toast'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,6 +69,7 @@ const SUGGESTIE_TAGS = ['sociaal', 'speels', 'rustig', 'trouw', 'zelfstandig', '
 
 export default function NieuwDierForm({ asielId }: { asielId: number }) {
   const router = useRouter()
+  const { showToast } = useToast()
   const fileRef = useRef<HTMLInputElement>(null)
   const tagInputRef = useRef<HTMLInputElement>(null)
 
@@ -78,7 +80,6 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
   const [verhaalLaden, setVerhaalLaden] = useState(false)
   const [aiSuggestie, setAiSuggestie] = useState<null | { ras?: string; geschatteLeeftijd?: number; geslacht?: string; energieNiveau?: string; tags?: string[]; verhaal?: string }>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
-  const [fout, setFout] = useState<string | null>(null)
 
   const [form, setForm] = useState<FormData>({
     naam: '',
@@ -122,10 +123,10 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
       if (res.ok && json.url) {
         set('hoofdFotoUrl', json.url)
       } else {
-        setFout(json.error ?? 'Foto upload mislukt')
+        showToast(json.error ?? 'Foto upload mislukt', 'error')
       }
     } catch {
-      setFout('Foto upload mislukt — controleer je verbinding')
+      showToast('Foto upload mislukt — controleer je verbinding', 'error')
     } finally {
       setUploading(false)
     }
@@ -207,7 +208,6 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
   // ─── Submit ───────────────────────────────────────────────────────────────
 
   async function opslaan() {
-    setFout(null)
     setLaden(true)
     try {
       const res = await fetch('/api/animals', {
@@ -245,10 +245,11 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
 
       if (!res.ok) {
         const err = await res.json()
-        setFout(err.error ?? 'Er is iets misgegaan')
+        showToast(err.error ?? 'Er is iets misgegaan', 'error')
         return
       }
 
+      showToast(`${form.naam} toegevoegd`, 'success')
       router.push('/admin/dieren')
       router.refresh()
     } finally {
@@ -273,7 +274,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-4">
+      <header className="sticky top-0 z-50 bg-white border-b border-[#33335c]/8 px-5 py-4 flex items-center gap-4">
         <button
           onClick={() => stap > 1 ? setStap(stap - 1) : router.back()}
           className="size-9 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -426,7 +427,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`py-3 rounded-2xl flex flex-col items-center gap-1.5 border-2 transition-all ${
                       form.soort === s.value
                         ? 'border-[#33335c] bg-[#33335c] text-white'
-                        : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                        : 'border-[#33335c]/8 bg-white text-gray-500 hover:border-gray-300'
                     }`}
                   >
                     <span className="text-2xl">{s.emoji}</span>
@@ -485,7 +486,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`flex-1 py-3 rounded-xl border-2 text-sm font-bold transition-all ${
                       form.geslacht === g.value
                         ? 'border-[#33335c] bg-[#33335c] text-white'
-                        : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                        : 'border-[#33335c]/8 bg-white text-gray-500 hover:border-gray-300'
                     }`}
                   >
                     {g.label}
@@ -497,7 +498,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                   className={`px-4 py-3 rounded-xl border-2 text-sm font-bold transition-all ${
                     form.geslacht === ''
                       ? 'border-gray-300 bg-gray-100 text-gray-600'
-                      : 'border-gray-100 bg-white text-gray-400 hover:border-gray-300'
+                      : 'border-[#33335c]/8 bg-white text-gray-400 hover:border-gray-300'
                   }`}
                 >
                   ?
@@ -531,7 +532,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`p-3 rounded-xl border-2 text-left transition-all ${
                       form.energieNiveau === e.value
                         ? e.kleur + ' border-opacity-100'
-                        : 'border-gray-100 bg-white hover:border-gray-200'
+                        : 'border-[#33335c]/8 bg-white hover:border-gray-200'
                     }`}
                   >
                     <p className={`text-sm font-bold ${form.energieNiveau === e.value ? '' : 'text-[#33335c]'}`}>
@@ -559,7 +560,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`p-3 rounded-xl border-2 text-center transition-all ${
                       form.alleenThuis === a.value
                         ? 'border-[#33335c] bg-[#33335c] text-white'
-                        : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
+                        : 'border-[#33335c]/8 bg-white text-gray-500 hover:border-gray-200'
                     }`}
                   >
                     <p className="text-xs font-bold">{a.label}</p>
@@ -585,7 +586,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`flex-1 py-3 rounded-xl border-2 text-sm font-bold transition-all ${
                       form.trainbaarheid === t.value
                         ? 'border-[#33335c] bg-[#33335c] text-white'
-                        : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'
+                        : 'border-[#33335c]/8 bg-white text-gray-500 hover:border-gray-200'
                     }`}
                   >
                     {t.label}
@@ -612,7 +613,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                     className={`flex-1 py-3 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${
                       form[veld]
                         ? 'border-[#33335c] bg-[#33335c] text-white'
-                        : 'border-gray-100 bg-white text-gray-400 hover:border-gray-200'
+                        : 'border-[#33335c]/8 bg-white text-gray-400 hover:border-gray-200'
                     }`}
                   >
                     <span className="text-xl">{emoji}</span>
@@ -729,7 +730,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
                   className={`w-full p-4 rounded-2xl border-2 flex items-center gap-4 transition-all text-left ${
                     form[veld]
                       ? 'border-green-200 bg-green-50'
-                      : 'border-gray-100 bg-white hover:border-gray-200'
+                      : 'border-[#33335c]/8 bg-white hover:border-gray-200'
                   }`}
                 >
                   <div className={`size-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
@@ -775,7 +776,7 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
             )}
 
             {/* Samenvatting */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+            <div className="bg-white rounded-2xl border border-[#33335c]/8 p-5 space-y-3">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Samenvatting</p>
               <div className="flex items-center gap-3">
                 {fotoPreview ? (
@@ -803,18 +804,12 @@ export default function NieuwDierForm({ asielId }: { asielId: number }) {
               </div>
             </div>
 
-            {fout && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-red-500">error_outline</span>
-                <p className="text-red-600 text-sm">{fout}</p>
-              </div>
-            )}
           </div>
         )}
       </main>
 
       {/* ── Sticky bottom CTA ─────────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-white/90 backdrop-blur-sm border-t border-gray-100 max-w-lg mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-white/90 backdrop-blur-sm border-t border-[#33335c]/8 max-w-lg mx-auto">
         {stap < 3 ? (
           <button
             onClick={() => setStap(stap + 1)}

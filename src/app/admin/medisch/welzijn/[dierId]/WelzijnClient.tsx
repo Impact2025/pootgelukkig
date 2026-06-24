@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { useToast } from '@/components/admin/Toast'
 
 type Voeding = 'alles' | 'helft' | 'weinig' | 'niets'
 type Gedrag = 'normaal' | 'onrustig' | 'agressief' | 'teruggetrokken'
@@ -61,7 +62,7 @@ function KiesKnop({
       className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all border-2 ${
         actief
           ? `${kleur} border-transparent`
-          : 'bg-gray-50 text-[#33335c]/40 border-gray-100 hover:border-gray-200'
+          : 'bg-gray-50 text-[#33335c]/40 border-[#33335c]/8 hover:border-gray-200'
       }`}
     >
       {label}
@@ -70,12 +71,12 @@ function KiesKnop({
 }
 
 export default function WelzijnClient({ dierId, dierNaam, dierFotoUrl, initialeLogs }: Props) {
+  const { showToast } = useToast()
   const [voeding, setVoeding] = useState<Voeding | null>(null)
   const [gedrag, setGedrag] = useState<Gedrag | null>(null)
   const [gezondheid, setGezondheid] = useState<Gezondheid | null>(null)
   const [notitie, setNotitie] = useState('')
   const [versturen, setVersturen] = useState(false)
-  const [success, setSuccess] = useState(false)
   const [logs, setLogs] = useState<Log[]>(initialeLogs)
 
   async function opslaan() {
@@ -94,8 +95,7 @@ export default function WelzijnClient({ dierId, dierNaam, dierFotoUrl, initialeL
         setGedrag(null)
         setGezondheid(null)
         setNotitie('')
-        setSuccess(true)
-        setTimeout(() => setSuccess(false), 3000)
+        showToast('Check-in opgeslagen', 'success')
       }
     } finally {
       setVersturen(false)
@@ -128,19 +128,7 @@ export default function WelzijnClient({ dierId, dierNaam, dierFotoUrl, initialeL
         </div>
       </div>
 
-      {success && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3 flex items-center gap-3">
-          <span
-            className="material-symbols-outlined text-emerald-500"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            check_circle
-          </span>
-          <p className="text-emerald-700 font-semibold text-sm">Check-in opgeslagen!</p>
-        </div>
-      )}
-
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
+      <div className="bg-white rounded-2xl border border-[#33335c]/8 p-6 space-y-5">
         {/* Voeding */}
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-[#33335c]/40 mb-2">
@@ -258,7 +246,7 @@ export default function WelzijnClient({ dierId, dierNaam, dierFotoUrl, initialeL
 
       {/* Geschiedenis */}
       {logs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#33335c]/8 overflow-hidden">
           <div className="px-5 py-3 border-b border-gray-50">
             <h2 className="font-bold text-sm text-[#33335c]">Recente logs</h2>
           </div>

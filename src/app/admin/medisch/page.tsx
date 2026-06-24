@@ -1,15 +1,11 @@
 export const dynamic = 'force-dynamic'
 
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { medischeRecords, dieren } from '@/lib/db/schema'
 import { eq, and, lte, isNotNull } from 'drizzle-orm'
 import Link from 'next/link'
 import Image from 'next/image'
-
-const soortEmoji = (soort: string): string =>
-  ({ hond: '🐕', kat: '🐈', vogel: '🦜', konijn: '🐇', cavia: '🐹', hamster: '🐹', overig: '🐾' } as Record<string, string>)[soort] ?? '🐾'
+import { PageHeader, EmptyState, ButtonLink } from '@/components/admin/ui'
 
 function formatDatum(d: Date | null) {
   if (!d) return '—'
@@ -67,29 +63,23 @@ function BehandelingsRij({ b, isPast, isUrgent }: { b: Behandeling; isPast: bool
         isUrgent ? 'hover:bg-red-100/60' : 'hover:bg-gray-50'
       }`}
     >
-      {/* Urgentie indicator */}
-      {isPast && (
-        <div className="w-1 h-8 rounded-full bg-red-400 flex-shrink-0" />
-      )}
+      {isPast && <div className="w-1 h-8 rounded-full bg-red-400 flex-shrink-0" />}
 
-      {/* Foto */}
       <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 ring-2 ring-white shadow-sm">
         {b.dierFotoUrl ? (
           <Image src={b.dierFotoUrl} alt={b.dierNaam} fill className="object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-lg">
-            {soortEmoji(b.dierSoort)}
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="material-symbols-outlined text-gray-300 text-lg">pets</span>
           </div>
         )}
       </div>
 
-      {/* Naam + titel */}
       <div className="flex-1 min-w-0">
         <p className="font-bold text-[#33335c] text-sm leading-tight">{b.dierNaam}</p>
         <p className="text-xs text-[#33335c]/50 mt-0.5 truncate">{b.titel}</p>
       </div>
 
-      {/* Type badge */}
       <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wide ${cfg.bg} ${cfg.kleur}`}>
         <span className="material-symbols-outlined" style={{ fontSize: '0.7rem', fontVariationSettings: "'FILL' 1" }}>
           {cfg.icon}
@@ -97,7 +87,6 @@ function BehandelingsRij({ b, isPast, isUrgent }: { b: Behandeling; isPast: bool
         {b.type}
       </div>
 
-      {/* Datum */}
       <div className="text-right flex-shrink-0">
         <p className={`text-sm font-bold tabular-nums ${isPast ? 'text-red-500' : 'text-[#33335c]'}`}>
           {formatDatum(datum)}
@@ -107,7 +96,6 @@ function BehandelingsRij({ b, isPast, isUrgent }: { b: Behandeling; isPast: bool
         </p>
       </div>
 
-      {/* Arrow */}
       <span
         className={`material-symbols-outlined text-base transition-all duration-150 group-hover:translate-x-0.5 ${
           isUrgent ? 'text-red-300 group-hover:text-red-500' : 'text-[#33335c]/20 group-hover:text-[#33335c]/60'
@@ -120,9 +108,6 @@ function BehandelingsRij({ b, isPast, isUrgent }: { b: Behandeling; isPast: bool
 }
 
 export default async function AdminMedischPage() {
-  const session = await auth()
-  if (!session?.user || !['asiel', 'admin'].includes(session.user.rol)) redirect('/auth/login')
-
   const now = new Date()
   const inZevenDagen = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
   const inVeertigDagen = new Date(now.getTime() + 40 * 24 * 60 * 60 * 1000)
@@ -151,59 +136,69 @@ export default async function AdminMedischPage() {
     )
     .orderBy(medischeRecords.volgendeDatum)
 
-  const vandaag = alleBehandelingen.filter(b => b.volgendeDatum && b.volgendeDatum <= now)
-  const dezeWeek = alleBehandelingen.filter(b => b.volgendeDatum && b.volgendeDatum > now && b.volgendeDatum <= inZevenDagen)
-  const later = alleBehandelingen.filter(b => b.volgendeDatum && b.volgendeDatum > inZevenDagen)
+  const vandaag = alleBehandelingen.filter((b) => b.volgendeDatum && b.volgendeDatum <= now)
+  const dezeWeek = alleBehandelingen.filter(
+    (b) => b.volgendeDatum && b.volgendeDatum > now && b.volgendeDatum <= inZevenDagen
+  )
+  const later = alleBehandelingen.filter((b) => b.volgendeDatum && b.volgendeDatum > inZevenDagen)
 
   const totaal = alleBehandelingen.length
   const urgentPct = totaal > 0 ? Math.round((vandaag.length / totaal) * 100) : 0
 
   return (
-    <div className="p-8 max-w-4xl space-y-6">
-
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#33335c] tracking-tight">Medisch overzicht</h1>
-          <p className="text-sm text-[#33335c]/45 mt-1">Behandelingen, vaccinaties &amp; welzijn</p>
-        </div>
-
-        <div className="flex gap-2.5">
-          {/* Urgent pill */}
-          <div className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border font-bold text-sm ${
-            vandaag.length > 0
-              ? 'bg-red-50 border-red-200 text-red-600'
-              : 'bg-gray-50 border-gray-100 text-[#33335c]/40'
-          }`}>
-            <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
-              {vandaag.length > 0 ? 'warning' : 'check_circle'}
-            </span>
-            <span>{vandaag.length} vandaag</span>
+    <div className="p-8 max-w-4xl mx-auto space-y-6">
+      <PageHeader
+        title="Medisch overzicht"
+        icon="medical_services"
+        description="Behandelingen, vaccinaties &amp; welzijn"
+        actions={
+          <div className="flex gap-2.5">
+            <div
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border font-bold text-sm ${
+                vandaag.length > 0
+                  ? 'bg-red-50 border-red-200 text-red-600'
+                  : 'bg-gray-50 border-[#33335c]/8 text-[#33335c]/40'
+              }`}
+            >
+              <span
+                className="material-symbols-outlined text-base"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                {vandaag.length > 0 ? 'warning' : 'check_circle'}
+              </span>
+              <span>{vandaag.length} vandaag</span>
+            </div>
+            <div
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border font-bold text-sm ${
+                dezeWeek.length > 0
+                  ? 'bg-amber-50 border-amber-200 text-amber-600'
+                  : 'bg-gray-50 border-[#33335c]/8 text-[#33335c]/40'
+              }`}
+            >
+              <span
+                className="material-symbols-outlined text-base"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                calendar_today
+              </span>
+              <span>{dezeWeek.length} deze week</span>
+            </div>
           </div>
+        }
+      />
 
-          {/* Week pill */}
-          <div className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border font-bold text-sm ${
-            dezeWeek.length > 0
-              ? 'bg-amber-50 border-amber-200 text-amber-600'
-              : 'bg-gray-50 border-gray-100 text-[#33335c]/40'
-          }`}>
-            <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
-              calendar_today
-            </span>
-            <span>{dezeWeek.length} deze week</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Urgentie progress bar ── */}
       {totaal > 0 && vandaag.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-4">
-          <span className="material-symbols-outlined text-red-400 text-2xl flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <span
+            className="material-symbols-outlined text-red-400 text-2xl flex-shrink-0"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             emergency
           </span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-red-700">
-              {vandaag.length} behandeling{vandaag.length !== 1 ? 'en' : ''} verei{vandaag.length !== 1 ? 'sen' : 'st'} direct actie
+              {vandaag.length} behandeling{vandaag.length !== 1 ? 'en' : ''} verei
+              {vandaag.length !== 1 ? 'sen' : 'st'} direct actie
             </p>
             <div className="mt-2 h-1.5 bg-red-100 rounded-full overflow-hidden">
               <div
@@ -216,26 +211,22 @@ export default async function AdminMedischPage() {
         </div>
       )}
 
-      {/* ── Lege staat ── */}
       {alleBehandelingen.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-          <div className="size-16 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-4">
-            <span className="material-symbols-outlined text-3xl text-emerald-400" style={{ fontVariationSettings: "'FILL' 1" }}>
-              health_and_safety
-            </span>
-          </div>
-          <p className="text-[#33335c] font-bold text-base">Alle dieren zijn up-to-date</p>
-          <p className="text-[#33335c]/40 text-sm mt-1">Geen behandelingen gepland voor de komende 40 dagen.</p>
-        </div>
+        <EmptyState
+          icon="health_and_safety"
+          title="Alle dieren zijn up-to-date"
+          description="Geen behandelingen gepland voor de komende 40 dagen."
+        />
       ) : (
         <div className="space-y-4">
-
-          {/* ── Vandaag & achterstallig ── */}
           {vandaag.length > 0 && (
             <div className="bg-red-50 rounded-2xl border border-red-200 overflow-hidden">
               <div className="px-5 py-3.5 border-b border-red-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-red-500 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  <span
+                    className="material-symbols-outlined text-red-500 text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
                     warning
                   </span>
                   <h2 className="font-extrabold text-sm text-red-700">Vandaag &amp; achterstallig</h2>
@@ -253,12 +244,14 @@ export default async function AdminMedischPage() {
             </div>
           )}
 
-          {/* ── Deze week ── */}
           {dezeWeek.length > 0 && (
             <div className="bg-amber-50 rounded-2xl border border-amber-200 overflow-hidden">
               <div className="px-5 py-3.5 border-b border-amber-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-amber-500 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  <span
+                    className="material-symbols-outlined text-amber-500 text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
                     schedule
                   </span>
                   <h2 className="font-extrabold text-sm text-amber-700">Deze week</h2>
@@ -275,21 +268,23 @@ export default async function AdminMedischPage() {
             </div>
           )}
 
-          {/* ── Komende periode ── */}
           {later.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="px-5 py-3.5 border-b border-gray-50 flex items-center justify-between">
+            <div className="bg-white rounded-2xl border border-[#33335c]/8 overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-[#33335c]/5 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-[#33335c]/40 text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  <span
+                    className="material-symbols-outlined text-[#33335c]/40 text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
                     event
                   </span>
                   <h2 className="font-extrabold text-sm text-[#33335c]/60">Komende periode</h2>
                 </div>
-                <span className="bg-gray-50 border border-gray-100 text-[#33335c]/40 text-xs font-bold px-2.5 py-1 rounded-full">
+                <span className="bg-gray-50 border border-[#33335c]/8 text-[#33335c]/40 text-xs font-bold px-2.5 py-1 rounded-full">
                   {later.length}
                 </span>
               </div>
-              <div className="divide-y divide-gray-50 px-2 py-1">
+              <div className="divide-y divide-[#33335c]/5 px-2 py-1">
                 {later.map((b) => (
                   <BehandelingsRij key={b.id} b={b} isPast={false} isUrgent={false} />
                 ))}
@@ -299,11 +294,13 @@ export default async function AdminMedischPage() {
         </div>
       )}
 
-      {/* ── Welzijn check-ins ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-50 flex items-center gap-3">
+      <div className="bg-white rounded-2xl border border-[#33335c]/8 overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#33335c]/5 flex items-center gap-3">
           <div className="size-9 rounded-xl bg-[#33335c]/[0.06] flex items-center justify-center flex-shrink-0">
-            <span className="material-symbols-outlined text-[#33335c]/60 text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
+            <span
+              className="material-symbols-outlined text-[#33335c]/60 text-base"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
               favorite
             </span>
           </div>
@@ -311,22 +308,23 @@ export default async function AdminMedischPage() {
             <p className="font-bold text-sm text-[#33335c]">Welzijn check-ins</p>
             <p className="text-xs text-[#33335c]/45 mt-0.5">Dagelijkse observaties: voeding, gedrag en gezondheid</p>
           </div>
-          <Link
-            href="/admin/dieren"
-            className="flex items-center gap-2 bg-[#33335c] text-white font-bold px-4 py-2.5 rounded-xl text-sm hover:bg-[#33335c]/90 transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm text-[#f8aa25]" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+          <ButtonLink href="/admin/dieren" variant="ghost" icon="pets">
             Kies dier
-          </Link>
+          </ButtonLink>
         </div>
 
-        {/* Type legenda */}
         <div className="px-5 py-4">
           <p className="text-[10px] font-bold text-[#33335c]/30 uppercase tracking-wider mb-3">Behandelingstypes</p>
           <div className="flex flex-wrap gap-2">
             {Object.entries(typeConfig).map(([type, cfg]) => (
-              <div key={type} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wide ${cfg.bg} ${cfg.kleur}`}>
-                <span className="material-symbols-outlined" style={{ fontSize: '0.7rem', fontVariationSettings: "'FILL' 1" }}>
+              <div
+                key={type}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wide ${cfg.bg} ${cfg.kleur}`}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: '0.7rem', fontVariationSettings: "'FILL' 1" }}
+                >
                   {cfg.icon}
                 </span>
                 {type}
@@ -335,7 +333,6 @@ export default async function AdminMedischPage() {
           </div>
         </div>
       </div>
-
     </div>
   )
 }

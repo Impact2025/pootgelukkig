@@ -184,6 +184,20 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Respecteer gebruikers die beweging beperken (toegankelijkheid) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Tour pulse animatie */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -223,3 +237,17 @@ input[type="password"]:focus {
 .admin-input {
   @apply w-full px-4 py-2.5 text-sm text-[#33335c] bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#33335c]/40 focus:ring-2 focus:ring-[#33335c]/5 transition-colors placeholder:text-[#33335c]/25;
 }
+
+/* ─── Blog artikel typografie ─────────────────────────────────────────────── */
+.blog-inhoud h1 { @apply text-3xl font-extrabold text-[#33335c] mt-8 mb-4 leading-tight; }
+.blog-inhoud h2 { @apply text-2xl font-extrabold text-[#33335c] mt-8 mb-3 leading-tight; }
+.blog-inhoud h3 { @apply text-xl font-bold text-[#33335c] mt-6 mb-2; }
+.blog-inhoud p { @apply mb-4; }
+.blog-inhoud a { @apply text-[#ee5b2b] font-semibold underline underline-offset-2 hover:text-[#33335c]; }
+.blog-inhoud ul { @apply list-disc pl-6 mb-4 space-y-1; }
+.blog-inhoud ol { @apply list-decimal pl-6 mb-4 space-y-1; }
+.blog-inhoud li { @apply text-[#33335c]/80; }
+.blog-inhoud strong { @apply font-bold text-[#33335c]; }
+.blog-inhoud blockquote { @apply border-l-4 border-[#f8aa25] pl-4 italic text-[#33335c]/60 my-4; }
+.blog-inhoud img { @apply rounded-2xl my-6; }
+.blog-inhoud h1:first-child { @apply mt-0; }

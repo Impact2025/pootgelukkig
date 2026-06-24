@@ -224,7 +224,8 @@ function parseerJsonAntwoord(tekst: string): ReturnType<typeof JSON.parse> {
 export async function berekenMatch(
   adopter: AdopterProfiel,
   dier: DierProfiel,
-  historischeContext?: string
+  historischeContext?: string,
+  userId?: number
 ): Promise<MatchResultaat> {
   // Harde filters
   const filterReden = hardFilter(adopter, dier)
@@ -245,7 +246,7 @@ export async function berekenMatch(
         { role: 'system', content: MATCHING_SYSTEEM_PROMPT },
         { role: 'user', content: prompt },
       ],
-      { maxTokens: 400 }
+      { maxTokens: 400, meta: { module: 'matching', userId } }
     )
 
     const r = parseerJsonAntwoord(tekst) as {
@@ -396,7 +397,8 @@ function parseerBatchJsonAntwoord(tekst: string): Map<number, {
 export async function berekenMatchesBatch(
   adopter: AdopterProfiel,
   dieren: DierProfiel[],
-  historischeContext?: Record<string, string>
+  historischeContext?: Record<string, string>,
+  userId?: number
 ): Promise<MatchResultaat[]> {
   // Stap 1: Harde filters — meteen afwijzen
   const gefilterd: DierProfiel[] = []
@@ -435,7 +437,7 @@ export async function berekenMatchesBatch(
         { role: 'system', content: MATCHING_SYSTEEM_PROMPT },
         { role: 'user', content: prompt },
       ],
-      { maxTokens: 4000 }
+      { maxTokens: 4000, meta: { module: 'matching', userId } }
     )
 
     const aiMap = parseerBatchJsonAntwoord(tekst)
@@ -582,7 +584,8 @@ function nulScore(dierId: number, reden: string): MatchResultaat {
 export async function genereerMatchAnalyse(
   adopter: AdopterProfiel,
   dier: DierProfiel,
-  score: number
+  score: number,
+  userId?: number
 ): Promise<string> {
   const prompt = `Je bent Dr. Poot, een warme dierenwelzijn-expert voor PootGelukkig.
 
@@ -599,7 +602,7 @@ Begin met "Op basis van..." en benoem zowel de sterkste match-reden als één co
         { role: 'system', content: 'Je bent Dr. Poot, een warme maar eerlijke dierenwelzijn-expert. Schrijf in het Nederlands.' },
         { role: 'user', content: prompt },
       ],
-      { maxTokens: 250 }
+      { maxTokens: 250, meta: { module: 'matching', userId } }
     )
   } catch {
     return `Op basis van jouw leefstijl is ${dier.naam} een ${score >= 80 ? 'uitstekende' : score >= 60 ? 'goede' : 'mogelijke'} keuze met een score van ${score}%.`

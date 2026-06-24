@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useToast } from '@/components/admin/Toast'
 
 type Energie = 'laag' | 'normaal' | 'hoog' | 'zeer_hoog'
 type AlleenThuis = 'slecht' | 'matig' | 'goed'
@@ -41,6 +42,7 @@ const SUGGESTIE_TAGS = ['sociaal', 'speels', 'rustig', 'trouw', 'zelfstandig', '
 
 export default function BewerkDierForm({ dier }: { dier: Dier }) {
   const router = useRouter()
+  const { showToast } = useToast()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [naam, setNaam] = useState(dier.naam)
@@ -62,8 +64,6 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
 
   const [uploading, setUploading] = useState(false)
   const [laden, setLaden] = useState(false)
-  const [fout, setFout] = useState<string | null>(null)
-  const [opgeslagen, setOpgeslagen] = useState(false)
 
   async function verwerkFoto(bestand: File) {
     const reader = new FileReader()
@@ -79,17 +79,16 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
       if (res.ok && json.url) {
         setHoofdFotoUrl(json.url)
       } else {
-        setFout(json.error ?? 'Foto upload mislukt')
+        showToast(json.error ?? 'Foto upload mislukt', 'error')
       }
     } catch {
-      setFout('Foto upload mislukt')
+      showToast('Foto upload mislukt', 'error')
     } finally {
       setUploading(false)
     }
   }
 
   async function opslaan() {
-    setFout(null)
     setLaden(true)
     try {
       const res = await fetch(`/api/animals/${dier.id}`, {
@@ -122,15 +121,13 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
 
       if (!res.ok) {
         const err = await res.json()
-        setFout(err.error ?? 'Opslaan mislukt')
+        showToast(err.error ?? 'Opslaan mislukt', 'error')
         return
       }
 
-      setOpgeslagen(true)
-      setTimeout(() => {
-        router.push('/admin/dieren')
-        router.refresh()
-      }, 800)
+      showToast(`${naam} opgeslagen`, 'success')
+      router.push('/admin/dieren')
+      router.refresh()
     } finally {
       setLaden(false)
     }
@@ -146,7 +143,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-4">
+      <header className="sticky top-0 z-50 bg-white border-b border-[#33335c]/8 px-5 py-4 flex items-center gap-4">
         <button
           onClick={() => router.back()}
           className="size-9 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -164,19 +161,17 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
         >
           {laden ? (
             <span className="size-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : opgeslagen ? (
-            <span className="material-symbols-outlined text-base">check</span>
           ) : (
             <span className="material-symbols-outlined text-base">save</span>
           )}
-          {opgeslagen ? 'Opgeslagen!' : 'Opslaan'}
+          Opslaan
         </button>
       </header>
 
       <main className="max-w-lg mx-auto px-5 pt-6 pb-24 space-y-6">
 
         {/* Foto */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-5">
+        <section className="bg-white rounded-2xl border border-[#33335c]/8 p-5">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Foto</p>
           <div
             onClick={() => fileRef.current?.click()}
@@ -223,7 +218,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
         </section>
 
         {/* Basisinfo */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-[#33335c]/8 p-5 space-y-4">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Basisinfo</p>
 
           <div>
@@ -272,7 +267,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
                   type="button"
                   onClick={() => setStatus(s.value)}
                   className={`py-2.5 rounded-xl border-2 text-xs font-bold transition-all ${
-                    status === s.value ? s.kleur : 'border-gray-100 bg-white text-gray-400 hover:border-gray-200'
+                    status === s.value ? s.kleur : 'border-[#33335c]/8 bg-white text-gray-400 hover:border-gray-200'
                   }`}
                 >
                   {s.label}
@@ -283,7 +278,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
         </section>
 
         {/* Karakter */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
+        <section className="bg-white rounded-2xl border border-[#33335c]/8 p-5 space-y-4">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Karakter</p>
 
           <div>
@@ -297,7 +292,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
                   className={`py-2 rounded-xl border-2 text-xs font-bold transition-all ${
                     energieNiveau === e
                       ? 'border-[#33335c] bg-[#33335c] text-white'
-                      : 'border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200'
+                      : 'border-[#33335c]/8 bg-gray-50 text-gray-500 hover:border-gray-200'
                   }`}
                 >
                   {e === 'laag' ? 'Rustig' : e === 'normaal' ? 'Normaal' : e === 'hoog' ? 'Actief' : 'Heel actief'}
@@ -319,7 +314,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
                   type="button"
                   onClick={() => set(!state)}
                   className={`flex-1 py-2.5 rounded-xl border-2 flex flex-col items-center gap-1 transition-all ${
-                    state ? 'border-[#33335c] bg-[#33335c] text-white' : 'border-gray-100 bg-gray-50 text-gray-400'
+                    state ? 'border-[#33335c] bg-[#33335c] text-white' : 'border-[#33335c]/8 bg-gray-50 text-gray-400'
                   }`}
                 >
                   <span className="text-lg">{emoji}</span>
@@ -373,7 +368,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
         </section>
 
         {/* Gezondheid */}
-        <section className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+        <section className="bg-white rounded-2xl border border-[#33335c]/8 p-5 space-y-3">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Gezondheid</p>
           {[
             { state: gevaccineerd, set: setGevaccineerd, label: 'Gevaccineerd', icon: 'vaccines' },
@@ -385,7 +380,7 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
               type="button"
               onClick={() => set(!state)}
               className={`w-full p-4 rounded-xl border-2 flex items-center gap-3 transition-all text-left ${
-                state ? 'border-green-200 bg-green-50' : 'border-gray-100 bg-gray-50 hover:border-gray-200'
+                state ? 'border-green-200 bg-green-50' : 'border-[#33335c]/8 bg-gray-50 hover:border-gray-200'
               }`}
             >
               <div className={`size-9 rounded-xl flex items-center justify-center flex-shrink-0 ${state ? 'bg-green-500' : 'bg-gray-200'}`}>
@@ -398,13 +393,6 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
           ))}
         </section>
 
-        {fout && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-red-500">error_outline</span>
-            <p className="text-red-600 text-sm">{fout}</p>
-          </div>
-        )}
-
         <button
           onClick={opslaan}
           disabled={laden || uploading}
@@ -412,11 +400,6 @@ export default function BewerkDierForm({ dier }: { dier: Dier }) {
         >
           {laden ? (
             <span className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : opgeslagen ? (
-            <>
-              <span className="material-symbols-outlined">check_circle</span>
-              Opgeslagen!
-            </>
           ) : (
             <>
               <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>save</span>

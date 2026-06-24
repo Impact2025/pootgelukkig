@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
@@ -7,6 +7,7 @@ import { and, eq, count, desc, gte, ne, sql } from 'drizzle-orm'
 import Link from 'next/link'
 import Image from 'next/image'
 import WelkomTour from '@/components/onboarding/WelkomTour'
+import { StatCard, Card, ButtonLink, StatusBadge } from '@/components/admin/ui'
 
 function begroeting() {
   const uur = new Date().getHours()
@@ -77,7 +78,6 @@ export default async function AdminDashboardPage() {
         : eq(adopties.status, 'aangevraagd')
     )
 
-  // 7-dag trend
   const zeveDagenGeleden = new Date()
   zeveDagenGeleden.setDate(zeveDagenGeleden.getDate() - 6)
   zeveDagenGeleden.setHours(0, 0, 0, 0)
@@ -111,7 +111,6 @@ export default async function AdminDashboardPage() {
   })
   const maxTrend = Math.max(...trendData.map((t) => t.aantal), 1)
 
-  // Openstaande verzoeken (top 3 voor dashboard)
   const openstaandeVerzoeken = await db
     .select({
       id: adopties.id,
@@ -133,7 +132,6 @@ export default async function AdminDashboardPage() {
     .orderBy(adopties.aangevraagdOp)
     .limit(3)
 
-  // Recente dieren
   const recenteDieren = await db
     .select({
       id: dieren.id,
@@ -154,27 +152,14 @@ export default async function AdminDashboardPage() {
   const inShelter = aantalInShelter?.aantal ?? 0
   const openstaand = aantalOpenstaand?.aantal ?? 0
 
-  const statusKleur: Record<string, { text: string; dot: string }> = {
-    beschikbaar: { text: 'text-emerald-700', dot: 'bg-emerald-500' },
-    in_behandeling: { text: 'text-amber-700', dot: 'bg-amber-500' },
-    geadopteerd: { text: 'text-blue-700', dot: 'bg-blue-500' },
-    niet_beschikbaar: { text: 'text-gray-500', dot: 'bg-gray-400' },
-  }
-  const statusLabel: Record<string, string> = {
-    beschikbaar: 'Beschikbaar',
-    in_behandeling: 'In behandeling',
-    geadopteerd: 'Geadopteerd',
-    niet_beschikbaar: 'Niet beschikbaar',
-  }
-
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-6xl mx-auto space-y-6">
       <WelkomTour naam={session?.user?.name ?? 'beheerder'} rol={session?.user?.rol ?? 'asiel'} />
 
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      {/* Begroeting */}
+      <div className="flex items-start justify-between">
         <div>
-          <p className="text-[#33335c]/40 text-sm font-medium mb-1">
+          <p className="text-[#33335c]/40 text-sm font-medium">
             {new Date().toLocaleDateString('nl-NL', {
               weekday: 'long',
               day: 'numeric',
@@ -182,23 +167,19 @@ export default async function AdminDashboardPage() {
               year: 'numeric',
             })}
           </p>
-          <h1 className="text-3xl font-extrabold text-[#33335c] leading-tight">
-            {begroeting()}, {session?.user?.name?.split(' ')[0] ?? 'beheerder'} 👋
+          <h1 className="text-3xl font-extrabold text-[#33335c] leading-tight mt-0.5">
+            {begroeting()}, {session?.user?.name?.split(' ')[0] ?? 'beheerder'}
           </h1>
-          <p className="text-[#33335c]/40 text-sm mt-1 font-medium">{asielNaam}</p>
+          <p className="text-[#33335c]/40 text-sm mt-0.5 font-medium">{asielNaam}</p>
         </div>
-        <Link
-          href="/admin/dieren/nieuw"
-          className="flex items-center gap-2 bg-[#33335c] text-white font-bold px-5 py-3 rounded-2xl hover:bg-[#33335c]/90 transition-all shadow-lg shadow-[#33335c]/20 text-sm flex-shrink-0"
-        >
-          <span className="material-symbols-outlined text-base">add</span>
+        <ButtonLink href="/admin/dieren/nieuw" icon="add" className="flex-shrink-0">
           Dier toevoegen
-        </Link>
+        </ButtonLink>
       </div>
 
-      {/* Alert banner */}
+      {/* Alert banner openstaande verzoeken */}
       {openstaand > 0 && (
-        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
               <span
@@ -210,8 +191,7 @@ export default async function AdminDashboardPage() {
             </div>
             <div>
               <p className="font-bold text-amber-900 text-sm">
-                {openstaand} {openstaand === 1 ? 'adoptieverzoek wacht' : 'adoptieverzoeken wachten'} op jouw
-                actie
+                {openstaand} {openstaand === 1 ? 'adoptieverzoek wacht' : 'adoptieverzoeken wachten'} op jouw actie
               </p>
               <p className="text-amber-600/70 text-xs mt-0.5">Reageer snel voor de beste ervaring</p>
             </div>
@@ -226,84 +206,64 @@ export default async function AdminDashboardPage() {
         </div>
       )}
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        {[
-          {
-            label: 'Beschikbaar',
-            waarde: beschikbaar,
-            icon: 'pets',
-            bg: 'bg-emerald-50',
-            iconBg: 'bg-[#f8aa25]/20',
-            iconKleur: '#059669',
-            sub: `van ${inShelter} in opvang`,
-          },
-          {
-            label: 'Wachten',
-            waarde: openstaand,
-            icon: 'schedule',
-            bg: 'bg-amber-50',
-            iconBg: 'bg-amber-100',
-            iconKleur: '#d97706',
-            sub: 'adoptieverzoeken',
-          },
-          {
-            label: 'Adopties',
-            waarde: aantalAfgerond?.aantal ?? 0,
-            icon: 'favorite',
-            bg: 'bg-blue-50',
-            iconBg: 'bg-blue-100',
-            iconKleur: '#2563eb',
-            sub: 'afgerond totaal',
-          },
-          {
-            label: 'AI Matches',
-            waarde: aantalMatches?.aantal ?? 0,
-            icon: 'auto_awesome',
-            bg: 'bg-violet-50',
-            iconBg: 'bg-violet-100',
-            iconKleur: '#7c3aed',
-            sub: 'berekend totaal',
-          },
-        ].map((stat) => (
-          <div key={stat.label} className={`${stat.bg} rounded-2xl p-5 border border-black/[0.04]`}>
-            <div className={`size-10 rounded-xl ${stat.iconBg} flex items-center justify-center mb-4`}>
-              <span
-                className="material-symbols-outlined text-xl"
-                style={{ color: stat.iconKleur, fontVariationSettings: "'FILL' 1" }}
-              >
-                {stat.icon}
-              </span>
-            </div>
-            <p className="text-3xl font-extrabold text-[#33335c] tabular-nums">{stat.waarde}</p>
-            <p className="text-[#33335c]/60 text-xs font-bold mt-1 uppercase tracking-wider">{stat.label}</p>
-            <p className="text-[#33335c]/30 text-[10px] mt-0.5">{stat.sub}</p>
-          </div>
-        ))}
+      {/* KPI rij */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Beschikbaar"
+          value={beschikbaar}
+          icon="pets"
+          tone="success"
+          hint={`van ${inShelter} in opvang`}
+          href="/admin/dieren"
+        />
+        <StatCard
+          label="Openstaand"
+          value={openstaand}
+          icon="schedule"
+          tone={openstaand > 0 ? 'warning' : 'neutral'}
+          hint="adoptieverzoeken"
+          href="/admin/adopties"
+        />
+        <StatCard
+          label="Adopties"
+          value={aantalAfgerond?.aantal ?? 0}
+          icon="favorite"
+          tone="info"
+          hint="afgerond totaal"
+          href="/admin/adopties"
+        />
+        <StatCard
+          label="AI Matches"
+          value={aantalMatches?.aantal ?? 0}
+          icon="auto_awesome"
+          tone="neutral"
+          hint="berekend totaal"
+        />
       </div>
 
       {/* Trend + Urgent queue */}
-      <div className="grid grid-cols-3 gap-5 mb-5">
+      <div className="grid grid-cols-3 gap-5">
         {/* Bar chart */}
-        <div className="col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+        <Card className="col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-bold text-[#33335c]">Adoptieverzoeken trend</h2>
               <p className="text-[#33335c]/40 text-xs mt-0.5">Afgelopen 7 dagen</p>
             </div>
-            <span className="text-xs font-semibold text-[#33335c]/40 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+            <span className="text-xs font-semibold text-[#33335c]/40 bg-gray-50 px-3 py-1.5 rounded-full border border-[#33335c]/8">
               {trendData.reduce((s, d) => s + d.aantal, 0)} totaal
             </span>
           </div>
           <div className="flex items-end gap-2" style={{ height: '100px' }}>
             {trendData.map((dag) => (
               <div key={dag.datum} className="flex-1 flex flex-col items-center gap-2 group">
-                {dag.aantal > 0 && (
+                {dag.aantal > 0 ? (
                   <span className="text-[10px] font-bold text-white bg-[#33335c] rounded-md px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     {dag.aantal}
                   </span>
+                ) : (
+                  <span className="text-[10px] opacity-0">0</span>
                 )}
-                {dag.aantal === 0 && <span className="text-[10px] opacity-0">0</span>}
                 <div className="w-full flex items-end" style={{ height: '68px' }}>
                   <div
                     className={`w-full rounded-xl transition-all duration-300 ${
@@ -326,7 +286,7 @@ export default async function AdminDashboardPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 mt-5 pt-4 border-t border-gray-50">
+          <div className="flex items-center gap-4 mt-5 pt-4 border-t border-[#33335c]/5">
             <div className="flex items-center gap-1.5">
               <div className="size-2.5 rounded-sm bg-[#f8aa25]" />
               <span className="text-[10px] text-[#33335c]/40 font-medium">Vandaag</span>
@@ -336,14 +296,14 @@ export default async function AdminDashboardPage() {
               <span className="text-[10px] text-[#33335c]/40 font-medium">Eerdere dagen</span>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Urgent queue */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col">
+        <Card className="flex flex-col">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-bold text-[#33335c]">Actie nodig</h2>
             {openstaand > 3 && (
-              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">
+              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">
                 +{openstaand - 3} meer
               </span>
             )}
@@ -399,11 +359,11 @@ export default async function AdminDashboardPage() {
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </Link>
           )}
-        </div>
+        </Card>
       </div>
 
       {/* Recente dieren */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <Card>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-4">
             <h2 className="font-bold text-[#33335c]">Recente dieren</h2>
@@ -412,7 +372,7 @@ export default async function AdminDashboardPage() {
                 <div className="h-1.5 w-28 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#f8aa25] rounded-full"
-                    style={{ width: `${inShelter > 0 ? (beschikbaar / inShelter) * 100 : 0}%` }}
+                    style={{ width: `${(beschikbaar / inShelter) * 100}%` }}
                   />
                 </div>
                 <span className="text-xs text-[#33335c]/40 font-medium">
@@ -434,52 +394,44 @@ export default async function AdminDashboardPage() {
           <div className="py-10 text-center">
             <span className="material-symbols-outlined text-gray-200 text-5xl block mb-3">pets</span>
             <p className="text-gray-400 text-sm font-medium">Nog geen dieren toegevoegd</p>
-            <Link href="/admin/dieren/nieuw">
-              <button className="mt-3 bg-[#33335c] text-white text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-[#33335c]/90 transition-colors">
-                Eerste dier toevoegen
-              </button>
-            </Link>
+            <ButtonLink href="/admin/dieren/nieuw" icon="add" className="mt-3">
+              Eerste dier toevoegen
+            </ButtonLink>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {recenteDieren.map((dier) => {
-              const sk = statusKleur[dier.status] ?? { text: 'text-gray-500', dot: 'bg-gray-400' }
-              return (
-                <Link
-                  key={dier.id}
-                  href={`/animals/${dier.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="size-11 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative">
-                    {dier.hoofdFotoUrl ? (
-                      <Image src={dier.hoofdFotoUrl} alt={dier.naam} fill className="object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-gray-300">pets</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-[#33335c] text-sm truncate group-hover:underline">
-                      {dier.naam}
-                    </p>
-                    <p className="text-gray-400 text-xs truncate">
-                      {dier.ras ?? dier.soort}
-                      {dier.leeftijdJaren ? ` · ${dier.leeftijdJaren}j` : ''}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className={`size-1.5 rounded-full flex-shrink-0 ${sk.dot}`} />
-                      <span className={`text-[10px] font-semibold ${sk.text}`}>
-                        {statusLabel[dier.status]}
-                      </span>
+            {recenteDieren.map((dier) => (
+              <Link
+                key={dier.id}
+                href={`/animals/${dier.id}`}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
+              >
+                <div className="size-11 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 relative">
+                  {dier.hoofdFotoUrl ? (
+                    <Image src={dier.hoofdFotoUrl} alt={dier.naam} fill className="object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="material-symbols-outlined text-gray-300">pets</span>
                     </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-[#33335c] text-sm truncate group-hover:underline">
+                    {dier.naam}
+                  </p>
+                  <p className="text-gray-400 text-xs truncate">
+                    {dier.ras ?? dier.soort}
+                    {dier.leeftijdJaren ? ` · ${dier.leeftijdJaren}j` : ''}
+                  </p>
+                  <div className="mt-1">
+                    <StatusBadge status={dier.status} />
                   </div>
-                </Link>
-              )
-            })}
+                </div>
+              </Link>
+            ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

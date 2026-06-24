@@ -5,10 +5,12 @@ import { NextResponse } from 'next/server'
 const { auth } = NextAuth(authConfig)
 
 const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/pitch', '/auth/wachtwoord-vergeten', '/auth/wachtwoord-reset']
-const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron']
+const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron', '/api/coupons/valideer']
 const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
 const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/animals', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
+// Publieke marketing-site — altijd toegankelijk, ook uitgelogd
+const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact']
 
 function thuisRoute(rol?: string) {
   return rol === 'asiel' || rol === 'admin' ? '/admin' : '/dashboard'
@@ -32,15 +34,36 @@ export default auth((req) => {
   if (nextUrl.pathname.startsWith(API_AUTH_PREFIX)) return NextResponse.next()
   if (PUBLIC_API_ROUTES.some((r) => nextUrl.pathname.startsWith(r))) return NextResponse.next()
 
+  // Publieke blog + SEO-bestanden: altijd toegankelijk, ook uitgelogd, zonder redirect.
+  // OG-/twitter-images (next/og) hebben geen bestandsextensie en moeten voor crawlers
+  // bereikbaar zijn zonder login.
+  if (
+    nextUrl.pathname === '/blog' ||
+    nextUrl.pathname.startsWith('/blog/') ||
+    nextUrl.pathname === '/sitemap.xml' ||
+    nextUrl.pathname === '/robots.txt' ||
+    nextUrl.pathname.includes('opengraph-image') ||
+    nextUrl.pathname.includes('twitter-image')
+  ) {
+    return NextResponse.next()
+  }
+
+  // Marketing-subpagina's: altijd publiek, ook voor ingelogde gebruikers
+  if (MARKETING_ROUTES.some((r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + '/'))) {
+    return NextResponse.next()
+  }
+
   // Publieke routes — ingelogde gebruikers sturen naar hun eigen home
   if (PUBLIC_ROUTES.some((r) => nextUrl.pathname.startsWith(r))) {
     if (isLoggedIn) return NextResponse.redirect(new URL(thuisRoute(rol), req.url))
     return NextResponse.next()
   }
 
-  // Root redirect
+  // Root: uitgelogde bezoekers zien de marketing-homepage; ingelogde gebruikers
+  // gaan naar hun eigen home (dashboard of admin).
   if (nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL(isLoggedIn ? thuisRoute(rol) : '/auth/login', req.url))
+    if (isLoggedIn) return NextResponse.redirect(new URL(thuisRoute(rol), req.url))
+    return NextResponse.next()
   }
 
   // Niet ingelogd → login
@@ -60,6 +83,11 @@ export default auth((req) => {
   const isAsielRoute = ASIEL_ROUTES.some((r) => nextUrl.pathname.startsWith(r))
   if (isAsielRoute && rol === 'adoptant') {
     return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  // Platform-beheer (CRM, blog, coupons, gebruikers) is alleen voor admins
+  if (nextUrl.pathname.startsWith('/admin/beheer') && rol !== 'admin') {
+    return NextResponse.redirect(new URL('/admin', req.url))
   }
 
   return NextResponse.next()

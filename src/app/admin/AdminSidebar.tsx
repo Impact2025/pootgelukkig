@@ -1,59 +1,68 @@
-﻿'use client'
+'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from 'next-auth/react'
-
-const navItems = [
-  { href: '/admin', icon: 'grid_view', label: 'Dashboard', exact: true },
-  { href: '/admin/copilot', icon: 'auto_awesome', label: 'AI Copilot', highlight: true },
-  { href: '/admin/dieren', icon: 'pets', label: 'Dieren' },
-  { href: '/admin/adopties', icon: 'favorite', label: 'Adoptie' },
-  { href: '/admin/afspraken', icon: 'calendar_month', label: 'Afspraken' },
-  { href: '/admin/berichten', icon: 'chat', label: 'Berichten' },
-]
-
-const navItemsExtra = [
-  { href: '/admin/medisch', icon: 'medical_services', label: 'Medisch' },
-  { href: '/admin/wachtlijst', icon: 'format_list_bulleted', label: 'Wachtlijst' },
-  { href: '/admin/pleeggezinnen', icon: 'house', label: 'Pleeggezinnen' },
-  { href: '/admin/asielen-werving', icon: 'domain_add', label: 'Asielen werving' },
-  { href: '/admin/rapportage', icon: 'bar_chart', label: 'Rapportage' },
-  { href: '/admin/instellingen', icon: 'settings', label: 'Instellingen' },
-]
+import { NAV_GROUPS, type NavItem } from '@/components/admin/nav'
+import { cx } from '@/components/admin/ui'
+import type { AdminCounts, AdminUser } from './AdminShell'
 
 interface Props {
-  userName: string
-  userEmail: string
-  openstaand: number
-  ongelezen?: number
-  medischAlert?: number
-  wachtlijstAantal?: number
-  afsprakenAangevraagd?: number
+  user: AdminUser
+  counts: AdminCounts
+  collapsed: boolean
+  mobileOpen: boolean
+  onCloseMobile: () => void
 }
 
-export default function AdminSidebar({
-  userName,
-  userEmail,
-  openstaand,
-  ongelezen = 0,
-  medischAlert = 0,
-  wachtlijstAantal = 0,
-  afsprakenAangevraagd = 0,
-}: Props) {
-  const pathname = usePathname()
+function badgeFor(item: NavItem, counts: AdminCounts): { value: number; tone: 'rood' | 'navy' } | null {
+  switch (item.badge) {
+    case 'openstaand':
+      return counts.openstaand > 0 ? { value: counts.openstaand, tone: 'rood' } : null
+    case 'afspraken':
+      return counts.afspraken > 0 ? { value: counts.afspraken, tone: 'rood' } : null
+    case 'ongelezen':
+      return counts.ongelezen > 0 ? { value: counts.ongelezen, tone: 'rood' } : null
+    case 'medisch':
+      return counts.medisch > 0 ? { value: counts.medisch, tone: 'rood' } : null
+    case 'wachtlijst':
+      return counts.wachtlijst > 0 ? { value: counts.wachtlijst, tone: 'navy' } : null
+    default:
+      return null
+  }
+}
 
-  function isActive(item: { href: string; exact?: boolean }) {
-    if (item.exact) return pathname === item.href
-    return pathname.startsWith(item.href)
+export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCloseMobile }: Props) {
+  const pathname = usePathname()
+  const isAdmin = user.rol === 'admin'
+
+  function isActive(item: NavItem) {
+    return item.exact ? pathname === item.href : pathname.startsWith(item.href)
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 fixed h-full flex flex-col z-50">
-      {/* Logo */}
-      <div className="px-5 pt-6 pb-5 border-b border-gray-50">
-        <div className="flex items-center gap-3">
-          <div className="size-9 rounded-xl bg-[#33335c] flex items-center justify-center flex-shrink-0">
+    <>
+      {/* Mobiel: backdrop */}
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Menu sluiten"
+          onClick={onCloseMobile}
+          className="fixed inset-0 z-40 bg-[#33335c]/30 backdrop-blur-sm lg:hidden"
+        />
+      )}
+
+      <aside
+        className={cx(
+          'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-gray-100 bg-white transition-[width,transform] duration-200',
+          'w-64',
+          collapsed ? 'lg:w-[76px]' : 'lg:w-64',
+          'lg:translate-x-0',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {/* Logo */}
+        <div className="flex h-16 items-center gap-3 border-b border-gray-50 px-5">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#33335c]">
             <span
               className="material-symbols-outlined text-[#f8aa25]"
               style={{ fontSize: '1.1rem', fontVariationSettings: "'FILL' 1" }}
@@ -61,125 +70,84 @@ export default function AdminSidebar({
               pets
             </span>
           </div>
-          <div>
-            <p className="font-extrabold text-[#33335c] text-sm leading-tight">PootGelukkig</p>
-            <p className="text-[10px] text-[#33335c]/40 font-semibold uppercase tracking-widest">
-              Asiel Portaal
-            </p>
+          <div className={cx(collapsed && 'lg:hidden')}>
+            <p className="text-sm font-extrabold leading-tight text-[#33335c]">PootGelukkig</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#33335c]/40">Asiel Portaal</p>
           </div>
         </div>
-      </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const active = isActive(item)
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                active
-                  ? 'bg-[#33335c] text-white shadow-md shadow-[#33335c]/20'
-                  : item.highlight
-                  ? 'bg-[#f8aa25]/10 text-[#33335c] hover:bg-[#f8aa25]/20'
-                  : 'text-[#33335c]/50 hover:bg-gray-50 hover:text-[#33335c]'
-              }`}
-            >
-              <span
-                className="material-symbols-outlined text-xl flex-shrink-0"
-                style={{
-                  fontVariationSettings: active || item.highlight ? "'FILL' 1" : "'FILL' 0",
-                  color: !active && item.highlight ? '#f8aa25' : undefined,
-                }}
-              >
-                {item.icon}
-              </span>
-              <span className="flex-1">{item.label}</span>
-              {item.href === '/admin/adopties' && openstaand > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
-                  {openstaand}
-                </span>
-              )}
-              {item.href === '/admin/afspraken' && afsprakenAangevraagd > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
-                  {afsprakenAangevraagd}
-                </span>
-              )}
-              {item.href === '/admin/berichten' && ongelezen > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
-                  {ongelezen}
-                </span>
-              )}
-            </Link>
-          )
-        })}
-
-        {/* Separator */}
-        <div className="px-1 py-2">
-          <div className="h-px bg-gray-100" />
-        </div>
-
-        {navItemsExtra.map((item) => {
-          const active = isActive(item)
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                active
-                  ? 'bg-[#33335c] text-white shadow-md shadow-[#33335c]/20'
-                  : 'text-[#33335c]/50 hover:bg-gray-50 hover:text-[#33335c]'
-              }`}
-            >
-              <span
-                className="material-symbols-outlined text-xl flex-shrink-0"
-                style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
-              >
-                {item.icon}
-              </span>
-              <span className="flex-1">{item.label}</span>
-              {item.href === '/admin/medisch' && medischAlert > 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
-                  {medischAlert}
-                </span>
-              )}
-              {item.href === '/admin/wachtlijst' && wachtlijstAantal > 0 && (
-                <span className="bg-[#33335c]/20 text-[#33335c] text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-tight">
-                  {wachtlijstAantal}
-                </span>
-              )}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Divider */}
-      <div className="px-4 mb-3">
-        <div className="h-px bg-gray-100" />
-      </div>
-
-      {/* User */}
-      <div className="px-3 pb-5">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50">
-          <div className="size-8 rounded-lg bg-[#33335c] flex items-center justify-center flex-shrink-0">
-            <span className="text-[#f8aa25] font-extrabold text-sm leading-none">
-              {userName.charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[#33335c] text-xs font-bold truncate leading-tight">{userName}</p>
-            <p className="text-[#33335c]/40 text-[10px] truncate">{userEmail}</p>
-          </div>
-          <button
-            onClick={() => signOut({ callbackUrl: '/auth/login' })}
-            className="text-[#33335c]/30 hover:text-[#33335c]/70 transition-colors flex-shrink-0"
-            title="Uitloggen"
-          >
-            <span className="material-symbols-outlined text-base">logout</span>
-          </button>
-        </div>
-      </div>
-    </aside>
+        {/* Nav */}
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+          {NAV_GROUPS.map((groep, gi) => {
+            const items = groep.items.filter((i) => isAdmin || !i.adminOnly)
+            if (items.length === 0) return null
+            return (
+              <div key={gi}>
+                {gi > 0 && (
+                  <div className="px-1 py-2">
+                    <div className="h-px bg-gray-100" />
+                  </div>
+                )}
+                {groep.titel && (
+                  <div className={cx('px-3 pb-1.5 pt-2', collapsed && 'lg:hidden')}>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#33335c]/30">{groep.titel}</p>
+                  </div>
+                )}
+                {items.map((item) => {
+                  const active = isActive(item)
+                  const badge = badgeFor(item, counts)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      title={collapsed ? item.label : undefined}
+                      aria-current={active ? 'page' : undefined}
+                      onClick={onCloseMobile}
+                      className={cx(
+                        'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all',
+                        collapsed && 'lg:justify-center',
+                        active
+                          ? 'bg-[#33335c] text-white shadow-md shadow-[#33335c]/20'
+                          : item.highlight
+                            ? 'bg-[#f8aa25]/10 text-[#33335c] hover:bg-[#f8aa25]/20'
+                            : 'text-[#33335c]/50 hover:bg-gray-50 hover:text-[#33335c]'
+                      )}
+                    >
+                      <span className="relative flex-shrink-0">
+                        <span
+                          className="material-symbols-outlined text-xl"
+                          style={{
+                            fontVariationSettings: active || item.highlight ? "'FILL' 1" : "'FILL' 0",
+                            color: !active && item.highlight ? '#f8aa25' : undefined,
+                          }}
+                        >
+                          {item.icon}
+                        </span>
+                        {/* Ingeklapt: kleine indicator i.p.v. teller */}
+                        {badge && collapsed && (
+                          <span className="absolute -right-1 -top-1 hidden size-2 rounded-full bg-red-500 lg:block" />
+                        )}
+                      </span>
+                      <span className={cx('flex-1', collapsed && 'lg:hidden')}>{item.label}</span>
+                      {badge && (
+                        <span
+                          className={cx(
+                            'rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold leading-tight min-w-[18px]',
+                            collapsed && 'lg:hidden',
+                            badge.tone === 'rood' ? 'bg-red-500 text-white' : 'bg-[#33335c]/20 text-[#33335c]'
+                          )}
+                        >
+                          {badge.value}
+                        </span>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </nav>
+      </aside>
+    </>
   )
 }

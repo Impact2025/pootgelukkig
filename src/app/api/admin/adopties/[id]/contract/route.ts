@@ -79,7 +79,7 @@ Return ONLY clean HTML (no markdown, no \`\`\`html wrapper). Use inline styles f
 
   const html = await chatCompletion(
     [{ role: 'user', content: prompt }],
-    { maxTokens: 3000 }
+    { maxTokens: 3000, meta: { module: 'contract' } }
   )
 
   return NextResponse.json({ data: { html } })

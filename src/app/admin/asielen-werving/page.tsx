@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { asielen } from '@/lib/db/schema'
 import { eq, count } from 'drizzle-orm'
+import { PageHeader, StatCard } from '@/components/admin/ui'
 import WervingClient from './WervingClient'
 
 export default async function AsielenWervingPage() {
@@ -25,31 +26,26 @@ export default async function AsielenWervingPage() {
     .where(eq(asielen.wervingStatus, 'uitgenodigd'))
 
   return (
-    <div className="p-8 max-w-5xl">
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-extrabold text-[#33335c]">Asielen werving</h1>
-          <p className="text-sm text-[#33335c]/50 mt-1">
-            Nieuw gevonden asielen. Controleer het e-mailadres en stuur een uitnodiging
-            in de huisstijl.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-white border border-gray-100 rounded-xl px-4 py-2.5">
-          <span
-            className="material-symbols-outlined text-[#f8aa25] text-xl"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            mark_email_read
-          </span>
-          <div>
-            <p className="text-lg font-extrabold text-[#33335c] leading-none">
-              {uitgenodigd?.aantal ?? 0}
-            </p>
-            <p className="text-[10px] text-[#33335c]/40 font-semibold uppercase tracking-wider">
-              Uitgenodigd
-            </p>
-          </div>
-        </div>
+    <div className="p-8 max-w-5xl mx-auto space-y-6">
+      <PageHeader
+        title="Asielen werving"
+        icon="domain_add"
+        description="Nieuw gevonden asielen. Controleer het e-mailadres en stuur een uitnodiging in de huisstijl."
+      />
+
+      <div className="grid grid-cols-3 gap-4">
+        <StatCard
+          label="Nog uitnodigen"
+          value={nieuweAsielen.length}
+          icon="mail_outline"
+          tone="warning"
+        />
+        <StatCard
+          label="Uitgenodigd"
+          value={uitgenodigd?.aantal ?? 0}
+          icon="mark_email_read"
+          tone="success"
+        />
       </div>
 
       <WervingClient asielen={nieuweAsielen} />

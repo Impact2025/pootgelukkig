@@ -43,7 +43,7 @@ Genereer de volgende onderdelen en return ALLEEN geldig JSON (geen markdown, gee
 
   const raw = await chatCompletion(
     [{ role: 'user', content: prompt }],
-    { maxTokens: 1000 }
+    { maxTokens: 1000, meta: { module: 'dier-intake' } }
   )
 
   let profiel: unknown

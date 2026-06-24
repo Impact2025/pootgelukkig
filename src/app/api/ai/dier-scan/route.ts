@@ -34,7 +34,7 @@ Geef ALLEEN dit JSON object terug, geen uitleg:
           { type: 'image_url', image_url: { url: fotoUrl } },
         ],
       },
-    ], { maxTokens: 400, model: 'anthropic/claude-sonnet-4-5' })
+    ], { maxTokens: 400, model: 'anthropic/claude-sonnet-4-5', meta: { module: 'dier-scan' } })
 
     const start = tekst.indexOf('{')
     const end = tekst.lastIndexOf('}')

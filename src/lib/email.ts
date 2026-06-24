@@ -1,24 +1,126 @@
 import { Resend } from 'resend'
 import { render } from '@react-email/components'
+import { db } from '@/lib/db'
+import { mailLog } from '@/lib/db/schema'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
 const VAN = 'PootGelukkig <no-reply@pootgelukkig.nl>'
 
+interface MailMeta {
+  template?: string
+  userId?: number | null
+  asielId?: number | null
+  contactId?: number | null
+  van?: string
+}
+
+// Niet-blokkerend wegschrijven naar mail_log (tracking van volume + status)
+async function logMail(args: {
+  naar: string
+  van: string
+  onderwerp: string
+  status: 'verzonden' | 'gefaald'
+  resendId?: string
+  fout?: string
+  meta?: MailMeta
+}) {
+  try {
+    await db.insert(mailLog).values({
+      naar: args.naar,
+      van: args.van,
+      onderwerp: args.onderwerp,
+      template: args.meta?.template ?? null,
+      status: args.status,
+      resendId: args.resendId ?? null,
+      contactId: args.meta?.contactId ?? null,
+      asielId: args.meta?.asielId ?? null,
+      userId: args.meta?.userId ?? null,
+      fout: args.fout ?? null,
+    })
+  } catch (err) {
+    console.error('[Email] mail_log schrijven mislukt:', err)
+  }
+}
+
 // ─── Basis verzend functie ────────────────────────────────────────────────────
 
-async function stuurEmail({ naar, onderwerp, html }: { naar: string; onderwerp: string; html: string }) {
+async function stuurEmail(
+  { naar, onderwerp, html, antwoordNaar }: { naar: string; onderwerp: string; html: string; antwoordNaar?: string },
+  meta?: MailMeta
+) {
+  const van = meta?.van ?? VAN
   if (!resend) {
     console.log(`[Email] ${onderwerp} → ${naar} (geen RESEND_API_KEY)`)
+    await logMail({ naar, van, onderwerp, status: 'gefaald', fout: 'geen RESEND_API_KEY', meta })
     return { ok: false }
   }
   try {
-    const result = await resend.emails.send({ from: VAN, to: naar, subject: onderwerp, html })
+    const result = await resend.emails.send({
+      from: van,
+      to: naar,
+      subject: onderwerp,
+      html,
+      ...(antwoordNaar ? { replyTo: antwoordNaar } : {}),
+    })
+    await logMail({ naar, van, onderwerp, status: 'verzonden', resendId: result.data?.id, meta })
     return { ok: true, id: result.data?.id }
   } catch (err) {
     console.error('[Email] Versturen mislukt:', err)
+    await logMail({ naar, van, onderwerp, status: 'gefaald', fout: String(err), meta })
     return { ok: false }
   }
+}
+
+// ─── Generieke verzendfunctie (o.a. voor CRM-mail) ────────────────────────────
+
+export async function verstuurMail(args: {
+  naar: string
+  onderwerp: string
+  html: string
+  antwoordNaar?: string
+  meta?: MailMeta
+}) {
+  return stuurEmail(
+    { naar: args.naar, onderwerp: args.onderwerp, html: args.html, antwoordNaar: args.antwoordNaar },
+    args.meta
+  )
+}
+
+// ─── Management rapport (dag + maand) ─────────────────────────────────────────
+
+const MANAGEMENT_EMAIL = process.env.MANAGEMENT_EMAIL ?? 'v.munster@weareimpact.nl'
+
+export async function stuurManagementRapport(props: {
+  periode: 'dag' | 'maand'
+  periodeLabel: string
+  periodeTitel: string
+  stats: { nieuweGebruikers: number; nieuweMatches: number; nieuweAdopties: number; verzondenMails: number }
+  aiKosten: string
+  aiCalls: number
+  aiPerModule: { module: string; kosten: string; calls: number }[]
+  samenvatting?: string
+  trends?: { label: string; waarde: string }[]
+}) {
+  const { ManagementRapport } = await import('@/emails/ManagementRapport')
+  const html = await render(
+    ManagementRapport({
+      periodeLabel: props.periodeLabel,
+      periodeTitel: props.periodeTitel,
+      stats: props.stats,
+      aiKosten: props.aiKosten,
+      aiCalls: props.aiCalls,
+      aiPerModule: props.aiPerModule,
+      samenvatting: props.samenvatting,
+      trends: props.trends,
+      portaalUrl: `${APP_URL}/admin/beheer`,
+    })
+  )
+  const prefix = props.periode === 'dag' ? '📊 Dagrapport' : '📈 Maandrapport'
+  return stuurEmail(
+    { naar: MANAGEMENT_EMAIL, onderwerp: `${prefix} PootGelukkig — ${props.periodeTitel}`, html },
+    { template: `management-${props.periode}` }
+  )
 }
 
 // ─── Match alert voor asiel ───────────────────────────────────────────────────
@@ -58,7 +160,7 @@ export async function stuurMatchAlert({
     naar: asielEmail,
     onderwerp: `🐾 ${adoptantNaam} matcht ${Math.round(matchScore)}% met ${dierNaam}`,
     html,
-  })
+  }, { template: 'match-alert' })
 }
 
 // ─── Welkomstmail asiel ───────────────────────────────────────────────────────
@@ -84,7 +186,7 @@ export async function stuurWelkomAsiel({
     naar: asielEmail,
     onderwerp: `Welkom bij PootGelukkig, ${asielNaam}! 🎉`,
     html,
-  })
+  }, { template: 'welkom-asiel' })
 }
 
 // ─── Wekelijkse digest ────────────────────────────────────────────────────────
@@ -118,7 +220,7 @@ export async function stuurWeekelijkseDigest({
     naar: asielEmail,
     onderwerp: `📊 Weekoverzicht ${asielNaam} — ${stats.nieuweMatches} nieuwe matches`,
     html,
-  })
+  }, { template: 'weekdigest' })
 }
 
 // ─── Afspraak herinnering ─────────────────────────────────────────────────────
@@ -159,7 +261,7 @@ export async function stuurAfspraakHerinnering({
     naar: email,
     onderwerp: `⏰ Morgen: kennismaking met ${dierNaam} bij ${asielNaam}`,
     html,
-  })
+  }, { template: 'afspraak-herinnering' })
 }
 
 // ─── Nazorg emails (3-3-3 regel) ──────────────────────────────────────────────
@@ -195,7 +297,7 @@ export async function stuurNazorgEmail({
     naar: adoptantEmail,
     onderwerp: `${faseLabels[fase]} met ${dierNaam} — hoe gaat het? 🐾`,
     html,
-  })
+  }, { template: 'nazorg' })
 }
 
 // ─── Uitnodiging voor nieuw asiel (cold outreach) ─────────────────────────────
@@ -224,7 +326,7 @@ export async function stuurUitnodigingAsiel({
     naar: asielEmail,
     onderwerp: `${asielNaam}, help dieren sneller aan het juiste thuis 🐾`,
     html,
-  })
+  }, { template: 'uitnodiging-asiel' })
 }
 
 // ─── Wachtwoord vergeten / reset ──────────────────────────────────────────────
@@ -252,7 +354,7 @@ export async function stuurWachtwoordReset({
     naar: email,
     onderwerp: 'Stel je PootGelukkig-wachtwoord opnieuw in 🔑',
     html,
-  })
+  }, { template: 'wachtwoord-reset' })
 }
 
 // ─── Adoptie status update ────────────────────────────────────────────────────
@@ -289,5 +391,5 @@ export async function stuurAdoptieStatusUpdate({
     naar: adoptantEmail,
     onderwerp: isGoedgekeurd ? `🎉 Adoptie van ${dierNaam} goedgekeurd!` : `Update over je adoptie van ${dierNaam}`,
     html,
-  })
+  }, { template: 'adoptie-status' })
 }

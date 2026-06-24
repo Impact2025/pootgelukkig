@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { berekenMatch, type AdopterProfiel, type DierProfiel } from '@/lib/ai/matching'
+import { auth } from '@/auth'
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    const userId = session?.user?.id ? Number(session.user.id) : undefined
+
     const body = await request.json()
     const { adopterProfiel, dieren } = body as {
       adopterProfiel: AdopterProfiel
@@ -18,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     // Bereken match voor elk dier parallel
     const matchResultaten = await Promise.all(
-      dieren.map((dier) => berekenMatch(adopterProfiel, dier))
+      dieren.map((dier) => berekenMatch(adopterProfiel, dier, undefined, userId))
     )
 
     // Sorteer op score (hoogste eerst)

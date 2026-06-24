@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env.local src/lib/db/seed.ts",
-    "db:import-asielen": "tsx --env-file=.env.local src/scripts/import-asielen.ts"
+    "db:import-asielen": "tsx --env-file=.env.local src/scripts/import-asielen.ts",
+    "test:beheer": "tsx --env-file=.env.local src/scripts/test-beheer.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.4",
@@ -20,6 +22,7 @@
     "@vercel/blob": "^0.27.1",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.38.4",
+    "marked": "^15.0.12",
     "next": "^15.3.9",
     "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",

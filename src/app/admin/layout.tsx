@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
 import { adopties, berichten, gesprekken, medischeRecords, wachtlijst, afspraken } from '@/lib/db/schema'
 import { and, eq, count, lt } from 'drizzle-orm'
-import AdminSidebar from './AdminSidebar'
+import AdminShell from './AdminShell'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -59,17 +59,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     )
 
   return (
-    <div className="min-h-screen bg-[#f6f8f6] flex">
-      <AdminSidebar
-        userName={session.user.name ?? 'Beheerder'}
-        userEmail={session.user.email ?? ''}
-        openstaand={openstaandResult?.aantal ?? 0}
-        ongelezen={Number(onglezenResult?.aantal ?? 0)}
-        medischAlert={Number(medischResult?.aantal ?? 0)}
-        wachtlijstAantal={Number(wachtlijstResult?.aantal ?? 0)}
-        afsprakenAangevraagd={Number(afsprakenResult?.aantal ?? 0)}
-      />
-      <main className="ml-64 flex-1 min-w-0 min-h-screen">{children}</main>
-    </div>
+    <AdminShell
+      user={{
+        naam: session.user.name ?? 'Beheerder',
+        email: session.user.email ?? '',
+        rol: session.user.rol,
+      }}
+      counts={{
+        openstaand: openstaandResult?.aantal ?? 0,
+        ongelezen: Number(onglezenResult?.aantal ?? 0),
+        medisch: Number(medischResult?.aantal ?? 0),
+        wachtlijst: Number(wachtlijstResult?.aantal ?? 0),
+        afspraken: Number(afsprakenResult?.aantal ?? 0),
+      }}
+    >
+      {children}
+    </AdminShell>
   )
 }

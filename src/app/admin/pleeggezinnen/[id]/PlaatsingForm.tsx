@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/admin/Toast'
 
 interface Dier {
   id: number
@@ -26,21 +27,20 @@ const SOORT_EMOJI: Record<string, string> = {
 
 export default function PlaatsingForm({ pleeggezinId, beschikbareDieren }: Props) {
   const router = useRouter()
+  const { showToast } = useToast()
   const [open, setOpen] = useState(false)
   const [dierId, setDierId] = useState('')
   const [startdatum, setStartdatum] = useState(new Date().toISOString().split('T')[0])
   const [notities, setNotities] = useState('')
   const [bezig, setBezig] = useState(false)
-  const [fout, setFout] = useState('')
 
   async function opslaan(e: React.FormEvent) {
     e.preventDefault()
     if (!dierId || !startdatum) {
-      setFout('Kies een dier en startdatum')
+      showToast('Kies een dier en startdatum', 'warning')
       return
     }
     setBezig(true)
-    setFout('')
     try {
       const res = await fetch('/api/admin/pleegplaatsingen', {
         method: 'POST',
@@ -54,15 +54,16 @@ export default function PlaatsingForm({ pleeggezinId, beschikbareDieren }: Props
       })
       const json = (await res.json()) as { error?: string }
       if (!res.ok) {
-        setFout(json.error ?? 'Er is een fout opgetreden')
+        showToast(json.error ?? 'Er is een fout opgetreden', 'error')
         return
       }
+      showToast('Dier geplaatst', 'success')
       setOpen(false)
       setDierId('')
       setNotities('')
       router.refresh()
     } catch {
-      setFout('Verbindingsfout. Probeer opnieuw.')
+      showToast('Verbindingsfout. Probeer opnieuw.', 'error')
     } finally {
       setBezig(false)
     }
@@ -86,12 +87,6 @@ export default function PlaatsingForm({ pleeggezinId, beschikbareDieren }: Props
       className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 space-y-4"
     >
       <h3 className="font-bold text-[#33335c] text-sm">Nieuw dier plaatsen</h3>
-
-      {fout && (
-        <p className="text-red-600 text-xs font-medium bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
-          {fout}
-        </p>
-      )}
 
       <div>
         <label className="block text-xs font-bold text-[#33335c]/50 uppercase tracking-widest mb-1.5">

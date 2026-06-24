@@ -218,7 +218,7 @@ Als je iets niet weet of data mist, zeg dat eerlijk.`
   ]
 
   try {
-    const stream = await chatStream(messages, { maxTokens: 800 })
+    const stream = await chatStream(messages, { maxTokens: 800, meta: { module: 'copilot' } })
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
