@@ -240,8 +240,9 @@ input[type="password"]:focus {
 
 /* ─── Blog artikel typografie ─────────────────────────────────────────────── */
 .blog-inhoud h1 { @apply text-3xl font-extrabold text-[#33335c] mt-8 mb-4 leading-tight; }
-.blog-inhoud h2 { @apply text-2xl font-extrabold text-[#33335c] mt-8 mb-3 leading-tight; }
-.blog-inhoud h3 { @apply text-xl font-bold text-[#33335c] mt-6 mb-2; }
+.blog-inhoud h2 { @apply text-2xl font-extrabold text-[#33335c] mt-8 mb-3 leading-tight scroll-mt-28; }
+.blog-inhoud h3 { @apply text-xl font-bold text-[#33335c] mt-6 mb-2 scroll-mt-28; }
+.blog-inhoud h4 { @apply text-lg font-semibold text-[#33335c] mt-4 mb-1 scroll-mt-28; }
 .blog-inhoud p { @apply mb-4; }
 .blog-inhoud a { @apply text-[#ee5b2b] font-semibold underline underline-offset-2 hover:text-[#33335c]; }
 .blog-inhoud ul { @apply list-disc pl-6 mb-4 space-y-1; }
