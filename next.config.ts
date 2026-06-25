@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { hostname: 'images.unsplash.com' },
       { hostname: '*.public.blob.vercel-storage.com' },
       { hostname: 'localhost' },
+      { hostname: 'www.pootgelukkig.nl' },
+      { hostname: 'pootgelukkig.nl' },
     ],
   },
   serverExternalPackages: ['@neondatabase/serverless'],
