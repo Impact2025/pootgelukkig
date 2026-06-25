@@ -289,6 +289,35 @@ We zijn open over wat de techniek doet. Heb je vragen over een specifieke match 
 
 // ─── Helpers (puur, eenvoudig te testen) ─────────────────────────────────────
 
+export function zoekKennisbank(query: string): {
+  artikel: KennisArtikel
+  categorie: KennisCategorie
+  score: number
+}[] {
+  const q = query.toLowerCase().trim()
+  if (!q) return []
+  const results: { artikel: KennisArtikel; categorie: KennisCategorie; score: number }[] = []
+
+  for (const artikel of ARTIKELEN) {
+    const cat = categorieBySlug(artikel.categorieSlug)
+    if (!cat) continue
+    const inTitel = artikel.titel.toLowerCase().includes(q)
+    const inSamenvatting = artikel.samenvatting.toLowerCase().includes(q)
+    const inInhoud = artikel.inhoudMd.toLowerCase().includes(q)
+    if (inTitel || inSamenvatting || inInhoud) {
+      let score = 0
+      if (inTitel) score += 10
+      if (inSamenvatting) score += 5
+      if (inInhoud) score += 1
+      // Bonus voor exacte match of begin van titel
+      if (artikel.titel.toLowerCase().startsWith(q)) score += 20
+      if (cat.naam.toLowerCase().includes(q)) score += 3
+      results.push({ artikel, categorie: cat, score })
+    }
+  }
+  return results.sort((a, b) => b.score - a.score).slice(0, 12)
+}
+
 export function categorieBySlug(slug: string): KennisCategorie | undefined {
   return CATEGORIEEN.find((c) => c.slug === slug)
 }

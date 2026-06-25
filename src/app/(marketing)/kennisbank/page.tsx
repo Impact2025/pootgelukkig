@@ -6,6 +6,7 @@ import {
   artikelenVoorCategorie,
   DOELGROEP_LABELS,
 } from '@/lib/kennisbank/content'
+import KennisbankSearch from '@/components/kennisbank/KennisbankSearch'
 
 export const metadata: Metadata = {
   title: 'Kennisbank — PootGelukkig',
@@ -36,6 +37,11 @@ export default function KennisbankPage() {
             <Link href="/blog" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">blog</Link>.
           </p>
         </div>
+      </Section>
+
+      {/* Zoekbalk */}
+      <Section className="!pt-0 !pb-4">
+        <KennisbankSearch />
       </Section>
 
       <Section className="!pt-0">
