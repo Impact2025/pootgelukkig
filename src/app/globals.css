@@ -248,6 +248,10 @@ input[type="password"]:focus {
 .blog-inhoud ol { @apply list-decimal pl-6 mb-4 space-y-1; }
 .blog-inhoud li { @apply text-[#33335c]/80; }
 .blog-inhoud strong { @apply font-bold text-[#33335c]; }
-.blog-inhoud blockquote { @apply border-l-4 border-[#f8aa25] pl-4 italic text-[#33335c]/60 my-4; }
+.blog-inhoud blockquote {
+  @apply my-8 rounded-r-2xl border-l-4 border-[#E2725B] bg-[#fef6f3] p-5 not-italic text-[#33335c]/80 leading-relaxed text-base;
+}
+.blog-inhoud blockquote p:last-child { @apply mb-0; }
+.blog-inhoud blockquote strong { @apply text-[#33335c]; }
 .blog-inhoud img { @apply rounded-2xl my-6; }
 .blog-inhoud h1:first-child { @apply mt-0; }

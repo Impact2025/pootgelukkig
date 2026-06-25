@@ -532,6 +532,7 @@ export const blogPosts = pgTable('blog_posts', {
   status: blogStatusEnum('status').default('concept').notNull(),
   metaTitle: varchar('meta_title', { length: 255 }),
   metaDescription: varchar('meta_description', { length: 320 }),
+  leestijd: integer('leestijd').default(0).notNull(), // in minuten
   focusKeyword: varchar('focus_keyword', { length: 120 }),
   seoScore: integer('seo_score').default(0).notNull(),
   interneLinks: json('interne_links').$type<{ tekst: string; url: string }[]>().default([]),

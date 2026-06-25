@@ -64,6 +64,13 @@
       "when": 1781987107974,
       "tag": "0008_flashy_groot",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1782416436116,
+      "tag": "0009_clumsy_talon",
+      "breakpoints": true
     }
   ]
 }
