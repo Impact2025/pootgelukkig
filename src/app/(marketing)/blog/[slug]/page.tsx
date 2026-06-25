@@ -80,7 +80,7 @@ function analyseerInhoud(inhoudMd: string, titel: string) {
       if (inFaq && huidigeFaqVraag && huidigeFaqAntwoord) {
         faqItems.push({ vraag: huidigeFaqVraag, antwoord: huidigeFaqAntwoord.trim() })
       }
-      inFaq = h2Match[1].toLowerCase().includes('vraag') || h2Match[1].toLowerCase().includes('faq')
+      inFaq = /vraag|vragen|faq/i.test(h2Match[1])
       huidigeFaqVraag = ''
       huidigeFaqAntwoord = ''
 
