@@ -83,6 +83,20 @@ function analyseerInhoud(inhoudMd: string, titel: string) {
       inFaq = h2Match[1].toLowerCase().includes('vraag') || h2Match[1].toLowerCase().includes('faq')
       huidigeFaqVraag = ''
       huidigeFaqAntwoord = ''
+
+      // HowTo detectie ook voor H2 (bv. "Stap 1: bouw het alleen zijn op")
+      const volgendeLijnH2 = lijnen[i + 1]?.trim() || ''
+      if (volgendeLijnH2.match(/^\d+\.\s/)) {
+        let stepText = ''
+        let j = i + 1
+        while (j < lijnen.length && lijnen[j].trim().match(/^\d+\.\s/)) {
+          stepText += lijnen[j].trim().replace(/^\d+\.\s+/, '') + ' '
+          j++
+        }
+        if (stepText) {
+          howtoSteps.push({ name: txt, text: stepText.trim().substring(0, 200) })
+        }
+      }
     }
     if (h3Match) {
       const txt = h3Match[1].replace(/\*\*/g, '').trim()
