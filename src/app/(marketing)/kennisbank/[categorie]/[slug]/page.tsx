@@ -43,16 +43,23 @@ function analyseerInhoud(inhoudMd: string) {
       huidigeFaqVraag = ''
       huidigeFaqAntwoord = ''
 
-      // HowTo detectie ook voor H2 (bv. "Stap 1:")
-      const volgendeLijnH2 = lijnen[i + 1]?.trim() || ''
-      if (volgendeLijnH2.match(/^\d+\.\s/)) {
-        let stepText = ''
-        let j = i + 1
-        while (j < lijnen.length && lijnen[j].trim().match(/^\d+\.\s/)) {
-          stepText += lijnen[j].trim().replace(/^\d+\.\s+/, '') + ' '
-          j++
+      // HowTo detectie voor H2 — zoek vooruit naar genummerde lijst
+      if (/^stap|^hoe|stap\s+\d+|stappen/i.test(txt)) {
+        for (let k = i + 1; k < Math.min(i + 10, lijnen.length); k++) {
+          const ll = lijnen[k].trim()
+          if (!ll) continue
+          if (ll.match(/^#{1,3}\s/)) break
+          if (ll.match(/^\d+\.\s/)) {
+            let stepText = ''
+            let j = k
+            while (j < lijnen.length && lijnen[j].trim().match(/^\d+\.\s/)) {
+              stepText += lijnen[j].trim().replace(/^\d+\.\s+/, '') + ' '
+              j++
+            }
+            if (stepText) howtoSteps.push({ name: txt, text: stepText.trim().substring(0, 200) })
+            break
+          }
         }
-        if (stepText) howtoSteps.push({ name: txt, text: stepText.trim().substring(0, 200) })
       }
     }
     if (h3Match) {
@@ -65,15 +72,23 @@ function analyseerInhoud(inhoudMd: string) {
         huidigeFaqVraag = txt.endsWith('?') ? txt : txt + '?'
         huidigeFaqAntwoord = ''
       }
-      const volgendeLijn = lijnen[i + 1]?.trim() || ''
-      if (volgendeLijn.match(/^\d+\.\s/)) {
-        let stepText = ''
-        let j = i + 1
-        while (j < lijnen.length && lijnen[j].trim().match(/^\d+\.\s/)) {
-          stepText += lijnen[j].trim().replace(/^\d+\.\s+/, '') + ' '
-          j++
+      // HowTo detectie voor H3 — zoek vooruit naar genummerde lijst
+      if (/^stap|^hoe|stap\s+\d+|stappen/i.test(txt)) {
+        for (let k = i + 1; k < Math.min(i + 10, lijnen.length); k++) {
+          const ll = lijnen[k].trim()
+          if (!ll) continue
+          if (ll.match(/^#{1,3}\s/)) break
+          if (ll.match(/^\d+\.\s/)) {
+            let stepText = ''
+            let j = k
+            while (j < lijnen.length && lijnen[j].trim().match(/^\d+\.\s/)) {
+              stepText += lijnen[j].trim().replace(/^\d+\.\s+/, '') + ' '
+              j++
+            }
+            if (stepText) howtoSteps.push({ name: txt, text: stepText.trim().substring(0, 200) })
+            break
+          }
         }
-        if (stepText) howtoSteps.push({ name: txt, text: stepText.trim().substring(0, 200) })
       }
     }
     if (inFaq && huidigeFaqVraag && !l.match(/^#{1,3}\s/) && l.trim() && !l.match(/^>\s/)) {
