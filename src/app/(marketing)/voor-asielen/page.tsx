@@ -25,8 +25,21 @@ const FEATURES = [
 ]
 
 export default function VoorAsielenPage() {
+  const siteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'PootGelukkig',
+    alternateName: 'PootGelukkig — Adoptieplatform voor asiels',
+    url: 'https://www.pootgelukkig.nl/voor-asielen',
+    description: 'Dashboard voor asiels met AI-matching, Copilot en nazorg.',
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+      />
       <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Voor asiels</Eyebrow>

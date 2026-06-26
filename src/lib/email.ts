@@ -62,6 +62,7 @@ async function stuurEmail(
       subject: onderwerp,
       html,
       ...(antwoordNaar ? { replyTo: antwoordNaar } : {}),
+      ...({ open_tracking: true, click_tracking: true } as any),
     })
     await logMail({ naar, van, onderwerp, status: 'verzonden', resendId: result.data?.id, meta })
     return { ok: true, id: result.data?.id }
@@ -300,7 +301,7 @@ export async function stuurNazorgEmail({
   }, { template: 'nazorg' })
 }
 
-// ─── Uitnodiging voor nieuw asiel (cold outreach) ─────────────────────────────
+// ─── Uitnodiging voor nieuw asiel (cold outreach) — V1 ─────────────────────────
 
 export async function stuurUitnodigingAsiel({
   asielEmail,
@@ -327,6 +328,38 @@ export async function stuurUitnodigingAsiel({
     onderwerp: `${asielNaam}, help dieren sneller aan het juiste thuis 🐾`,
     html,
   }, { template: 'uitnodiging-asiel' })
+}
+
+// ─── Uitnodiging voor nieuw asiel (cold outreach) — V2 met demo-link ──────────
+
+const DEMO_VIDEO_URL = process.env.DEMO_VIDEO_URL ?? 'https://www.youtube.com/watch?v=DEMO_VIDEO_PLACEHOLDER'
+
+export async function stuurUitnodigingAsielV2({
+  asielEmail,
+  asielNaam,
+  stad,
+  asielId,
+}: {
+  asielEmail: string
+  asielNaam: string
+  stad: string
+  asielId: number
+}) {
+  const { UitnodigingAsielV2 } = await import('@/emails/UitnodigingAsielV2')
+  const html = await render(
+    UitnodigingAsielV2({
+      asielNaam,
+      stad,
+      aanmeldUrl: `${APP_URL}/auth/register?type=asiel&asielId=${asielId}`,
+      demoUrl: DEMO_VIDEO_URL,
+      afmeldUrl: `${APP_URL}/asiel-afmelden?asielId=${asielId}`,
+    })
+  )
+  return stuurEmail({
+    naar: asielEmail,
+    onderwerp: `${asielNaam}, 2 minuten die jullie werkdag veranderen 🐾`,
+    html,
+  }, { template: 'uitnodiging-asiel-v2' })
 }
 
 // ─── Wachtwoord vergeten / reset ──────────────────────────────────────────────

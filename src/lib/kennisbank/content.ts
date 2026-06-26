@@ -17,6 +17,7 @@ export interface KennisArtikel {
   titel: string
   samenvatting: string
   bijgewerkt: string // ISO-datum (YYYY-MM-DD)
+  coverUrl: string // relatief pad naar /images/kennisbank/
   inhoudMd: string
 }
 
@@ -94,6 +95,7 @@ export const ARTIKELEN: KennisArtikel[] = [
     samenvatting:
       'Van adoptiebijdrage tot maandelijkse voer- en dierenartskosten. Een compleet overzicht van wat een asieldier écht kost, zodat je niet voor verrassingen komt te staan.',
     bijgewerkt: '2026-06-01',
+    coverUrl: '/images/kennisbank/wat-kost-een-asieldier.jpg',
     inhoudMd: `Adopteren uit een asiel is goedkoper dan een dier kopen bij een fokker, maar gratis is het niet. Een eerlijk beeld vooraf voorkomt verrassingen.
 
 ## Eenmalige kosten
@@ -116,6 +118,7 @@ Een dier kan ziek worden of een operatie nodig hebben. Een spaarbuffer van een p
     samenvatting:
       'Twijfel je of adopteren bij je past? Vijf eerlijke vragen over tijd, budget, woonsituatie en gezin die je helpen beslissen of een asieldier nú de juiste keuze is.',
     bijgewerkt: '2026-06-01',
+    coverUrl: '/images/kennisbank/is-adopteren-iets-voor-jou.jpg',
     inhoudMd: `Een dier adopteren is een keuze voor jaren. Deze vragen helpen je inschatten of het nu het juiste moment is.
 
 ## Veelgestelde vragen over adopteren
@@ -141,6 +144,7 @@ Het perfecte dier op papier bestaat niet. Sta je open voor een dier dat misschie
     titel: 'Hoe bereid je je huis voor op een nieuw dier?',
     samenvatting: 'Praktische checklist met alles wat je nodig hebt voordat je asieldier thuiskomt: van een veilige plek en voerbakken tot planten die je beter kunt verwijderen.',
     bijgewerkt: '2026-07-01',
+    coverUrl: '/images/kennisbank/hoe-bereid-je-je-huis-voor-op-een-nieuw-dier.jpg',
     inhoudMd: `Een nieuw dier komt in een onbekende omgeving. Een goede voorbereiding maakt de overgang soepeler.
 
 ## Checklist voor aankomst
@@ -162,6 +166,7 @@ Het perfecte dier op papier bestaat niet. Sta je open voor een dier dat misschie
     titel: 'Welk dier past bij jouw leefstijl?',
     samenvatting: 'Hond, kat of konijn? Ontdek welk asieldier past bij jouw tijd, ruimte en ervaring. Een heldere vergelijking van kosten, verzorging en benodigde aandacht per diersoort.',
     bijgewerkt: '2026-07-02',
+    coverUrl: '/images/kennisbank/welk-dier-past-bij-jouw-leefstijl.jpg',
     inhoudMd: `Niet elk dier past bij elke leefstijl. Deze vergelijking helpt je een richting te kiezen.
 
 ## Hond
@@ -193,6 +198,7 @@ Het is verleidelijk om te vallen voor de eerste blik. Maar een dier dat past bij
     samenvatting:
       'Hoe de PootGelukkig intake werkt in een paar minuten: welke vragen we stellen en waarom, en wat er met je antwoorden gebeurt op weg naar jouw ideale match.',
     bijgewerkt: '2026-06-10',
+    coverUrl: '/images/kennisbank/zo-werkt-de-intake.jpg',
     inhoudMd: `De intake is een kort gesprek over jouw leefstijl. Het duurt een paar minuten en bepaalt op welke dieren we je matchen.
 
 ## Wat we vragen
@@ -213,6 +219,7 @@ Je krijgt een lijst met passende dieren, elk met een score en een korte uitleg w
     titel: 'Hoe lang duurt een adoptie via PootGelukkig?',
     samenvatting: 'Hoe snel kun je een asieldier adopteren via PootGelukkig? Een realistische tijdlijn van intake tot sleuteloverdracht, inclusief tips om sneller een match te vinden.',
     bijgewerkt: '2026-07-05',
+    coverUrl: '/images/kennisbank/hoe-lang-duurt-een-adoptie.jpg',
     inhoudMd: `Hoe snel een adoptie gaat, hangt af van meerdere factoren. Dit is een gemiddelde tijdlijn.
 
 ## Fase 1: Intake (5 minuten)
@@ -237,6 +244,7 @@ Direct na de kennismaking kan de adoptie worden afgerond. Het totale doorloopt i
     samenvatting:
       'De 3-3-3 regel helpt je begrijpen hoe een asieldier went aan zijn nieuwe thuis. Wat je kunt verwachten na drie dagen, drie weken en drie maanden, en wanneer je hulp moet zoeken.',
     bijgewerkt: '2026-06-12',
+    coverUrl: '/images/kennisbank/de-eerste-dagen-3-3-3.jpg',
     inhoudMd: `Een nieuw dier heeft tijd nodig om te wennen. De 3-3-3 regel is een handig kompas voor die eerste periode.
 
 ## De eerste 3 dagen
@@ -257,6 +265,7 @@ Twijfel je over gedrag of gezondheid, wacht dan niet te lang. Het asiel kent het
     titel: 'Introductie met andere huisdieren: zo doe je dat',
     samenvatting: 'Stap-voor-stap hoe je een nieuw asieldier veilig introduceert bij je bestaande hond, kat of ander huisdier. Van aparte ruimtes tot samenleven in vertrouwen en rust.',
     bijgewerkt: '2026-07-06',
+    coverUrl: '/images/kennisbank/introductie-andere-huisdieren.jpg',
     inhoudMd: `De introductie tussen een nieuw en bestaand huisdier bepaalt vaak of ze goed samenleven. Geduld is de sleutel.
 
 ## Stap 1: Aparte ruimtes (dag 1-3)
@@ -281,6 +290,7 @@ Na twee tot drie weken kunnen de meeste dieren samenleven. Blijf voerbakken en r
     samenvatting:
       'Dierenarts, voeding en gedrag in de eerste maanden na adoptie. Waar je op moet letten om je asieldier gezond en ontspannen te laten wennen aan zijn nieuwe thuis.',
     bijgewerkt: '2026-06-12',
+    coverUrl: '/images/kennisbank/de-eerste-dierenartscontrole.jpg',
     inhoudMd: `Goede nazorg legt de basis voor een lang en gezond leven samen. Drie dingen verdienen meteen aandacht.
 
 ## De eerste dierenartscontrole
@@ -301,6 +311,7 @@ Vaste tijden voor eten, beweging en rust geven houvast. Dat ritme is misschien w
     titel: 'Wanneer moet je naar de dierenarts?',
     samenvatting: 'Wanneer bel je direct de dierenarts en wat kan wachten tot morgen? Herken spoed, plan routinecontroles en noteer het noodnummer van een 24-uurskliniek vóór je het nodig hebt.',
     bijgewerkt: '2026-07-08',
+    coverUrl: '/images/kennisbank/wanneer-naar-de-dierenarts.jpg',
     inhoudMd: `Niet elk vreemd gedrag is een reden voor paniek, maar sommige signalen vragen om actie.
 
 ## Spoed (meteen bellen)
@@ -332,6 +343,7 @@ Vaste tijden voor eten, beweging en rust geven houvast. Dat ritme is misschien w
     samenvatting:
       'Stap-voor-stap aan de slag met PootGelukkig als asiel: registreren, dieren toevoegen, aanvragen ontvangen en matches beheren. Zo ben je in een uurtje operationeel.',
     bijgewerkt: '2026-06-15',
+    coverUrl: '/images/kennisbank/aan-de-slag-met-je-asiel-dashboard.jpg',
     inhoudMd: `Een asiel komt in een paar stappen op gang met PootGelukkig.
 
 ## 1. Registreer je asiel
@@ -355,6 +367,7 @@ Begin met een paar dieren om het systeem te leren kennen. Je breidt daarna eenvo
     titel: 'Dieren in bulk importeren',
     samenvatting: 'Bespaar uren werk door meerdere dieren tegelijk in te voeren in PootGelukkig. Stap-voor-stap uitleg voor CSV-upload en API-koppeling met jouw eigen administratiesysteem.',
     bijgewerkt: '2026-07-10',
+    coverUrl: '/images/kennisbank/dieren-bulk-importeren.jpg',
     inhoudMd: `Heb je veel dieren tegelijk in te voeren? Bulk-import bespaart uren werk.
 
 ## Optie 1: CSV-upload
@@ -376,6 +389,7 @@ Voor asiels met een eigen administratiesysteem is een API-koppeling mogelijk. Di
     samenvatting:
       'Hoe de AI-matchscore van PootGelukkig tot stand komt, wat een hoge of lage score écht betekent en waarom het asiel altijd het laatste woord houdt in adoptiebeslissingen.',
     bijgewerkt: '2026-06-15',
+    coverUrl: '/images/kennisbank/de-ai-matchscore-lezen.jpg',
     inhoudMd: `De match-score helpt je sneller de kansrijke aanvragen herkennen. Maar de score vervangt je oordeel niet.
 
 ## Hoe de score is opgebouwd
@@ -396,6 +410,7 @@ Jij kent het dier en de context. De score is een hulpmiddel, het asiel houdt alt
     titel: 'Aanvragen filteren, beheren en opvolgen',
     samenvatting: 'Houd overzicht op alle adoptieaanvragen in PootGelukkig: filteren op status en matchscore, notities toevoegen en via het platform communiceren met adoptanten.',
     bijgewerkt: '2026-07-12',
+    coverUrl: '/images/kennisbank/aanvragen-filteren-en-beheren.jpg',
     inhoudMd: `Als er meerdere aanvragen binnenkomen, is het belangrijk om overzicht te houden.
 
 ## Status per aanvraag
@@ -418,6 +433,7 @@ Alle communicatie verloopt via het platform. Zo heb je alles op één plek en mi
     samenvatting:
       'Alles wat asielen moeten weten over privacy en AVG bij PootGelukkig: dataminimalisatie, verwerkersovereenkomst, rechten van adoptanten en beveiliging van dier- en persoonsgegevens.',
     bijgewerkt: '2026-06-15',
+    coverUrl: '/images/kennisbank/privacy-en-avg-voor-asiels.jpg',
     inhoudMd: `Werken met persoonsgegevens van adoptanten vraagt zorgvuldigheid. PootGelukkig is daarop ingericht.
 
 ## Veelgestelde vragen over privacy
@@ -440,6 +456,7 @@ Adoptanten kunnen hun gegevens inzien en laten verwijderen. We helpen je om aan 
     titel: 'Bewaartermijnen en gegevens verwijderen',
     samenvatting: 'Hoe lang bewaart PootGelukkig gegevens van adoptanten en adopties? Bewaartermijnen per categorie, verwijdering aanvragen en automatische opschoning uitgelegd voor asielen.',
     bijgewerkt: '2026-07-14',
+    coverUrl: '/images/kennisbank/bewaartermijnen-en-verwijderen.jpg',
     inhoudMd: `Goed gegevensbeheer is onderdeel van AVG-compliance. Dit zijn de richtlijnen.
 
 ## Bewaartermijnen
@@ -462,6 +479,7 @@ Het systeem verwijdert verlopen profielen automatisch. Je krijgt een melding voo
     samenvatting:
       'Hoe de AI-matching van PootGelukkig precies werkt: van harde voorwaarden en compatibiliteitsscore tot wat de technologie wél en niet beslist in het adoptieproces.',
     bijgewerkt: '2026-06-18',
+    coverUrl: '/images/kennisbank/hoe-werkt-de-matching.jpg',
     inhoudMd: `Matching klinkt als magie, maar het is vooral zorgvuldig redeneren in stappen. Dit is wat er gebeurt.
 
 ## Laag 1: harde voorwaarden
@@ -485,6 +503,7 @@ We zijn open over wat de techniek doet. Heb je vragen over een specifieke match 
     titel: 'Voor wie is PootGelukkig?',
     samenvatting: 'Voor wie is PootGelukkig bedoeld? Ontdek wat het platform biedt aan adoptanten, asielen en regionale netwerken. Voor iedereen die betrokken is bij dieradoptie in Nederland.',
     bijgewerkt: '2026-07-15',
+    coverUrl: '/images/kennisbank/voor-wie-is-pootgelukkig.jpg',
     inhoudMd: `PootGelukkig is er voor iedereen die betrokken is bij dieradoptie in Nederland.
 
 ## Voor adoptanten (gratis)
@@ -498,6 +517,177 @@ Dierenlot-aangesloten asielen en regionale samenwerkingsverbanden krijgen gecent
 
 ## Wie er niet bij kan
 PootGelukkig richt zich op erkende asielen en herplaatsingsinitiatieven. Particuliere verkopers of fokkers kunnen geen gebruik maken van het platform.`,
+  },
+
+  {
+    slug: 'wat-gebeurt-er-na-de-intake',
+    categorieSlug: 'intake',
+    titel: 'Wat gebeurt er na de intake?',
+    samenvatting: 'Na je intake matcht het systeem, krijg je suggesties en kun je contact opnemen met het asiel. Een helder overzicht van het proces na je aanmelding.',
+    bijgewerkt: '2026-07-20',
+    coverUrl: '/images/kennisbank/wat-gebeurt-er-na-de-intake.jpg',
+    inhoudMd: `Je intake is verwerkt. Wat gebeurt er daarna? Een kort overzicht van het proces.
+
+## Je profiel wordt gematcht
+Het systeem vergelijkt jouw leefstijl met de beschikbare dieren. Harde voorwaarden filteren we eerst, daarna berekenen we een compatibiliteitsscore per dier. Dit gebeurt in enkele seconden.
+
+## Je ontvangt dier-suggesties
+Je ziet een lijst met dieren die bij je passen, elk met een score en een korte uitleg. Je kunt filteren op soort, leeftijd en locatie.
+
+## Contact met het asiel
+Past een dier? Je dient een aanvraag in via het platform. Het asiel ontvangt je profiel en de match-score en neemt contact op. Meestal gebeurt dat binnen 1-2 werkdagen.
+
+## De kennismaking
+Na goedkeuring plan je een kennismaking. Je leert het dier kennen, stelt vragen en voelt of het klikt. Besluit je tot adoptie, dan wordt alles in het systeem afgerond.
+
+## Veelgestelde vragen
+### Hoe lang duurt het voordat ik matches zie?
+Direct na de intake zie je de eerste suggesties.
+### Kan ik meerdere aanvragen doen?
+Ja, je kunt tegelijkertijd op meerdere dieren reageren.
+### Wat als het niet klikt?
+Geen probleem. Je kunt een nieuwe aanvraag doen voor een ander dier.`,
+  },
+  {
+    slug: 'dagritme-opbouwen-nieuw-asieldier',
+    categorieSlug: 'thuiskomst',
+    titel: 'Een dagritme opbouwen met je nieuwe asieldier',
+    samenvatting: 'Een vast ritme geeft een pas geadopteerd dier rust en voorspelbaarheid. Zo bouw je een dagelijkse routine die werkt voor jullie allebei.',
+    bijgewerkt: '2026-07-21',
+    coverUrl: '/images/kennisbank/dagritme-opbouwen-nieuw-asieldier.jpg',
+    inhoudMd: `Een vast dagritme geeft een nieuw dier houvast. Het schept vertrouwen en vermindert stress. Zo bouw je het op.
+
+## Waarom routine belangrijk is
+Dieren leren van patronen. Door elke dag dezelfde volgorde aan te houden, weet je dier wat het kan verwachten. Dat maakt de overgang naar een nieuw thuis een stuk rustiger.
+
+## Ochtendroutine
+Begin de dag rustig. Bij honden: uitlaten zodra ze wakker zijn. Bij katten: even de kattenbak verschonen en vers water geven. Daarna ontbijt op een vast tijdstip. Een kwartiertje aandacht of spelen is een fijne start.
+
+## Overdag: rust en regelmaat
+Alleen thuis is voor veel dieren wennen. Bouw het op: begin met een uurtje, breid langzaam uit. Laat een kledingstuk met je geur achter, dat werkt geruststellend.
+
+## Avondroutine
+Rond etenstijd weer een vast moment. Daarna een rustige wandeling of speelsessie. De avond is voor ontspanning, niet voor nieuwe prikkels. Een vaste slaapplek en bedtijd sluiten de dag af.
+
+## Wanneer kun je het ritme loslaten?
+Na een maand of twee, als je dier zich helemaal thuis voelt, kun je soepeler worden met de tijden. Het ritme is dan vanzelfsprekend geworden.`,
+  },
+  {
+    slug: 'gedragsveranderingen-eerste-maand',
+    categorieSlug: 'nazorg',
+    titel: 'Gedragsveranderingen herkennen in de eerste maand',
+    samenvatting: 'Een nieuw thuis is wennen. Welke gedragsveranderingen zijn normaal en wanneer moet je alert zijn? Praktische gids voor de eerste maand van adoptie.',
+    bijgewerkt: '2026-07-22',
+    coverUrl: '/images/kennisbank/gedragsveranderingen-eerste-maand.jpg',
+    inhoudMd: `Gedragsveranderingen in de eerste maand zijn normaal. Dit is wat je kunt verwachten en wanneer je actie moet ondernemen.
+
+## Week 1: verstoppen en observeren
+De meeste dieren zijn de eerste dagen stiller en trekken zich terug. Dat is normaal. Geef ze de ruimte en dwing geen contact af. Een eigen veilige plek helpt.
+
+## Week 2: de ware aard komt boven
+Na een week beginnen de meeste dieren hun echte persoonlijkheid te tonen. Je ziet speels gedrag, nieuwsgierigheid en voorkeuren ontstaan. Blijf rustig en voorspelbaar.
+
+## Week 3-4: wennen en ontspannen
+Rond week drie zie je het dier echt ontspannen. Het herkent de vaste patronen en vertrouwt op de omgeving. Eventueel ongewenst gedrag, zoals blaffen of krabben, kan nu pas echt zichtbaar worden.
+
+## Wanneer schakel je een expert in?
+Als het dier na vier weken nog steeds extreem angstig is, niet eet of drinkt, of agressief gedrag vertoont dat escaleert. Raadpleeg dan een gedragsdeskundige of de dierenarts. Het asiel kent het dier en kan ook meedenken.`,
+  },
+  {
+    slug: 'statistieken-asiel-dashboard',
+    categorieSlug: 'dashboard',
+    titel: 'Statistieken en rapportages in je asiel-dashboard',
+    samenvatting: 'Welke cijfers je als asiel in één oogopslag ziet en hoe je ze gebruikt om betere beslissingen te nemen over opname, matching en nazorg.',
+    bijgewerkt: '2026-07-23',
+    coverUrl: '/images/kennisbank/statistieken-asiel-dashboard.jpg',
+    inhoudMd: `Het dashboard geeft je in één oogopslag inzicht in de prestaties van je asiel. Dit zijn de belangrijkste cijfers.
+
+## Adoptiecijfers per maand
+Zie hoeveel adopties je per maand hebt afgerond, uitgesplitst naar diersoort. Vergelijk periodes om trends te ontdekken. Dit helpt je om capaciteit en personeel beter te plannen.
+
+## Wachtlijst en doorlooptijd
+Hoe lang staan dieren gemiddeld in je asiel voordat ze worden geadopteerd? Het dashboard toont de gemiddelde doorlooptijd per diersoort. Honden hebben vaak een langere doorlooptijd dan katten.
+
+## Retourpercentages bijhouden
+Hoeveel adopties worden teruggedraaid? Het dashboard laat het percentage zien per maand en per diersoort. Een stijging is een signaal om je matching of nazorg aan te scherpen.
+
+## Rapportages exporteren en delen
+Exporteer je cijfers als PDF of CSV. Deel ze met je bestuur, gemeente of subsidieverstrekker om verantwoording af te leggen over je resultaten.`,
+  },
+  {
+    slug: 'matchkans-asieldier-verbeteren',
+    categorieSlug: 'matching',
+    titel: 'Hoe verbeter je de matchkans van je asieldier?',
+    samenvatting: 'Een volledig en eerlijk profiel is de sleutel tot een goede match. Tips voor asiels om het profiel van een dier te optimaliseren en de matchkans te vergroten.',
+    bijgewerkt: '2026-07-24',
+    coverUrl: '/images/kennisbank/matchkans-asieldier-verbeteren.jpg',
+    inhoudMd: `Hoe vollediger het profiel van een dier, hoe beter de matching werkt. Dit kun je doen om de matchkans te verbeteren.
+
+## Waarom een compleet profiel werkt
+Het matchingalgoritme vergelijkt de eigenschappen van het dier met de leefstijl van de adoptant. Een incompleet profiel mist aanknopingspunten en leidt tot minder en minder precieze matches.
+
+## Foto's maken die het gedrag tonen
+Laat het dier zien in een rustige, natuurlijke setting. Een foto van een hond die rustig ligt, zegt meer dan een onscherpe kooifoto. Neem meerdere foto's: portret, volledige lichaamshouding en een foto in een huiselijke situatie.
+
+## Gedragskenmerken eerlijk beschrijven
+Wees eerlijk over eigenschappen: energiek, rustig, angstig, speels, zelfstandig. Een eerlijk beeld voorkomt dat een adoptant voor verrassingen komt te staan.
+
+## Medische informatie volledig invullen
+Vermeld vaccinaties, operaties en chronische aandoeningen. Dit schept vertrouwen en voorkomt dat de adoptie later afketst op medische gronden.
+
+## Veelgestelde vragen over profieloptimalisatie
+### Hoeveel foto's zijn optimaal?
+Tussen de 3 en 5 foto's geven een goed beeld.
+### Moet ik negatieve eigenschappen vermelden?
+Ja. Een eerlijk profiel voorkomt teleurstelling en retouren.`,
+  },
+  {
+    slug: 'rechten-adoptanten-avg',
+    categorieSlug: 'privacy-avg',
+    titel: 'Rechten van adoptanten onder de AVG',
+    samenvatting: 'Welke privacyrechten heb je als adoptant? Inzage, correctie, verwijdering en bezwaar. Hoe PootGelukkig en asielen hiermee omgaan.',
+    bijgewerkt: '2026-07-25',
+    coverUrl: '/images/kennisbank/rechten-adoptanten-avg.jpg',
+    inhoudMd: `De AVG geeft je als adoptant duidelijke rechten over je persoonsgegevens. Dit is wat je kunt doen.
+
+## Recht op inzage
+Je hebt het recht te weten welke gegevens van jou zijn opgeslagen. Vraag het asiel of PootGelukkig om een overzicht. We verstrekken dit binnen de wettelijke termijn van een maand.
+
+## Recht op correctie
+Kloppen je gegevens niet? Je kunt ze laten verbeteren. Denk aan een veranderd adres, telefoonnummer of woonsituatie. Een actueel profiel zorgt voor betere matches.
+
+## Recht op vergetelheid
+Wil je niet langer dat je gegevens worden gebruikt? Je kunt verzoeken om verwijdering. Let op: na een afgeronde adoptie bewaren we bepaalde gegevens nog voor wettelijke of administratieve doeleinden.
+
+## Recht op bezwaar
+Je kunt bezwaar maken tegen het gebruik van je gegevens voor bepaalde doeleinden. Bij PootGelukkig gebruiken we je gegevens alleen voor matching en adoptie, dus er is weinig om bezwaar op te maken.
+
+## Hoe lang bewaren we je gegevens?
+Intakeprofielen zonder adoptie worden na 6 maanden automatisch verwijderd. Na een adoptie worden basisgegevens maximaal 2 jaar bewaard.`,
+  },
+  {
+    slug: 'asiel-aanmelden-pootgelukkig',
+    categorieSlug: 'hoe-het-werkt',
+    titel: 'Hoe meld je een asiel aan bij PootGelukkig?',
+    samenvatting: 'Stappenplan voor asielen die PootGelukkig willen gebruiken. Van registratie tot eerste dieren importeren en de AI-matching activeren.',
+    bijgewerkt: '2026-07-26',
+    coverUrl: '/images/kennisbank/asiel-aanmelden-pootgelukkig.jpg',
+    inhoudMd: `Een asiel aanmelden bij PootGelukkig is eenvoudig. In een paar stappen ben je operationeel.
+
+## 1. Registreer je asiel
+Maak een account aan op PootGelukkig met de naam en gegevens van je asiel. Kies de Start-tier (gratis) om te ontdekken of het platform werkt voor jullie situatie.
+
+## 2. Voer je eerste dieren in
+Voeg per dier een profiel toe: naam, soort, leeftijd, geslacht en een korte omschrijving. Een foto en gedragskenmerken maken het profiel compleet en verbeteren de matching direct.
+
+## 3. Activeer de AI-matching
+Zodra je dieren zijn ingevoerd, wordt de AI-matching automatisch actief. Adoptanten kunnen via het platform matches vinden en aanvragen indienen.
+
+## 4. Nodig medewerkers uit
+Voeg collega's toe aan je account zodat meerdere mensen het dashboard kunnen beheren. Elk teamlid krijgt een eigen inlog met de rechten die jij instelt.
+
+## Hoe lang duurt het voordat je aan de slag kunt?
+De registratie duurt 5 minuten. Het invoeren van de eerste dieren kost een halfuur tot een uur, afhankelijk van het aantal. Daarna is de matching direct actief.`,
   },
 ]
 

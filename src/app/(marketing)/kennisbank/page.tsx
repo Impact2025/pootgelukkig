@@ -11,7 +11,7 @@ import KennisbankSearch from '@/components/kennisbank/KennisbankSearch'
 export const metadata: Metadata = {
   title: 'Kennisbank — PootGelukkig',
   description:
-    'Gidsen en uitleg over het adopteren van asieldieren, het asiel-dashboard en hoe PootGelukkig werkt. Praktische naslag voor adoptanten en asiels met 9 artikelen in 8 categorieën.',
+    'Gidsen en uitleg over het adopteren van asieldieren, het asiel-dashboard en hoe PootGelukkig werkt. Praktische naslag voor adoptanten en asiels met 18 artikelen in 8 categorieën.',
   alternates: { canonical: '/kennisbank' },
   openGraph: {
     title: 'Kennisbank — PootGelukkig',

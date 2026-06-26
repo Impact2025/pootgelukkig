@@ -59,8 +59,21 @@ const LAGEN = [
 ]
 
 export default function WerkwijzePage() {
+  const siteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'PootGelukkig',
+    alternateName: 'PootGelukkig — Zo werkt de matching',
+    url: 'https://www.pootgelukkig.nl/werkwijze',
+    description: 'Van intake tot nazorg: hoe PootGelukkig werkt.',
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+      />
       <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Werkwijze</Eyebrow>

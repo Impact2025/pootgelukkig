@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Section, Eyebrow } from '@/components/marketing/ui'
@@ -66,14 +67,21 @@ export default async function KennisCategoriePage({
           <Link
             key={a.slug}
             href={`/kennisbank/${cat.slug}/${a.slug}`}
-            className="group flex flex-col rounded-3xl border border-[#33335c]/8 bg-white p-7 shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)]"
+            className="group flex flex-col rounded-3xl border border-[#33335c]/8 bg-white shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)] overflow-hidden"
           >
-            <h2 className="text-lg font-bold leading-tight text-[#33335c]">{a.titel}</h2>
-            <p className="mt-2 flex-1 text-[15px] leading-relaxed text-[#33335c]/60">{a.samenvatting}</p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[#ee5b2b]">
-              Lees verder
-              <span className="material-symbols-outlined text-[1.1rem]">arrow_forward</span>
-            </span>
+            {a.coverUrl && (
+              <div className="relative aspect-[16/9] overflow-hidden bg-[#f1f1f5]">
+                <Image src={a.coverUrl} alt={a.titel} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col p-7 pt-5">
+              <h2 className="text-lg font-bold leading-tight text-[#33335c]">{a.titel}</h2>
+              <p className="mt-2 flex-1 text-[15px] leading-relaxed text-[#33335c]/60">{a.samenvatting}</p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[#ee5b2b]">
+                Lees verder
+                <span className="material-symbols-outlined text-[1.1rem]">arrow_forward</span>
+              </span>
+            </div>
           </Link>
         ))}
       </div>

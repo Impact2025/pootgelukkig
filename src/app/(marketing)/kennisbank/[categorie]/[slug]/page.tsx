@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { marked } from 'marked'
@@ -238,6 +239,12 @@ export default async function KennisArtikelPage({
 
           <p className="mt-4 text-lg leading-relaxed text-[#33335c]/65">{artikel.samenvatting}</p>
         </div>
+
+        {artikel.coverUrl && (
+          <div className="relative mx-auto mt-8 w-full max-w-4xl aspect-[16/9] overflow-hidden rounded-3xl bg-[#f1f1f5]">
+            <Image src={artikel.coverUrl} alt={artikel.titel} fill className="object-cover" priority />
+          </div>
+        )}
 
         <div className="mx-auto mt-8 flex max-w-5xl gap-8">
           {heeftToC && (

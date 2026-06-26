@@ -17,9 +17,22 @@ export const metadata: Metadata = {
 }
 
 export default function OverOnsPage() {
+  const siteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'PootGelukkig',
+    alternateName: 'PootGelukkig — Over ons',
+    url: 'https://www.pootgelukkig.nl/over-ons',
+    description: 'Het verhaal achter PootGelukkig: samen met asiels, voor asiels.',
+  }
+
   return (
     <>
-      <Section className="!pb-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
+      />
+      <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Over PootGelukkig</Eyebrow>
           <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">

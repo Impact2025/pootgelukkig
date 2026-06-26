@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { asielen } from '@/lib/db/schema'
 import { eq, inArray } from 'drizzle-orm'
 import { auth } from '@/auth'
-import { stuurUitnodigingAsiel } from '@/lib/email'
+import { stuurUitnodigingAsielV2 } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       continue
     }
 
-    const res = await stuurUitnodigingAsiel({
+    const res = await stuurUitnodigingAsielV2({
       asielEmail: asiel.email,
       asielNaam: asiel.naam,
       stad: asiel.stad,
