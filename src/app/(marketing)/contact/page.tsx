@@ -16,8 +16,22 @@ export const metadata: Metadata = {
 }
 
 export default function ContactPage() {
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    email: 'info@pootgelukkig.nl',
+    url: 'https://pootgelukkig.nl/contact',
+    availableLanguage: 'Dutch',
+  }
+
   return (
-    <Section>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }}
+      />
+      <Section>
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <Eyebrow>Contact</Eyebrow>
@@ -54,5 +68,6 @@ export default function ContactPage() {
         <ContactForm />
       </div>
     </Section>
+    </>
   )
 }

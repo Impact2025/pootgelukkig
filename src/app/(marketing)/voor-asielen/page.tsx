@@ -78,6 +78,22 @@ export default function VoorAsielenPage() {
         primary={{ href: '/contact', label: 'Plan een demo' }}
         secondary={{ href: '/prijzen', label: 'Bekijk de prijzen' }}
       />
+
+      {/* Blog links voor asiels */}
+      <Section className="!pt-12 !pb-16">
+        <SectionHeading
+          eyebrow="Verder lezen"
+          title="Artikelen voor asiels"
+          intro="Praktische gidsen over werkdruk, matching en digitalisering."
+        />
+        <ul className="mt-6 space-y-3 text-[15px]">
+          <li>→ <Link href="/blog/werkdruk-in-asielen-cijfers-en-5-oplossingen" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Werkdruk in asielen: cijfers en 5 oplossingen</Link> <span className="text-[#33335c]/40">— 7 min lezen</span></li>
+          <li>→ <Link href="/blog/administratieve-lasten-verlagen-met-30-procent-in-jouw-asiel" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Administratieve lasten 30% verlagen</Link> <span className="text-[#33335c]/40">— 6 min lezen</span></li>
+          <li>→ <Link href="/blog/hoe-een-middelgroot-asiel-40-procent-meer-plaatst-met-pootgelukkig" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Casestudy: asiel plaatst 40% meer met PootGelukkig</Link> <span className="text-[#33335c]/40">— 6 min lezen</span></li>
+          <li>→ <Link href="/blog/retourpercentage-verlagen-met-3-3-3-nazorgaanpak" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Retourpercentage verlagen met 3-3-3 nazorg</Link> <span className="text-[#33335c]/40">— 5 min lezen</span></li>
+          <li>→ <Link href="/blog/capaciteitsmanagement-in-het-asiel-data-gedreven-werken" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Capaciteitsmanagement in het asiel</Link> <span className="text-[#33335c]/40">— 5 min lezen</span></li>
+        </ul>
+      </Section>
     </>
   )
 }

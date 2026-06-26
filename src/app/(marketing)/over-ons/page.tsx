@@ -86,6 +86,20 @@ export default function OverOnsPage() {
         primary={{ href: '/contact', label: 'Neem contact op' }}
         secondary={{ href: '/voor-asielen', label: 'Voor asiels' }}
       />
+
+      {/* Blog links */}
+      <Section className="!pt-12 !pb-16">
+        <SectionHeading
+          eyebrow="Verder lezen"
+          title="Lees het verhaal"
+        />
+        <ul className="mt-6 space-y-3 text-[15px]">
+          <li>→ <Link href="/blog/van-bestuurskamer-naar-startup-waarom-ik-stopte-met-managen-en-ging-bouwen" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Van bestuurskamer naar startup — het persoonlijke verhaal</Link></li>
+          <li>→ <Link href="/blog/hoe-de-ai-matching-van-pootgelukkig-werkt" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hoe de AI-matching werkt</Link></li>
+          <li>→ <Link href="/blog/toekomst-van-asieladopties-van-papier-naar-data-gedreven" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">De toekomst van asieladopties</Link></li>
+          <li>→ <Link href="/blog/hoe-een-middelgroot-asiel-40-procent-meer-plaatst-met-pootgelukkig" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Casestudy: asiel plaatst 40% meer</Link></li>
+        </ul>
+      </Section>
     </>
   )
 }

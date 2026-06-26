@@ -107,6 +107,21 @@ export default function WerkwijzePage() {
         primary={{ href: '/intake', label: 'Start de intake' }}
         secondary={{ href: '/faq', label: 'Veelgestelde vragen' }}
       />
+
+      {/* Blog links */}
+      <Section className="!pt-12 !pb-16">
+        <SectionHeading
+          eyebrow="Verder lezen"
+          title="Meer weten over matching?"
+          intro="Lees hoe de matching werkt en wat je kunt verwachten."
+        />
+        <ul className="mt-6 space-y-3 text-[15px]">
+          <li>→ <Link href="/blog/hoe-de-ai-matching-van-pootgelukkig-werkt" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hoe de AI-matching werkt — uitgebreide uitleg</Link> <span className="text-[#33335c]/40">— 6 min lezen</span></li>
+          <li>→ <Link href="/blog/hond-adopteren-uit-het-asiel-complete-gids" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hond adopteren: complete gids</Link> <span className="text-[#33335c]/40">— 10 min lezen</span></li>
+          <li>→ <Link href="/blog/retourpercentage-verlagen-met-3-3-3-nazorgaanpak" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Waarom nazorg het retourpercentage verlaagt</Link> <span className="text-[#33335c]/40">— 5 min lezen</span></li>
+          <li>→ <Link href="/kennisbank/intake/zo-werkt-de-intake" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Zo werkt de intake — kennisbank</Link></li>
+        </ul>
+      </Section>
     </>
   )
 }

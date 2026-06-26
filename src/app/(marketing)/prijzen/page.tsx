@@ -82,8 +82,23 @@ const PRIJS_FAQ = [
 ]
 
 export default function PrijzenPage() {
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'PootGelukkig — Asiel abonnement',
+    description: 'Dashboard voor asiels met AI-matching, Copilot, statistieken en nazorg.',
+    offers: [
+      { '@type': 'Offer', name: 'Start', price: '0', priceCurrency: 'EUR', description: 'Gratis, tot 5 actieve dieren' },
+      { '@type': 'Offer', name: 'Asiel', price: '39', priceCurrency: 'EUR', description: 'Onbeperkt dieren, AI-matching, Copilot' },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Prijzen</Eyebrow>
@@ -187,6 +202,20 @@ export default function PrijzenPage() {
         primary={{ href: '/contact', label: 'Plan een demo' }}
         secondary={{ href: '/voor-asielen', label: 'Voor asiels' }}
       />
+
+      {/* Blog links */}
+      <Section className="!pt-12 !pb-16">
+        <SectionHeading
+          eyebrow="Verder lezen"
+          title="Lees meer over digitalisering in asiels"
+        />
+        <ul className="mt-6 space-y-3 text-[15px]">
+          <li>→ <Link href="/blog/administratieve-lasten-verlagen-met-30-procent-in-jouw-asiel" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Administratieve lasten 30% verlagen</Link></li>
+          <li>→ <Link href="/blog/diergedrag-vastleggen-zo-krijg-je-betere-matches" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Diergedrag vastleggen voor betere matches</Link></li>
+          <li>→ <Link href="/blog/hoe-de-ai-matching-van-pootgelukkig-werkt" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hoe AI-matching werkt — transparantie</Link></li>
+          <li>→ <Link href="/blog/impactrapportage-voor-asielen-waarom-je-moet-meten-en-delen" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Impactrapportage: waarom meten en delen</Link></li>
+        </ul>
+      </Section>
     </>
   )
 }
