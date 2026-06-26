@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Section, SectionHeading, Eyebrow, ButtonLink, CtaBlock } from '@/components/marketing/ui'
 import { FaqAccordion } from '@/components/marketing/FaqAccordion'
 

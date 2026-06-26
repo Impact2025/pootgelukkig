@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Section, SectionHeading, Eyebrow, StepItem, CtaBlock } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
