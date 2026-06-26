@@ -17,42 +17,47 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .where(eq(blogPosts.status, 'gepubliceerd'))
       .orderBy(desc(blogPosts.gepubliceerdOp))
   } catch {
-    // DB onbereikbaar: sitemap met statische + kennisbank-routes blijft geldig
+    // DB onbereikbaar: statische routes blijven geldig
   }
+
+  const nu = new Date()
+  const dertigDagenGeleden = new Date(nu.getTime() - 30 * 24 * 60 * 60 * 1000)
 
   const statisch: MetadataRoute.Sitemap = [
     { url: `${APP_URL}/`, changeFrequency: 'weekly', priority: 1 },
-    { url: `${APP_URL}/werkwijze`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${APP_URL}/voor-asielen`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${APP_URL}/prijzen`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${APP_URL}/ai-assistent`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/over-ons`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${APP_URL}/blog`, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${APP_URL}/kennisbank`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${APP_URL}/voor-asielen`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${APP_URL}/werkwijze`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${APP_URL}/prijzen`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${APP_URL}/faq`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/kennisbank`, changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${APP_URL}/intake`, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${APP_URL}/over-ons`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${APP_URL}/contact`, changeFrequency: 'yearly', priority: 0.5 },
-    { url: `${APP_URL}/blog`, changeFrequency: 'daily', priority: 0.8 },
-    { url: `${APP_URL}/zoeken`, changeFrequency: 'daily', priority: 0.7 },
-    { url: `${APP_URL}/intake`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${APP_URL}/zoeken`, changeFrequency: 'monthly', priority: 0.4 },
   ]
 
-  const artikelen: MetadataRoute.Sitemap = posts.map((p) => ({
-    url: `${APP_URL}/blog/${p.slug}`,
-    lastModified: p.bijgewerktOp ?? undefined,
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }))
+  const artikelen: MetadataRoute.Sitemap = posts.map((p) => {
+    const isRecent = p.bijgewerktOp && new Date(p.bijgewerktOp) > dertigDagenGeleden
+    return {
+      url: `${APP_URL}/blog/${p.slug}`,
+      lastModified: p.bijgewerktOp ?? undefined,
+      changeFrequency: isRecent ? 'weekly' : 'monthly',
+      priority: isRecent ? 0.9 : 0.8,
+    }
+  })
 
   const kennisCategorieen: MetadataRoute.Sitemap = CATEGORIEEN.map((c) => ({
     url: `${APP_URL}/kennisbank/${c.slug}`,
     changeFrequency: 'monthly',
-    priority: 0.6,
+    priority: 0.7,
   }))
 
   const kennisArtikelen: MetadataRoute.Sitemap = ARTIKELEN.map((a) => ({
     url: `${APP_URL}/kennisbank/${a.categorieSlug}/${a.slug}`,
     lastModified: new Date(a.bijgewerkt),
     changeFrequency: 'monthly',
-    priority: 0.6,
+    priority: 0.7,
   }))
 
   return [...statisch, ...artikelen, ...kennisCategorieen, ...kennisArtikelen]
