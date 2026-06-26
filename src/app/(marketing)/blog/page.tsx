@@ -70,6 +70,7 @@ export default async function BlogIndexPage(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
+      <Section>
       <div className="max-w-2xl">
         <Eyebrow>Blog</Eyebrow>
         <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">
