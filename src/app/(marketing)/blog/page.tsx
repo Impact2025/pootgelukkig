@@ -10,11 +10,13 @@ import { Section, Eyebrow } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
   title: 'Blog — PootGelukkig',
-  description: 'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland.',
+  description:
+    'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland. Van hond en kat tot konijn: lees alles over voorbereiding, matching en nazorg. 28 artikelen, wekelijks aangevuld.',
   alternates: { canonical: '/blog' },
   openGraph: {
     title: 'Blog — PootGelukkig',
-    description: 'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland.',
+    description:
+      'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland. Van hond tot konijn, van intake tot nazorg.',
     url: '/blog',
     type: 'website',
   },
@@ -52,8 +54,22 @@ export default async function BlogIndexPage(props: {
   // Koppel categorie naam aan posts
   const catMap = new Map(alleCats.map((c) => [c.id, c]))
 
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: catSlug
+      ? (alleCats.find((c) => c.slug === catSlug)?.naam + ' — Blog PootGelukkig')
+      : 'Blog — PootGelukkig',
+    description: 'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland.',
+    url: `https://pootgelukkig.nl/blog${catSlug ? `?categorie=${catSlug}` : ''}`,
+  }
+
   return (
-    <Section>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
       <div className="max-w-2xl">
         <Eyebrow>Blog</Eyebrow>
         <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">
@@ -162,5 +178,6 @@ export default async function BlogIndexPage(props: {
         </div>
       )}
     </Section>
+    </>
   )
 }

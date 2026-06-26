@@ -11,11 +11,11 @@ import KennisbankSearch from '@/components/kennisbank/KennisbankSearch'
 export const metadata: Metadata = {
   title: 'Kennisbank — PootGelukkig',
   description:
-    'Gidsen en uitleg over adopteren, het asiel-dashboard en hoe PootGelukkig werkt. Naslag voor adoptanten en asiels.',
+    'Gidsen en uitleg over het adopteren van asieldieren, het asiel-dashboard en hoe PootGelukkig werkt. Praktische naslag voor adoptanten en asiels met 9 artikelen in 8 categorieën.',
   alternates: { canonical: '/kennisbank' },
   openGraph: {
     title: 'Kennisbank — PootGelukkig',
-    description: 'Gidsen en uitleg voor adoptanten en asiels.',
+    description: 'Praktische gidsen voor adoptanten en asiels: van intake tot nazorg en matching.',
     url: '/kennisbank',
     type: 'website',
   },

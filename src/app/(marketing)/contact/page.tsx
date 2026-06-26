@@ -5,11 +5,11 @@ import { ContactForm } from '@/components/marketing/ContactForm'
 export const metadata: Metadata = {
   title: 'Contact — PootGelukkig',
   description:
-    'Neem contact op met PootGelukkig voor een demo, een vraag over je asiel-account of algemene informatie.',
+    'Neem contact op met PootGelukkig voor een demo, een vraag over je asiel-account of algemene informatie. We reageren doorgaans binnen één werkdag.',
   alternates: { canonical: '/contact' },
   openGraph: {
     title: 'Contact — PootGelukkig',
-    description: 'Plan een demo of stel je vraag.',
+    description: 'Plan een gratis demo of stel je vraag over PootGelukkig voor jouw asiel.',
     url: '/contact',
     type: 'website',
   },

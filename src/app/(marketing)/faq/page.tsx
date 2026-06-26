@@ -5,11 +5,11 @@ import { FaqAccordion } from '@/components/marketing/FaqAccordion'
 export const metadata: Metadata = {
   title: 'Veelgestelde vragen — PootGelukkig',
   description:
-    'Antwoorden op veelgestelde vragen over adopteren via PootGelukkig, het asiel-dashboard, en hoe de AI en privacy werken.',
+    'Antwoorden op veelgestelde vragen over adopteren via PootGelukkig, het asiel-dashboard, de werking van AI-matching, privacy en kosten. Alles wat je moet weten voor een zorgeloze adoptie.',
   alternates: { canonical: '/faq' },
   openGraph: {
     title: 'Veelgestelde vragen — PootGelukkig',
-    description: 'Alles wat je wilt weten over adopteren, asiels, AI en privacy.',
+    description: 'Antwoorden op vragen over adopteren, AI-matching, privacy, kosten en het asiel-dashboard.',
     url: '/faq',
     type: 'website',
   },
