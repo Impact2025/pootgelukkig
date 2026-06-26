@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
       { hostname: 'pootgelukkig.nl' },
     ],
   },
+  async rewrites() {
+    return [{ source: '/blog/feed.xml', destination: '/blog/rss' }]
+  },
   serverExternalPackages: ['@neondatabase/serverless'],
 }
 
