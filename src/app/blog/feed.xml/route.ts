@@ -18,7 +18,6 @@ export async function GET() {
     slug: string
     excerpt: string | null
     gepubliceerdOp: Date | null
-    leestijd: number | null
   }[] = []
 
   try {
@@ -28,7 +27,6 @@ export async function GET() {
         slug: blogPosts.slug,
         excerpt: blogPosts.excerpt,
         gepubliceerdOp: blogPosts.gepubliceerdOp,
-        leestijd: blogPosts.leestijd,
       })
       .from(blogPosts)
       .where(eq(blogPosts.status, 'gepubliceerd'))
