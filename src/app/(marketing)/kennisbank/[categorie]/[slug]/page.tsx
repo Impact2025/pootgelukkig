@@ -136,6 +136,7 @@ export async function generateMetadata({
       description: artikel.samenvatting,
       url,
       type: 'article',
+      images: artikel.coverUrl ? [{ url: artikel.coverUrl, width: 1200, height: 675 }] : undefined,
     },
   }
 }

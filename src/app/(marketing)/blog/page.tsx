@@ -19,6 +19,7 @@ export const metadata: Metadata = {
       'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland. Van hond tot konijn, van intake tot nazorg.',
     url: '/blog',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

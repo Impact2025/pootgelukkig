@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Plan een gratis demo of stel je vraag over PootGelukkig voor jouw asiel.',
     url: '/contact',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

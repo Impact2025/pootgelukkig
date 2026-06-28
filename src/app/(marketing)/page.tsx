@@ -47,6 +47,7 @@ export const metadata: Metadata = {
       'AI-gestuurde matching die asiels helpt om de juiste adoptant bij het juiste dier te vinden.',
     url: '/',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

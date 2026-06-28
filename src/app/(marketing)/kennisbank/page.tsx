@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     description: 'Praktische gidsen voor adoptanten en asiels: van intake tot nazorg en matching.',
     url: '/kennisbank',
     type: 'website',
+    images: [{ url: '/images/og-default-kennisbank.jpg', width: 1200, height: 675 }],
   },
 }
 

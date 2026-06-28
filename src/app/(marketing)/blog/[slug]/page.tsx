@@ -236,7 +236,7 @@ export default async function BlogArtikelPage({ params }: { params: Promise<{ sl
   // Schema.org blokken
   const jsonLdArtikel = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: post.titel,
     description: post.metaDescription || post.excerpt || undefined,
     image: post.coverUrl || undefined,

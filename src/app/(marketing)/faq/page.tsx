@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Antwoorden op vragen over adopteren, AI-matching, privacy, kosten en het asiel-dashboard.',
     url: '/faq',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

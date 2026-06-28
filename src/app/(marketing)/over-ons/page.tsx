@@ -13,6 +13,7 @@ export const metadata: Metadata = {
       'Het verhaal achter PootGelukkig: gebouwd samen met asiels, voor asiels.',
     url: '/over-ons',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

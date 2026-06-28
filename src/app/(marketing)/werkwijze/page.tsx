@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Van intake tot nazorg in vijf stappen.',
     url: '/werkwijze',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

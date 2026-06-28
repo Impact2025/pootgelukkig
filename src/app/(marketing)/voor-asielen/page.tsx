@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Minder handwerk, betere matches. Het dashboard voor asiels.',
     url: '/voor-asielen',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 

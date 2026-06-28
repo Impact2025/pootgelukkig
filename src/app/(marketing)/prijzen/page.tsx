@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     description: 'Gratis voor adoptanten. Heldere abonnementen voor asiels.',
     url: '/prijzen',
     type: 'website',
+    images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
 
