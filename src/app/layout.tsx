@@ -1,4 +1,5 @@
 ﻿import type { Metadata, Viewport } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { ToastProvider } from '@/components/ui/Toaster'
@@ -62,6 +63,7 @@ export default function RootLayout({
           <ToastProvider>{children}</ToastProvider>
           <AIAssistentWidget />
         </Providers>
+        <GoogleAnalytics gaId="G-LRTEECBPQN" />
       </body>
     </html>
   )
