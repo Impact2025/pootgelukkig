@@ -227,7 +227,7 @@ export default function VoorAsielenPage() {
         title="Zie het in je eigen werkdag"
         intro="Meld je gratis aan en zet je eerste dieren online, of plan een korte demo met het team."
         primary={{ href: '/voor-asielen/start', label: 'Meld je asiel gratis aan' }}
-        secondary={{ href: '/contact', label: 'Plan een demo' }}
+        secondary={{ href: '/demo-aanvragen', label: 'Plan een demo' }}
       />
 
       {/* Blog links voor asiels */}

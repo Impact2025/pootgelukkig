@@ -10,7 +10,7 @@ const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
 const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/animals', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
 // Publieke marketing-site — altijd toegankelijk, ook uitgelogd
-const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact']
+const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact', '/demo-aanvragen']
 
 function thuisRoute(rol?: string) {
   return rol === 'asiel' || rol === 'admin' ? '/admin' : '/dashboard'

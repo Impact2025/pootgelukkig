@@ -202,7 +202,7 @@ export default function PrijzenPage() {
       <CtaBlock
         title="Benieuwd wat PootGelukkig voor jouw asiel doet?"
         intro="Plan een korte demo en we laten zien hoe het in jouw werkdag past."
-        primary={{ href: '/contact', label: 'Plan een demo' }}
+        primary={{ href: '/demo-aanvragen', label: 'Plan een demo' }}
         secondary={{ href: '/voor-asielen', label: 'Voor asiels' }}
       />
 
