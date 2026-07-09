@@ -82,10 +82,11 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
                 Inloggen
               </Link>
               <Link
-                href="/auth/register"
+                href="/demo-aanvragen"
                 className="inline-flex items-center gap-2 rounded-full bg-[#ee5b2b] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#d94e22]"
               >
-                Aan de slag
+                <span className="material-symbols-outlined text-[1.05rem]">calendar_month</span>
+                Plan een demo
               </Link>
             </>
           )}
@@ -105,6 +106,13 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
       {open && (
         <div className="border-t border-[#33335c]/8 lg:hidden">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-5 py-4 sm:px-8">
+            <Link
+              href="/demo-aanvragen"
+              className="mb-1 flex items-center justify-center gap-2 rounded-xl bg-[#ee5b2b] px-5 py-3 text-center text-sm font-bold text-white"
+            >
+              <span className="material-symbols-outlined text-[1.05rem]">calendar_month</span>
+              Plan een demo
+            </Link>
             {LINKS.map((link) => (
               <Link
                 key={link.href}
