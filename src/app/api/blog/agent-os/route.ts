@@ -116,11 +116,13 @@ export async function POST(req: NextRequest) {
   const inhoudMd = htmlToMarkdown(htmlContent)
   const excerpt = (body.seoDescription ?? '').toString().trim()
   const focusKeyword = Array.isArray(body.tags) && body.tags.length ? body.tags[0] : null
-  // AgentOS zet soms een ✅ (of ander emoticon) vooraan de titel. De slug
-  // wordt via slugify() netjes gesaned (✅ verdwijnt), maar de H1-titel
-  // houden we ook schoon: de ✅ eruit, dubbele spaties weg.
-  const cleanTitle = title.replace(/✅/g, '').replace(/\s+/g, ' ').trim()
-  const slug = slugify((body.slug ?? '').toString().trim() || cleanTitle).slice(0, 280)
+  // AgentOS zet soms een ✅ (of ander emoticon) vooraan de titel, vaak gevolgd
+  // door een streepje ("✅-Titel"). De slug wordt via slugify() gesaned (✅ weg),
+  // maar dan blijft de leading "-" hangen. Hier halen we ✅ én een eventuele
+  // "✅-" direct weg, en strippen de slug ook leading/trailing dashes.
+  const cleanTitle = title.replace(/✅-?/g, '').replace(/\s+/g, ' ').trim()
+  const slugRaw = (body.slug ?? '').toString().trim().replace(/✅-?/g, '')
+  const slug = slugify(slugRaw || cleanTitle).replace(/^-+/, '').replace(/-+$/g, '').slice(0, 280)
   const metaTitle = cleanTitle.slice(0, 60)
 
   // Unieke slug
