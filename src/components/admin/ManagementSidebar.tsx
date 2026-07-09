@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { asielNav, type NavItem } from '@/components/admin/nav'
+import { managementNav, type NavItem } from '@/components/admin/nav'
 import { cx } from '@/components/admin/ui'
-import type { AdminCounts, AdminUser } from './AdminShell'
+import type { AdminCounts, AdminUser } from '@/app/admin/AdminShell'
 
 interface Props {
   user: AdminUser
@@ -18,20 +18,12 @@ function badgeFor(item: NavItem, counts: AdminCounts): { value: number; tone: 'r
   switch (item.badge) {
     case 'openstaand':
       return counts.openstaand > 0 ? { value: counts.openstaand, tone: 'rood' } : null
-    case 'afspraken':
-      return counts.afspraken > 0 ? { value: counts.afspraken, tone: 'rood' } : null
-    case 'ongelezen':
-      return counts.ongelezen > 0 ? { value: counts.ongelezen, tone: 'rood' } : null
-    case 'medisch':
-      return counts.medisch > 0 ? { value: counts.medisch, tone: 'rood' } : null
-    case 'wachtlijst':
-      return counts.wachtlijst > 0 ? { value: counts.wachtlijst, tone: 'navy' } : null
     default:
       return null
   }
 }
 
-export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCloseMobile }: Props) {
+export default function ManagementSidebar({ user, counts, collapsed, mobileOpen, onCloseMobile }: Props) {
   const pathname = usePathname()
 
   function isActive(item: NavItem) {
@@ -71,13 +63,13 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
           </div>
           <div className={cx(collapsed && 'lg:hidden')}>
             <p className="text-sm font-extrabold leading-tight text-[#33335c]">PootGelukkig</p>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#33335c]/40">Asiel Portaal</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#33335c]/40">Management</p>
           </div>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-          {asielNav.map((groep, gi) => {
+          {managementNav.map((groep, gi) => {
             const items = groep.items
             if (items.length === 0) return null
             return (
@@ -122,7 +114,6 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
                         >
                           {item.icon}
                         </span>
-                        {/* Ingeklapt: kleine indicator i.p.v. teller */}
                         {badge && collapsed && (
                           <span className="absolute -right-1 -top-1 hidden size-2 rounded-full bg-red-500 lg:block" />
                         )}
@@ -147,18 +138,18 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
           })}
         </nav>
 
-        {/* Onderaan: naar management-portaal (voor hybride accounts) */}
+        {/* Onderaan: terug naar asiel-portaal (voor hybride accounts) */}
         <div className="border-t border-gray-50 p-3">
           <Link
-            href="/management"
-            title={collapsed ? 'Management portaal' : undefined}
+            href="/admin"
+            title={collapsed ? 'Asiel portaal' : undefined}
             className={cx(
               'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#33335c]/40 transition-colors hover:bg-gray-50 hover:text-[#33335c]',
               collapsed && 'lg:justify-center'
             )}
           >
-            <span className="material-symbols-outlined text-xl">insights</span>
-            <span className={cx(collapsed && 'lg:hidden')}>Management portaal</span>
+            <span className="material-symbols-outlined text-xl">storefront</span>
+            <span className={cx(collapsed && 'lg:hidden')}>Asiel portaal</span>
           </Link>
         </div>
       </aside>

@@ -21,7 +21,9 @@ interface Melding {
   icon: string
 }
 
-function meldingen(counts: AdminCounts): Melding[] {
+function meldingen(counts: AdminCounts, isAdmin: boolean): Melding[] {
+  // Het management-portaal toont geen asiel-operatie meldingen.
+  if (isAdmin) return []
   const lijst: Melding[] = []
   if (counts.openstaand > 0)
     lijst.push({ label: `${counts.openstaand} openstaande ${counts.openstaand === 1 ? 'aanvraag' : 'aanvragen'}`, href: '/admin/adopties', icon: 'favorite' })
@@ -42,7 +44,7 @@ export default function AdminTopBar({ user, counts, onToggleSidebar, onOpenPalet
   const [meldingenOpen, setMeldingenOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
 
-  const lijst = meldingen(counts)
+  const lijst = meldingen(counts, user.rol === 'admin')
   const totaal = lijst.length
 
   return (
@@ -153,7 +155,7 @@ export default function AdminTopBar({ user, counts, onToggleSidebar, onOpenPalet
                 </div>
                 <div className="py-1">
                   <Link
-                    href="/admin/instellingen"
+                    href={user.rol === 'admin' ? '/management/instellingen' : '/admin/instellingen'}
                     onClick={() => setUserOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#33335c]/80 hover:bg-gray-50"
                   >

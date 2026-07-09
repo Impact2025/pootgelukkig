@@ -39,8 +39,9 @@ test('statuskleuren en labels kloppen', () => {
 test('command items respecteren de rol', () => {
   const alsAsiel = buildCommandItems(false)
   const alsAdmin = buildCommandItems(true)
-  assert.ok(!alsAsiel.some((i) => i.href === '/admin/beheer/crm'), 'asiel ziet geen CRM')
-  assert.ok(alsAdmin.some((i) => i.href === '/admin/beheer/crm'), 'admin ziet CRM')
+  assert.ok(!alsAsiel.some((i) => i.href === '/management/crm'), 'asiel ziet geen management-CRM')
+  assert.ok(alsAdmin.some((i) => i.href === '/management/crm'), 'admin ziet management-CRM')
+  assert.ok(!alsAdmin.some((i) => i.href === '/admin/dieren'), 'admin ziet geen asiel-operatie')
 })
 
 test('lege query geeft alle items terug', () => {
@@ -49,7 +50,7 @@ test('lege query geeft alle items terug', () => {
 })
 
 test('filter vindt acties en navigatie op trefwoord', () => {
-  const items = buildCommandItems(true)
+  const items = buildCommandItems(false) // asiel-portaal
   const dier = filterCommandItems('dier', items)
   assert.ok(dier.some((i) => i.href === '/admin/dieren/nieuw'))
   assert.ok(dier.some((i) => i.href === '/admin/dieren'))

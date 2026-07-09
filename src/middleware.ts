@@ -8,12 +8,13 @@ const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/pitch', '/auth/wachtwo
 const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron', '/api/coupons/valideer', '/api/blog/agent-os']
 const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
+const MANAGEMENT_ROUTES = ['/management']
 const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/animals', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
 // Publieke marketing-site — altijd toegankelijk, ook uitgelogd
 const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact', '/demo-aanvragen']
 
 function thuisRoute(rol?: string) {
-  return rol === 'asiel' || rol === 'admin' ? '/admin' : '/dashboard'
+  return rol === 'admin' ? '/management' : rol === 'asiel' ? '/admin' : '/dashboard'
 }
 
 export default auth((req) => {
@@ -76,7 +77,7 @@ export default auth((req) => {
   // Asiel-gebruiker probeert adoptant-pagina's te bezoeken → admin
   const isAdoptantRoute = ADOPTANT_ROUTES.some((r) => nextUrl.pathname.startsWith(r))
   if (isAdoptantRoute && (rol === 'asiel' || rol === 'admin')) {
-    return NextResponse.redirect(new URL('/admin', req.url))
+    return NextResponse.redirect(new URL(rol === 'admin' ? '/management' : '/admin', req.url))
   }
 
   // Adoptant probeert admin-pagina's te bezoeken → dashboard
@@ -85,8 +86,14 @@ export default auth((req) => {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  // Platform-beheer (CRM, blog, coupons, gebruikers) is alleen voor admins
-  if (nextUrl.pathname.startsWith('/admin/beheer') && rol !== 'admin') {
+  // Admin hoort in het management-portaal; /admin is voor asielen.
+  if (isAsielRoute && rol === 'admin') {
+    return NextResponse.redirect(new URL('/management', req.url))
+  }
+
+  // Asiel mag niet in het management-portaal.
+  const isManagementRoute = MANAGEMENT_ROUTES.some((r) => nextUrl.pathname.startsWith(r))
+  if (isManagementRoute && rol !== 'admin') {
     return NextResponse.redirect(new URL('/admin', req.url))
   }
 

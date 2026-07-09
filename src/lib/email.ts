@@ -114,7 +114,7 @@ export async function stuurManagementRapport(props: {
       aiPerModule: props.aiPerModule,
       samenvatting: props.samenvatting,
       trends: props.trends,
-      portaalUrl: `${APP_URL}/admin/beheer`,
+      portaalUrl: `${APP_URL}/management`,
     })
   )
   const prefix = props.periode === 'dag' ? '📊 Dagrapport' : '📈 Maandrapport'

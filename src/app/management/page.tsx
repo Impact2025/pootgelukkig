@@ -87,10 +87,10 @@ export default async function ManagementDashboardPage() {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { href: '/admin/beheer/gebruikers', icon: 'group', label: 'Gebruikers', sub: 'Kosten & activiteit' },
-          { href: '/admin/beheer/crm', icon: 'contacts', label: 'CRM', sub: 'Leads & deals' },
-          { href: '/admin/beheer/blog', icon: 'article', label: 'Blog', sub: 'AI-SEO artikelen' },
-          { href: '/admin/beheer/coupons', icon: 'sell', label: 'Coupons', sub: 'Marketingcodes' },
+          { href: '/management/gebruikers', icon: 'group', label: 'Gebruikers', sub: 'Kosten & activiteit' },
+          { href: '/management/crm', icon: 'contacts', label: 'CRM', sub: 'Leads & deals' },
+          { href: '/management/blog', icon: 'article', label: 'Blog', sub: 'AI-SEO artikelen' },
+          { href: '/management/coupons', icon: 'sell', label: 'Coupons', sub: 'Marketingcodes' },
         ].map((l) => (
           <Link
             key={l.href}

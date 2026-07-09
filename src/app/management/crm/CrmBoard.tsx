@@ -145,7 +145,7 @@ export default function CrmBoard({ contacten, deals }: { contacten: Contact[]; d
                       <p className="font-bold text-[#33335c] text-sm leading-tight">{deal.titel}</p>
                       {deal.contactNaam && (
                         <Link
-                          href={`/admin/beheer/crm/${deal.contactId}`}
+                          href={`/management/crm/${deal.contactId}`}
                           className="text-[#33335c]/40 text-xs hover:text-[#33335c] transition-colors"
                         >
                           {deal.contactNaam}
@@ -169,7 +169,7 @@ export default function CrmBoard({ contacten, deals }: { contacten: Contact[]; d
             contacten.map((c) => (
               <Link
                 key={c.id}
-                href={`/admin/beheer/crm/${c.id}`}
+                href={`/management/crm/${c.id}`}
                 className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/50 transition-colors"
               >
                 <div className="size-9 rounded-xl bg-[#33335c] flex items-center justify-center flex-shrink-0">

@@ -86,7 +86,7 @@ export default async function BeheerGebruikersPage() {
                     <td className="px-4 py-3 text-right text-[#33335c]/70">{r.adoptiesAantal || '–'}</td>
                     <td className="px-4 py-3 text-right">
                       <Link
-                        href={`/admin/beheer/gebruikers/${r.id}`}
+                        href={`/management/gebruikers/${r.id}`}
                         className="text-[#33335c]/40 hover:text-[#33335c] transition-colors"
                       >
                         <span className="material-symbols-outlined text-lg">chevron_right</span>

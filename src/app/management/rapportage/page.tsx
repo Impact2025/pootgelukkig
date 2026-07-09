@@ -111,7 +111,7 @@ export default async function RapportagePage({
               {jaren.map((j) => (
                 <a
                   key={j}
-                  href={`/admin/rapportage?jaar=${j}`}
+                  href={`/management/rapportage?jaar=${j}`}
                   className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-colors ${
                     j === geldigJaar
                       ? 'bg-[#33335c] text-white'

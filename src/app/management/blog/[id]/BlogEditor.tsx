@@ -78,13 +78,13 @@ export default function BlogEditor({ post }: { post: Post }) {
   async function verwijder() {
     await fetch(`/api/admin/beheer/blog/${post.id}`, { method: 'DELETE' })
     showToast('Artikel verwijderd', 'info')
-    router.push('/admin/beheer/blog')
+    router.push('/management/blog')
   }
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <Link href="/admin/beheer/blog" className="inline-flex items-center gap-1 text-[#33335c]/40 hover:text-[#33335c] text-sm font-semibold transition-colors">
+        <Link href="/management/blog" className="inline-flex items-center gap-1 text-[#33335c]/40 hover:text-[#33335c] text-sm font-semibold transition-colors">
           <span className="material-symbols-outlined text-base">arrow_back</span>
           Terug
         </Link>

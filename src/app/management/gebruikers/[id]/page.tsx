@@ -29,7 +29,7 @@ export default async function GebruikerDetailPage({ params }: { params: Promise<
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-4">
       <Link
-        href="/admin/beheer/gebruikers"
+        href="/management/gebruikers"
         className="inline-flex items-center gap-1 text-[#33335c]/40 hover:text-[#33335c] text-sm font-semibold transition-colors"
       >
         <span className="material-symbols-outlined text-base">arrow_back</span>

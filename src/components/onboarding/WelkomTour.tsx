@@ -346,7 +346,7 @@ const ASIEL_STAPPEN: AsielStap[] = [
   },
   // ── 8. Wachtlijst & Rapportage ───────────────────────────────────────────
   {
-    navIcon: 'bar_chart', navLabel: 'Rapportage', navHref: '/admin/rapportage',
+    navIcon: 'bar_chart', navLabel: 'Rapportage', navHref: '/management/rapportage',
     kleur: '#33335c', icon: 'insights',
     titel: 'Wachtlijst, rapportage & instellingen',
     beschrijving: 'Bekijk wie er op een dier wacht, analyseer adoptietrends per maand en beheer je openingstijden, adoptieprocedure en notificaties.',

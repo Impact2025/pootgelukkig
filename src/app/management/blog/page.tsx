@@ -37,7 +37,7 @@ export default async function BlogPage() {
             {posts.map((p) => (
               <Link
                 key={p.id}
-                href={`/admin/beheer/blog/${p.id}`}
+                href={`/management/blog/${p.id}`}
                 className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors"
               >
                 <div className="flex-1 min-w-0">

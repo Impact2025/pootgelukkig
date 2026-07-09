@@ -19,7 +19,7 @@ export default function BlogActies() {
     })
     const json = await res.json()
     setBezig(false)
-    if (json.data?.id) router.push(`/admin/beheer/blog/${json.data.id}`)
+    if (json.data?.id) router.push(`/management/blog/${json.data.id}`)
   }
 
   async function genereer() {
@@ -34,7 +34,7 @@ export default function BlogActies() {
     const json = await res.json()
     setBezig(false)
     if (json.data?.id) {
-      router.push(`/admin/beheer/blog/${json.data.id}`)
+      router.push(`/management/blog/${json.data.id}`)
     } else {
       setFout(json.error ?? 'Genereren mislukt')
     }

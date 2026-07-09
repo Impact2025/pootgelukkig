@@ -9,6 +9,7 @@ export interface NavItem {
   highlight?: boolean
   badge?: 'openstaand' | 'afspraken' | 'ongelezen' | 'medisch' | 'wachtlijst'
   adminOnly?: boolean
+  asielOnly?: boolean
 }
 
 export interface NavGroup {
@@ -16,7 +17,8 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-export const NAV_GROUPS: NavGroup[] = [
+// Asiel-portaal: dagelijkse operatie van één asiel.
+export const asielNav: NavGroup[] = [
   {
     items: [
       { href: '/admin', icon: 'grid_view', label: 'Dashboard', exact: true },
@@ -32,32 +34,39 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/medisch', icon: 'medical_services', label: 'Medisch', badge: 'medisch' },
       { href: '/admin/wachtlijst', icon: 'format_list_bulleted', label: 'Wachtlijst', badge: 'wachtlijst' },
       { href: '/admin/pleeggezinnen', icon: 'house', label: 'Pleeggezinnen' },
-      { href: '/admin/asielen-werving', icon: 'domain_add', label: 'Asielen werving' },
-      { href: '/admin/rapportage', icon: 'bar_chart', label: 'Rapportage' },
       { href: '/admin/instellingen', icon: 'settings', label: 'Instellingen' },
     ],
   },
+]
+
+// Management-portaal: platform-overzicht voor de beheerder(s).
+export const managementNav: NavGroup[] = [
   {
-    titel: 'Beheer',
     items: [
-      { href: '/admin/beheer', icon: 'insights', label: 'Management', exact: true, adminOnly: true },
-      { href: '/admin/beheer/gebruikers', icon: 'group', label: 'Gebruikers', adminOnly: true },
-      { href: '/admin/beheer/crm', icon: 'contacts', label: 'CRM', adminOnly: true },
-      { href: '/admin/beheer/blog', icon: 'article', label: 'Blog', adminOnly: true },
-      { href: '/admin/beheer/coupons', icon: 'sell', label: 'Coupons', adminOnly: true },
+      { href: '/management', icon: 'insights', label: 'Management', exact: true },
+      { href: '/management/gebruikers', icon: 'group', label: 'Gebruikers' },
+      { href: '/management/crm', icon: 'contacts', label: 'CRM' },
+      { href: '/management/asielen-werving', icon: 'domain_add', label: 'Asielen werving' },
+      { href: '/management/rapportage', icon: 'bar_chart', label: 'Rapportage' },
+      { href: '/management/content-queue', icon: 'inbox', label: 'Content-queue' },
     ],
   },
   {
-    titel: 'AI-team',
+    titel: 'Content',
     items: [
-      { href: '/admin/instellingen/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
-      { href: '/admin/content-queue', icon: 'inbox', label: 'Content-queue' },
+      { href: '/management/blog', icon: 'article', label: 'Blog' },
+      { href: '/management/coupons', icon: 'sell', label: 'Coupons' },
+      { href: '/management/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
+      { href: '/management/instellingen', icon: 'settings', label: 'Instellingen' },
     ],
   },
 ]
 
 // Vlakke lijst van alle navitems (handig voor palette + breadcrumbs).
-export const ALL_NAV_ITEMS: NavItem[] = NAV_GROUPS.flatMap((g) => g.items)
+export const ALL_NAV_ITEMS: NavItem[] = [
+  ...asielNav.flatMap((g) => g.items),
+  ...managementNav.flatMap((g) => g.items),
+]
 
 // Labels voor padsegmenten die geen eigen navitem hebben.
 export const SEGMENT_LABELS: Record<string, string> = {
@@ -83,6 +92,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   coupons: 'Coupons',
   'ai-rollen': 'AI-rollen',
   'content-queue': 'Content-queue',
+  management: 'Management',
 }
 
 export interface Crumb {
@@ -180,12 +190,14 @@ export interface CommandItem {
 export const QUICK_ACTIONS: CommandItem[] = [
   { id: 'nieuw-dier', label: 'Nieuw dier toevoegen', icon: 'add_circle', href: '/admin/dieren/nieuw', keywords: ['toevoegen', 'aanmaken', 'dier'] },
   { id: 'nieuw-pleeggezin', label: 'Nieuw pleeggezin', icon: 'add_home', href: '/admin/pleeggezinnen/nieuw', keywords: ['pleeg', 'gezin', 'toevoegen'] },
-  { id: 'rapportage', label: 'Rapportage downloaden', icon: 'download', href: '/admin/rapportage', keywords: ['export', 'pdf', 'csv'] },
+  { id: 'rapportage', label: 'Rapportage downloaden', icon: 'download', href: '/management/rapportage', keywords: ['export', 'pdf', 'csv'] },
 ]
 
 // Bouwt de volledige lijst commando's: navigatie + snelle acties (gefilterd op rol).
+// isAdmin krijgt het management-portaal, asiel het asiel-portaal.
 export function buildCommandItems(isAdmin: boolean): CommandItem[] {
-  const navCommands: CommandItem[] = ALL_NAV_ITEMS.filter((i) => isAdmin || !i.adminOnly).map((i) => ({
+  const items = isAdmin ? managementNav : asielNav
+  const navCommands: CommandItem[] = items.flatMap((g) => g.items).map((i) => ({
     id: `nav:${i.href}`,
     label: `Ga naar ${i.label}`,
     hint: 'Navigatie',

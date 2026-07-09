@@ -99,7 +99,7 @@ export default function ContactDetail({
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <Link href="/admin/beheer/crm" className="inline-flex items-center gap-1 text-[#33335c]/40 hover:text-[#33335c] text-sm font-semibold mb-4 transition-colors">
+      <Link href="/management/crm" className="inline-flex items-center gap-1 text-[#33335c]/40 hover:text-[#33335c] text-sm font-semibold mb-4 transition-colors">
         <span className="material-symbols-outlined text-base">arrow_back</span>
         Terug naar CRM
       </Link>
