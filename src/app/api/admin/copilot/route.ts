@@ -13,6 +13,7 @@ import {
 } from '@/lib/db/schema'
 import { and, eq, count, lt, gte, ne, desc } from 'drizzle-orm'
 import { chatStream } from '@/lib/ai/client'
+import { haalRol, isGeldigeRol } from '@/lib/ai/rollen'
 
 type Bericht = {
   rol: 'user' | 'assistant'
@@ -163,9 +164,9 @@ export async function POST(request: NextRequest) {
     return new Response('Geen toegang', { status: 401 })
   }
 
-  let body: { berichten: Bericht[] }
+  let body: { berichten: Bericht[]; rol?: unknown }
   try {
-    body = await request.json() as { berichten: Bericht[] }
+    body = await request.json() as { berichten: Bericht[]; rol?: unknown }
   } catch {
     return new Response('Ongeldig verzoek', { status: 400 })
   }
@@ -176,6 +177,10 @@ export async function POST(request: NextRequest) {
 
   const asielId = session.user.asielId
 
+  // Rol-gebaseerde systeemprompt (RAG-lite) of de algemene copilot-prompt
+  const rolId = isGeldigeRol(body.rol) ? body.rol : null
+  const rol = rolId ? haalRol(rolId) : null
+
   let context = ''
   try {
     context = await bouwCopilotContext(asielId)
@@ -183,9 +188,34 @@ export async function POST(request: NextRequest) {
     console.error('Context bouw fout:', error)
   }
 
-  const systemPrompt = `Je bent de PootGelukkig Asiel Copilot — een slimme, proactieve AI-assistent voor medewerkers van het asiel.
+  let systemPrompt: string
+  if (rol) {
+    let rolContext = ''
+    try {
+      rolContext = await rol.bouwContext(Number(asielId))
+    } catch (error) {
+      console.error(`Rol-context fout (${rol.id}):`, error)
+    }
+    systemPrompt = `${rol.systeemInstructie}
 
-Je bent niet zomaar een chatbot. Je bent een echte werkmaatje die:
+ASIEL CONTEXT:
+${context}
+
+ROL-SPECIFIEKE DATA:
+${rolContext}
+
+STIJL:
+- Persoonlijk en warm, maar professioneel
+- Concreet met namen en cijfers (gebruik echte data hierboven)
+- Beknopt tenzij gevraagd om meer detail
+- Gebruik **bold** voor belangrijke punten
+- Alle tekst in het Nederlands
+
+Als je iets niet weet of data mist, zeg dat eerlijk.`
+  } else {
+    systemPrompt = `Je bent de PootGelukkig Asiel Copilot — een slimme, proactieve AI-assistent voor medewerkers van het asiel.
+
+Je bent niet zomaar een chatbot. Je bent een echte werkmaatje dat:
 - Alle actuele data kent van het asiel
 - Proactief signaleert wat aandacht nodig heeft
 - Helpt met teksten schrijven (dierenverhalen, sociale media, brieven)
@@ -211,6 +241,7 @@ STIJL:
 - Alle tekst in het Nederlands
 
 Als je iets niet weet of data mist, zeg dat eerlijk.`
+  }
 
   const messages = [
     { role: 'system' as const, content: systemPrompt },
@@ -218,7 +249,10 @@ Als je iets niet weet of data mist, zeg dat eerlijk.`
   ]
 
   try {
-    const stream = await chatStream(messages, { maxTokens: 800, meta: { module: 'copilot' } })
+    const stream = await chatStream(messages, {
+      maxTokens: 800,
+      meta: { module: rol ? `rol-${rol.id}` : 'copilot', userId: Number(session.user.id), asielId: Number(asielId) },
+    })
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
