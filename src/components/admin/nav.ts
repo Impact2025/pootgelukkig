@@ -47,6 +47,12 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/beheer/coupons', icon: 'sell', label: 'Coupons', adminOnly: true },
     ],
   },
+  {
+    titel: 'AI-team',
+    items: [
+      { href: '/admin/instellingen/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
+    ],
+  },
 ]
 
 // Vlakke lijst van alle navitems (handig voor palette + breadcrumbs).
@@ -74,6 +80,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   crm: 'CRM',
   blog: 'Blog',
   coupons: 'Coupons',
+  'ai-rollen': 'AI-rollen',
 }
 
 export interface Crumb {

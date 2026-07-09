@@ -4,6 +4,17 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import type { BriefingData, CopilotTaak } from '@/app/api/admin/copilot/briefing/route'
 
+type Rol = {
+  id: string
+  naam: string
+  titel: string
+  icoon: string
+  kleur: string
+  beschrijving: string
+  actief: boolean
+  acties: { id: string; label: string; icoon: string; prompt: string; sideEffect: boolean; endpoint: string | null }[]
+}
+
 type ChatBericht = {
   id: string
   rol: 'user' | 'assistant'
@@ -118,11 +129,14 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
   const [briefingLaden, setBriefingLaden] = useState(true)
   const [briefingFout, setBriefingFout] = useState(false)
   const [toonTaken, setToonTaken] = useState(true)
+  const [rollen, setRollen] = useState<Rol[]>([])
+  const [rollenLaden, setRollenLaden] = useState(true)
+  const [actieveRol, setActieveRol] = useState<string | null>(null)
 
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const invoerRef = useRef<HTMLTextAreaElement>(null)
 
-  // Laad briefing bij mount
+  // Laad briefing + beschikbare rollen bij mount
   useEffect(() => {
     async function laadBriefing() {
       try {
@@ -136,7 +150,21 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
         setBriefingLaden(false)
       }
     }
+    async function laadRollen() {
+      try {
+        const res = await fetch('/api/admin/copilot/rollen')
+        if (res.ok) {
+          const data = (await res.json()) as { rollen: Rol[] }
+          setRollen(data.rollen)
+        }
+      } catch {
+        // rollen optioneel
+      } finally {
+        setRollenLaden(false)
+      }
+    }
     laadBriefing()
+    laadRollen()
   }, [])
 
   // Scroll naar beneden bij nieuwe berichten
@@ -144,7 +172,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [berichten])
 
-  const verstuurBericht = useCallback(async (tekst: string) => {
+  const verstuurBericht = useCallback(async (tekst: string, actieId?: string) => {
     const trim = tekst.trim()
     if (!trim || laadt) return
 
@@ -158,6 +186,8 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
     try {
       const payload = {
         berichten: [...berichten, nieuwBericht].map((b) => ({ rol: b.rol, inhoud: b.inhoud })),
+        ...(actieveRol ? { rol: actieveRol } : {}),
+        ...(actieId ? { actieId } : {}),
       }
 
       const res = await fetch('/api/admin/copilot', {
@@ -195,7 +225,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
       setLaadt(false)
       invoerRef.current?.focus()
     }
-  }, [berichten, laadt])
+  }, [berichten, laadt, actieveRol])
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -229,6 +259,45 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs font-semibold text-[#33335c]/40">Online</span>
         </div>
+      </div>
+
+      {/* Rol-switcher: AI-team */}
+      <div className="bg-white/60 border-b border-gray-100 px-8 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
+        <span className="text-xs font-extrabold text-[#33335c]/40 uppercase tracking-wider mr-1 flex-shrink-0">
+          AI-team
+        </span>
+        <button
+          onClick={() => setActieveRol(null)}
+          className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+            actieveRol === null
+              ? 'bg-[#33335c] text-white shadow-sm'
+              : 'bg-white border border-gray-200 text-[#33335c]/60 hover:bg-gray-50'
+          }`}
+        >
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+            auto_awesome
+          </span>
+          Algemeen
+        </button>
+        {!rollenLaden && rollen.map((r) => {
+          const actief = actieveRol === r.id
+          return (
+            <button
+              key={r.id}
+              onClick={() => setActieveRol(actief ? null : r.id)}
+              title={`${r.naam} — ${r.titel}`}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                actief ? 'text-white shadow-sm' : 'bg-white border border-gray-200 text-[#33335c]/60 hover:bg-gray-50'
+              }`}
+              style={actief ? { backgroundColor: r.kleur } : undefined}
+            >
+              <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                {r.icoon}
+              </span>
+              {r.naam}
+            </button>
+          )
+        })}
       </div>
 
       <div className="flex flex-1 min-h-0">
@@ -346,14 +415,24 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
               </div>
             )}
 
-            {/* Snelle acties */}
+            {/* Snelle acties — rol-specifiek of algemeen */}
             <div>
-              <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">Snelle acties</p>
+              <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">
+                {actieveRol ? `Acties · ${rollen.find((r) => r.id === actieveRol)?.naam ?? ''}` : 'Snelle acties'}
+              </p>
               <div className="space-y-1">
-                {SNELLE_ACTIES.map((actie) => (
+                {(actieveRol
+                  ? rollen.find((r) => r.id === actieveRol)?.acties.map((a) => ({
+                      label: a.label,
+                      prompt: a.prompt,
+                      icoon: a.icoon,
+                      actieId: a.id,
+                    })) ?? []
+                  : SNELLE_ACTIES.map((a) => ({ label: a.label, prompt: a.prompt, icoon: 'bolt', actieId: undefined }))
+                ).map((actie) => (
                   <button
                     key={actie.label}
-                    onClick={() => verstuurBericht(actie.prompt)}
+                    onClick={() => verstuurBericht(actie.prompt, actie.actieId)}
                     disabled={laadt}
                     className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group disabled:opacity-50"
                   >
@@ -361,7 +440,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                       className="material-symbols-outlined text-sm text-[#33335c]/30 group-hover:text-[#33335c]/60 transition-colors flex-shrink-0"
                       style={{ fontVariationSettings: "'FILL' 1" }}
                     >
-                      bolt
+                      {actie.icoon}
                     </span>
                     <span className="text-xs font-semibold text-[#33335c]/60 group-hover:text-[#33335c] transition-colors">
                       {actie.label}
@@ -375,6 +454,24 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
 
         {/* Chat gebied */}
         <div className="flex-1 flex flex-col min-w-0">
+          {/* Actieve rol banner */}
+          {actieveRol && (() => {
+            const r = rollen.find((x) => x.id === actieveRol)
+            if (!r) return null
+            return (
+              <div
+                className="px-6 py-2.5 flex items-center gap-2 text-white text-sm font-semibold flex-shrink-0"
+                style={{ backgroundColor: r.kleur }}
+              >
+                <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {r.icoon}
+                </span>
+                <span>{r.naam} · {r.titel}</span>
+                <span className="ml-auto text-white/80 text-xs font-medium">{r.beschrijving}</span>
+              </div>
+            )
+          })()}
+
           {/* Berichten */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {berichten.length === 0 && (

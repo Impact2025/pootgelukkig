@@ -30,7 +30,14 @@ export async function GET() {
     kleur: r.kleur,
     beschrijving: r.beschrijving,
     actief: actiefMap.get(r.id) ?? false,
-    acties: r.acties.map((a) => ({ id: a.id, label: a.label, icoon: a.icoon, sideEffect: a.sideEffect ?? false, endpoint: a.endpoint ?? null })),
+    acties: r.acties.map((a) => ({
+      id: a.id,
+      label: a.label,
+      icoon: a.icoon,
+      prompt: a.prompt,
+      sideEffect: a.sideEffect ?? false,
+      endpoint: a.endpoint ?? null,
+    })),
   }))
 
   return NextResponse.json({ rollen })
