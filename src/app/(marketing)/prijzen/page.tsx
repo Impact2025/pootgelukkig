@@ -23,7 +23,7 @@ const TIERS = [
     prijs: 'Gratis',
     periode: '',
     voor: 'Klein asiel dat wil proberen',
-    features: ['Tot 5 actieve dieren', '1 gebruiker', 'Basis aanvragenbeheer', 'Geen AI-matching'],
+    features: ['Tot 5 actieve dieren', '1 gebruiker', 'Basis aanvragenbeheer', 'Geen AI-matching of Copilot'],
     cta: { href: '/auth/register', label: 'Gratis beginnen' },
     highlight: false,
   },
@@ -108,8 +108,9 @@ export default function PrijzenPage() {
             Gratis voor adoptanten. Eerlijk voor asiels.
           </h1>
           <p className="mt-5 text-lg leading-relaxed text-[#33335c]/65">
-            Begin gratis en groei door zodra PootGelukkig je echt werk uit handen neemt. Geen
-            verrassingen, geen verplichtingen vooraf.
+            Begin gratis en groei door zodra PootGelukkig je echt werk uit handen neemt. De
+            Start-tier blijft gratis en onbeperkt in de tijd — pas vanaf de Asiel-tier krijg je
+            AI-matching en de Copilot. Geen verrassingen, geen verplichtingen vooraf.
           </p>
         </div>
       </Section>

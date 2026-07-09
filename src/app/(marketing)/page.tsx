@@ -72,7 +72,7 @@ export default async function HomePage() {
               <ButtonLink href="/intake" variant="primary" icon="arrow_forward">
                 Vind jouw match
               </ButtonLink>
-              <ButtonLink href="/voor-asielen" variant="ghost">
+              <ButtonLink href="/voor-asielen/start" variant="ghost">
                 Voor asiels
               </ButtonLink>
             </div>
@@ -222,17 +222,17 @@ export default async function HomePage() {
               </h2>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
                 Beheer dieren, lees aanvragen met AI-score, gebruik de Copilot voor briefings en
-                dossiers, en volg je adopties met heldere statistieken. Gratis te proberen, betaald
-                vanaf het moment dat het je echt werk uit handen neemt.
+                dossiers, en volg je adopties met heldere statistieken. Gratis starten, AI-matching
+                en Copilot vanaf de Asiel-tier.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <ButtonLink href="/prijzen" variant="primary">Bekijk de prijzen</ButtonLink>
-                <ButtonLink href="/contact" variant="ghost">Plan een demo</ButtonLink>
+                <ButtonLink href="/voor-asielen/start" variant="primary">Meld je asiel gratis aan</ButtonLink>
+                <ButtonLink href="/prijzen" variant="ghost">Bekijk de prijzen</ButtonLink>
               </div>
             </div>
             <ul className="space-y-3">
               {[
-                "Onbeperkt dieren en foto's",
+                "Tot 5 dieren in de gratis Start-tier",
                 'AI-matching en aanvragenbeheer',
                 'Copilot voor briefings en dossiers',
                 'Statistieken en rapportage',

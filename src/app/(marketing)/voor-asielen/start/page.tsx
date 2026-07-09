@@ -57,9 +57,9 @@ export default function VoorAsielenStartPage() {
           {/* Links: Voordelen */}
           <div className="space-y-6">
             {[
-              { icon: '🎯', titel: 'Minder telefoontjes', tekst: 'Adoptanten vullen zelf de intake in. Jullie krijgen alleen een melding bij een sterke match.' },
-              { icon: '⚡', titel: 'Sneller beslissen', tekst: 'Per aanvraag zie je een match-score met uitleg — geen giswerk meer.' },
-              { icon: '💚', titel: 'Altijd gratis voor asielen', tekst: 'PootGelukkig is een stichtingsinitiatief. Geen verborgen kosten.' },
+              { icon: '📉', titel: 'Minder telefoontjes', tekst: 'Adoptanten vullen zelf de intake in. Jullie krijgen alleen een melding bij een sterke match — niet bij elk "even vragen".' },
+              { icon: '⚡', titel: 'Sneller beslissen', tekst: 'Per aanvraag zie je een match-score van 0–100 mét uitleg. Geen twintig intakes lezen om de drie kansrijke te vinden.' },
+              { icon: '🤝', titel: 'Gratis starten', tekst: 'De Start-tier is gratis en onbeperkt in de tijd. Pas vanaf de Asiel-tier (€39/maand) krijg je AI-matching en de Copilot.' },
             ].map((v) => (
               <div key={v.titel} className="flex gap-4">
                 <span className="mt-0.5 text-2xl">{v.icon}</span>
@@ -79,7 +79,11 @@ export default function VoorAsielenStartPage() {
                 <h2 className="mt-4 text-2xl font-extrabold text-[#33335c]">Aanmelding ontvangen!</h2>
                 <p className="mt-3 text-[15px] leading-relaxed text-[#33335c]/65">
                   We hebben je gegevens ontvangen. Binnen 24 uur krijg je een e-mail met
-                  inloggegevens en een korte rondleiding door het dashboard.
+                  inloggegevens. Wil je eerst een demo? Mail of bel ons via de{' '}
+                  <Link href="/contact" className="font-semibold text-[#33335c] underline hover:text-[#8bc34a]">
+                    contactpagina
+                  </Link>
+                  .
                 </p>
                 <ButtonLink href="/voor-asielen" variant="ghost" className="mt-6">
                   Terug naar de informatiepagina
@@ -89,7 +93,7 @@ export default function VoorAsielenStartPage() {
               <form onSubmit={verstuur} className="rounded-3xl border border-[#33335c]/8 bg-white p-8 shadow-[0_1px_3px_rgba(51,51,92,0.04)]">
                 <h2 className="text-xl font-extrabold text-[#33335c]">Meld je asiel aan</h2>
                 <p className="mt-2 text-sm text-[#33335c]/50">
-                  Geen pinpas, geen proefperiode. Gewoon toegang.
+                  De Start-tier is gratis en blijft gratis. AI-matching en de Copilot zitten in de Asiel-tier (€39/maand).
                 </p>
 
                 <div className="mt-6 space-y-4">
@@ -199,21 +203,20 @@ export default function VoorAsielenStartPage() {
       <Section>
         <div className="overflow-hidden rounded-[2rem] bg-[#33335c] px-8 py-14 text-center sm:px-16">
           <h2 className="mx-auto max-w-xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-            Twijfel je nog? Bekijk de demo van 2 minuten
+            Nog even twijfelen? We bellen of mailen je graag.
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-lg text-white/70">
-            Zie hoe het dashboard eruit ziet voor een asiel — zonder dat je eerst hoeft aan te melden.
+            Geen opgenomen demo nodig — je praat met het team dat het bouwt. Stel je vragen en
+            zie in een kort gesprek of PootGelukkig past bij jullie asiel.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="https://youtube.com/watch?v=DEMO_VIDEO_PLACEHOLDER"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ee5b2b] px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#d94e22] active:scale-[0.97]"
             >
-              <span className="material-symbols-outlined text-base">play_circle</span>
-              Bekijk demo (2 min)
-            </a>
+              <span className="material-symbols-outlined text-base">mail</span>
+              Neem contact op
+            </Link>
             <Link
               href="/voor-asielen"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:border-white/40 active:scale-[0.97]"
