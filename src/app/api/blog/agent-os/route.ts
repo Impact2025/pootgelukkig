@@ -117,12 +117,19 @@ export async function POST(req: NextRequest) {
   const excerpt = (body.seoDescription ?? '').toString().trim()
   const focusKeyword = Array.isArray(body.tags) && body.tags.length ? body.tags[0] : null
   // AgentOS zet soms een ✅ (of ander emoticon) vooraan de titel, vaak gevolgd
-  // door een streepje ("✅-Titel"). De slug wordt via slugify() gesaned (✅ weg),
-  // maar dan blijft de leading "-" hangen. Hier halen we ✅ én een eventuele
-  // "✅-" direct weg, en strippen de slug ook leading/trailing dashes.
-  const cleanTitle = title.replace(/✅-?/g, '').replace(/\s+/g, ' ').trim()
-  const slugRaw = (body.slug ?? '').toString().trim().replace(/✅-?/g, '')
-  const slug = slugify(slugRaw || cleanTitle).replace(/^-+/, '').replace(/-+$/g, '').slice(0, 280)
+  // door een streepje of spatie ("✅-Titel" / "✅ Titel"). De slug wordt via
+  // slugify() gesaned, maar die slice(0,80) hakt lange titels doormidden — de
+  // slug-kolom is varchar(280), dus we bouwen hier een eigen slug tot 280.
+  const cleanTitle = title.replace(/✅\s*-?/g, '').replace(/\s+/g, ' ').trim()
+  const slugRaw = (body.slug ?? '').toString().trim().replace(/✅\s*-?/g, '')
+  const slug = slugRaw
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+/, '').replace(/-+$/g, '')
+    .slice(0, 280) || slugify(cleanTitle).slice(0, 280)
   const metaTitle = cleanTitle.slice(0, 60)
 
   // Unieke slug
