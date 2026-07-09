@@ -1,4 +1,5 @@
 import type { AiRol } from './types'
+export type { AiRol, AiRolId, AiRolActie } from './types'
 import {
   haalDierenSamenvatting,
   haalLangsteWachters,

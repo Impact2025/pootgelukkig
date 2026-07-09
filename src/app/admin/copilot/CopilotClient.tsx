@@ -227,6 +227,50 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
     }
   }, [berichten, laadt, actieveRol])
 
+  // Side-effect actie: roept een rol-endpoint aan dat een concept genereert
+  // en in de content-queue plaatst (geen chat-stream). Toont het concept in de chat.
+  const voerSideEffectUit = useCallback(async (endpoint: string, label: string) => {
+    if (laadt) return
+
+    const gebruikerMelding: ChatBericht = { id: Date.now().toString(), rol: 'user', inhoud: label }
+    const assistentPlaceholder: ChatBericht = { id: (Date.now() + 1).toString(), rol: 'assistant', inhoud: '', laden: true }
+    setBerichten((prev) => [...prev, gebruikerMelding, assistentPlaceholder])
+    setLaadt(true)
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const data = (await res.json().catch(() => null)) as
+        | { inhoud?: string; opgeslagen?: boolean; fout?: string; waarschuwing?: string }
+        | null
+
+      if (!res.ok || !data?.inhoud) {
+        throw new Error(data?.fout ?? 'Genereren mislukt')
+      }
+
+      const suffix = data.opgeslagen
+        ? '\n\n*Opgeslagen als concept in de content-queue — klaar om te bekijken en goed te keuren.*'
+        : data.waarschuwing
+          ? `\n\n*${data.waarschuwing}*`
+          : ''
+
+      setBerichten((prev) =>
+        prev.map((b) => (b.id === assistentPlaceholder.id ? { ...b, inhoud: data.inhoud + suffix, laden: false } : b))
+      )
+    } catch (err) {
+      const melding = err instanceof Error ? err.message : 'Sorry, er ging iets mis. Probeer het opnieuw.'
+      setBerichten((prev) =>
+        prev.map((b) => (b.id === assistentPlaceholder.id ? { ...b, inhoud: melding, laden: false } : b))
+      )
+    } finally {
+      setLaadt(false)
+      invoerRef.current?.focus()
+    }
+  }, [laadt])
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -427,12 +471,18 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                       prompt: a.prompt,
                       icoon: a.icoon,
                       actieId: a.id,
+                      sideEffect: a.sideEffect,
+                      endpoint: a.endpoint,
                     })) ?? []
-                  : SNELLE_ACTIES.map((a) => ({ label: a.label, prompt: a.prompt, icoon: 'bolt', actieId: undefined }))
+                  : SNELLE_ACTIES.map((a) => ({ label: a.label, prompt: a.prompt, icoon: 'bolt', actieId: undefined, sideEffect: false, endpoint: null }))
                 ).map((actie) => (
                   <button
                     key={actie.label}
-                    onClick={() => verstuurBericht(actie.prompt, actie.actieId)}
+                    onClick={() =>
+                      actie.sideEffect && actie.endpoint
+                        ? voerSideEffectUit(actie.endpoint, actie.label)
+                        : verstuurBericht(actie.prompt, actie.actieId)
+                    }
                     disabled={laadt}
                     className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group disabled:opacity-50"
                   >

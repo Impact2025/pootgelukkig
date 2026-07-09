@@ -51,6 +51,7 @@ export const NAV_GROUPS: NavGroup[] = [
     titel: 'AI-team',
     items: [
       { href: '/admin/instellingen/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
+      { href: '/admin/content-queue', icon: 'inbox', label: 'Content-queue' },
     ],
   },
 ]
@@ -81,6 +82,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   blog: 'Blog',
   coupons: 'Coupons',
   'ai-rollen': 'AI-rollen',
+  'content-queue': 'Content-queue',
 }
 
 export interface Crumb {
