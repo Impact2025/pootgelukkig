@@ -71,6 +71,13 @@
       "when": 1782416436116,
       "tag": "0009_clumsy_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783586621331,
+      "tag": "0010_organic_kid_colt",
+      "breakpoints": true
     }
   ]
 }

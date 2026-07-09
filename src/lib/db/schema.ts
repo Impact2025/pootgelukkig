@@ -9,6 +9,7 @@ import {
   pgEnum,
   real,
   varchar,
+  primaryKey,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -571,6 +572,150 @@ export const couponInwisselingen = pgTable('coupon_inwisselingen', {
   ingewisseldOp: timestamp('ingewisseld_op').defaultNow().notNull(),
 })
 
+// =================== AI-ROLLEN CONFIG ===================
+// Welke gespecialiseerde AI-rollen zijn geactiveerd per asiel
+
+export const aiRolEnum = pgEnum('ai_rol', [
+  'social', 'fundraising', 'vrijwilligers', 'evenementen',
+  'medisch', 'foto', 'rapportage', 'chat',
+])
+
+export const aiRollenConfig = pgTable('ai_rollen_config', {
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  rol: aiRolEnum('rol').notNull(),
+  actief: boolean('actief').default(true).notNull(),
+  instellingen: json('instellingen').$type<Record<string, unknown>>().default({}),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+}, (t) => ({ pk: primaryKey({ columns: [t.asielId, t.rol] }) }))
+
+// =================== VRIJWILLIGERS ===================
+
+export const vrijwilligerStatusEnum = pgEnum('vrijwilliger_status', ['kandidaat', 'actief', 'inactief'])
+export const vrijwilligers = pgTable('vrijwilligers', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  telefoon: varchar('telefoon', { length: 30 }),
+  functie: varchar('functie', { length: 120 }).default('algemene ondersteuning'),
+  status: vrijwilligerStatusEnum('status').default('kandidaat').notNull(),
+  urenPerWeek: integer('uren_per_week').default(0),
+  beschikbaarheid: json('beschikbaarheid').$type<Record<string, string[]>>().default({}),
+  tags: json('tags').$type<string[]>().default([]),
+  notities: text('notities'),
+  aangemeldOp: timestamp('aangemeld_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+// Sollicitaties (basis-screening door AI)
+export const sollicitatieStatusEnum = pgEnum('sollicitatie_status', ['nieuw', 'gescreend', 'uitgenodigd', 'afgewezen'])
+export const sollicitaties = pgTable('sollicitaties', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  telefoon: varchar('telefoon', { length: 30 }),
+  functie: varchar('functie', { length: 120 }),
+  motivatie: text('motivatie'),
+  ervaring: text('ervaring'),
+  status: sollicitatieStatusEnum('status').default('nieuw').notNull(),
+  aiScore: integer('ai_score'),
+  aiScreenNotitie: text('ai_screen_notitie'),
+  vrijwilligerId: integer('vrijwilliger_id').references(() => vrijwilligers.id, { onDelete: 'set null' }),
+  aangemeldOp: timestamp('aangemeld_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+// =================== FUNDRAISING & DONOREN ===================
+
+export const donorTypeEnum = pgEnum('donor_type', ['eenmalig', 'structureel', 'bedrijf'])
+export const donorSegmentEnum = pgEnum('donor_segment', ['nieuw', 'regulier', 'major', 'laps', 'actief'])
+export const donoren = pgTable('donoren', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  telefoon: varchar('telefoon', { length: 30 }),
+  bedrijf: varchar('bedrijf', { length: 255 }),
+  type: donorTypeEnum('type').default('eenmalig').notNull(),
+  segment: donorSegmentEnum('segment').default('nieuw').notNull(),
+  totaalGedoneerd: real('totaal_gedoneerd').default(0).notNull(),
+  eersteDonatieOp: timestamp('eerste_donatie_op'),
+  laatsteDonatieOp: timestamp('laatste_donatie_op'),
+  tags: json('tags').$type<string[]>().default([]),
+  notities: text('notities'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+export const campagneTypeEnum = pgEnum('campagne_type', ['donatie', 'grant', 'sponsor', 'evenement'])
+export const campagneStatusEnum = pgEnum('campagne_status', ['concept', 'actief', 'afgerond', 'gepauzeerd'])
+export const fondsenwervingCampagnes = pgTable('fondsenwerving_campagnes', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  type: campagneTypeEnum('type').default('donatie').notNull(),
+  status: campagneStatusEnum('status').default('concept').notNull(),
+  doelBedrag: real('doel_bedrag').default(0),
+  opgehaaldBedrag: real('opgehaald_bedrag').default(0).notNull(),
+  startOp: timestamp('start_op'),
+  eindOp: timestamp('eind_op'),
+  notities: text('notities'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+// =================== EVENEMENTEN ===================
+
+export const evenementTypeEnum = pgEnum('evenement_type', ['adoptiedag', 'opendag', 'fundraising', 'andere'])
+export const evenementStatusEnum = pgEnum('evenement_status', ['concept', 'gepland', 'afgerond', 'geannuleerd'])
+export const evenementen = pgTable('evenementen', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  titel: varchar('titel', { length: 255 }).notNull(),
+  type: evenementTypeEnum('type').default('adoptiedag').notNull(),
+  beschrijving: text('beschrijving'),
+  locatie: varchar('locatie', { length: 255 }),
+  startOp: timestamp('start_op').notNull(),
+  eindOp: timestamp('eind_op'),
+  capaciteit: integer('capaciteit'),
+  status: evenementStatusEnum('status').default('concept').notNull(),
+  promoConceptId: integer('promo_concept_id'),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
+export const shiftStatusEnum = pgEnum('shift_status', ['open', 'ingevuld', 'geannuleerd'])
+export const evenementShiften = pgTable('evenement_shiften', {
+  id: serial('id').primaryKey(),
+  evenementId: integer('evenement_id').notNull().references(() => evenementen.id, { onDelete: 'cascade' }),
+  taak: varchar('taak', { length: 160 }).notNull(),
+  startOp: timestamp('start_op').notNull(),
+  eindOp: timestamp('eind_op'),
+  vrijwilligerId: integer('vrijwilliger_id').references(() => vrijwilligers.id, { onDelete: 'set null' }),
+  status: shiftStatusEnum('shift_status').default('open').notNull(),
+  notities: text('notities'),
+})
+
+// =================== AI CONTENT QUEUE (social / nieuwsbrieven / verhalen) ===================
+
+export const contentStatusEnum = pgEnum('content_status', ['concept', 'voorgesteld', 'gepland', 'gepubliceerd', 'afgewezen'])
+export const aiContentQueue = pgTable('ai_content_queue', {
+  id: serial('id').primaryKey(),
+  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  rol: aiRolEnum('rol').notNull(),
+  type: varchar('type', { length: 40 }).notNull(),
+  platform: varchar('platform', { length: 40 }),
+  titel: varchar('titel', { length: 255 }),
+  inhoud: text('inhoud').notNull(),
+  status: contentStatusEnum('status').default('concept').notNull(),
+  geplandVoor: timestamp('gepland_voor'),
+  gepubliceerdOp: timestamp('gepubliceerd_op'),
+  engagement: json('engagement').$type<{ bereik?: number; likes?: number; deelActies?: number; klikken?: number }>().default({}),
+  gemaaktDoor: varchar('gemaakt_door', { length: 60 }).default('ai'),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+})
+
 // =================== RELATIONS ===================
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -589,6 +734,12 @@ export const dierenRelations = relations(dieren, ({ one, many }) => ({
 export const asielenRelations = relations(asielen, ({ many }) => ({
   dieren: many(dieren),
   gesprekken: many(gesprekken),
+  vrijwilligers: many(vrijwilligers),
+  donoren: many(donoren),
+  campagnes: many(fondsenwervingCampagnes),
+  evenementen: many(evenementen),
+  content: many(aiContentQueue),
+  rollen: many(aiRollenConfig),
 }))
 
 export const gesprekkenRelations = relations(gesprekken, ({ one, many }) => ({
