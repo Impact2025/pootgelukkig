@@ -153,7 +153,7 @@ export default function AIAssistentInline({ dierId, dierNaam }: Props) {
                   style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.06)' }}
                 >
                   <p className="text-white/90 text-sm leading-relaxed">
-                    Hoi! Stel gerust je vragen over {dierNaam}. Ik ken alle details over dit dier en het asiel. 🐾
+                    Hoi! Ik ben Dr. Poot. Stel gerust je vragen over {dierNaam} — ik ken alle details over dit dier en het asiel. 🐾
                   </p>
                 </div>
               </div>

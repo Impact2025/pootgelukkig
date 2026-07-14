@@ -405,12 +405,12 @@ export default function IntakePage() {
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-[11px] font-semibold text-sage uppercase tracking-wider ml-1">
-              PootGelukkig Assistent
+              Dr. Poot
             </p>
             <div className="bg-bg-dark/80 border border-white/10 rounded-2xl rounded-bl-none px-4 py-3">
               <p className="text-[15px] leading-relaxed text-white">
                 {huidigStap === 0
-                  ? 'Hoi! Ik ben je PootGelukkig assistent. Om de perfecte match te vinden, heb ik wat info nodig. 🐾'
+                  ? 'Hoi! Ik ben Dr. Poot, je dierenwelzijn-expert. Om de perfecte match te vinden, heb ik wat info nodig. 🐾'
                   : 'Super! Nog een vraagje:'}
                 <br /><br />
                 {stap.vraag}

@@ -154,7 +154,7 @@ export function AIAssistentWidget() {
 
         <button
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? 'AI Assistent sluiten' : 'AI Assistent openen'}
+          aria-label={open ? 'Dr. Poot sluiten' : 'Dr. Poot openen'}
           className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
           style={{
             background: open
@@ -175,13 +175,13 @@ export function AIAssistentWidget() {
             </span>
           )}
 
-          {/* AI badge */}
+          {/* Dr. Poot badge */}
           {!open && (
             <span
-              className="absolute -top-1 -right-1 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-[#12122a]/20"
+              className="absolute -top-1 -right-1 text-[8px] font-black px-1.5 py-0.5 rounded-full border border-[#12122a]/20"
               style={{ background: '#33335c', color: '#f8aa25', letterSpacing: '0.05em' }}
             >
-              AI
+              DR
             </span>
           )}
 
@@ -225,7 +225,7 @@ export function AIAssistentWidget() {
 
             {/* Title */}
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-bold leading-tight tracking-tight">PootGelukkig AI</p>
+              <p className="text-white text-sm font-bold leading-tight tracking-tight">Dr. Poot</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[#9db99d] text-xs font-medium">
@@ -263,7 +263,7 @@ export function AIAssistentWidget() {
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.06)' }}
                   >
                     <p className="text-white/90 text-sm leading-relaxed">
-                      Hoi {voornaam}! 👋 Ik ben de PootGelukkig AI. Ik kan je helpen met vragen over{' '}
+                      Hoi {voornaam}! 👋 Ik ben Dr. Poot, dierenwelzijn-expert bij PootGelukkig. Ik kan je helpen met vragen over{' '}
                       {animalId ? 'dit dier,' : ''} het asiel en het adoptieproces.
                     </p>
                   </div>
@@ -383,7 +383,7 @@ export function AIAssistentWidget() {
             </div>
 
             <p className="text-center text-white/15 text-[10px] mt-2 font-medium">
-              Powered by Claude AI · PootGelukkig
+              Powered by Claude AI · Dr. Poot
             </p>
           </div>
         </div>

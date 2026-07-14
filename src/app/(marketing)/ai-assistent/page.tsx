@@ -4,12 +4,12 @@ import Image from 'next/image'
 import { Section, SectionHeading, Eyebrow, FeatureCard, ButtonLink, CtaBlock } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
-  title: 'AI-assistent — PootGelukkig',
+  title: 'Dr. Poot — PootGelukkig',
   description:
-    'Een AI-assistent die adoptanten helpt met vragen en asiels ondersteunt bij intake, matchanalyse en nazorg. Transparant, met de mens aan het stuur.',
+    'Dr. Poot is de dierenwelzijn-AI die adoptanten helpt met vragen en asiels ondersteunt bij intake, matchanalyse en nazorg. Transparant, met de mens aan het stuur.',
   alternates: { canonical: '/ai-assistent' },
   openGraph: {
-    title: 'AI-assistent — PootGelukkig',
+    title: 'Dr. Poot — PootGelukkig',
     description: 'Slimme ondersteuning die het oordeel nooit overneemt.',
     url: '/ai-assistent',
     type: 'website',
@@ -22,12 +22,12 @@ export default function AiAssistentPage() {
       <Section className="!pt-16 sm:!pt-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <Eyebrow>AI-assistent</Eyebrow>
+            <Eyebrow>Dr. Poot</Eyebrow>
             <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl lg:text-6xl">
               Slim waar het kan, menselijk waar het moet
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
-              De assistent helpt adoptanten met vragen over het adoptieproces en ondersteunt asiels
+              Dr. Poot helpt adoptanten met vragen over het adoptieproces en ondersteunt asiels
               met intake, matchanalyse en nazorg-tips. Hij doet het voorwerk; de mens beslist.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -49,7 +49,7 @@ export default function AiAssistentPage() {
             <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
               <Image
                 src="/images/hero/voor-asielen-copilot.png"
-                alt="PootGelukkig Copilot: de AI-assistent geeft de dagelijkse briefing en beantwoordt vragen van het asielteam"
+                alt="PootGelukkig Copilot: Dr. Poot geeft de dagelijkse briefing en beantwoordt vragen van het asielteam"
                 width={1533}
                 height={863}
                 priority
@@ -117,8 +117,8 @@ export default function AiAssistentPage() {
       </div>
 
       <CtaBlock
-        title="Probeer de assistent zelf"
-        intro="Stel je vraag via de assistent rechtsonder, of start direct met de intake."
+        title="Maak kennis met Dr. Poot"
+        intro="Stel je vraag via Dr. Poot rechtsonder, of start direct met de intake."
         primary={{ href: '/intake', label: 'Start de intake' }}
         secondary={{ href: '/faq', label: 'Veelgestelde vragen' }}
       />

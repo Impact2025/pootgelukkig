@@ -5,7 +5,7 @@ const COLS = [
     title: 'Product',
     links: [
       { href: '/werkwijze', label: 'Werkwijze' },
-      { href: '/ai-assistent', label: 'AI-assistent' },
+      { href: '/ai-assistent', label: 'Dr. Poot' },
       { href: '/voor-asielen', label: 'Voor asiels' },
       { href: '/demo-aanvragen', label: 'Demo aanvragen' },
       { href: '/prijzen', label: 'Prijzen' },

@@ -174,18 +174,18 @@ export default async function HomePage() {
       <Section>
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <Eyebrow>AI-assistent</Eyebrow>
+            <Eyebrow>Dr. Poot</Eyebrow>
             <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#33335c] sm:text-4xl">
               Een slimme assistent die nooit het oordeel overneemt
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-[#33335c]/65">
-              De assistent helpt adoptanten met vragen en helpt asiels met intake, matchanalyse en
+              Dr. Poot helpt adoptanten met vragen en helpt asiels met intake, matchanalyse en
               nazorg-tips. Transparant over wat de AI wel en niet doet, met de mens altijd aan het
               stuur.
             </p>
             <div className="mt-7">
               <ButtonLink href="/ai-assistent" variant="secondary" icon="arrow_forward">
-                Bekijk de AI-assistent
+                Maak kennis met Dr. Poot
               </ButtonLink>
             </div>
           </div>

@@ -8,7 +8,7 @@ const LINKS = [
   { href: '/werkwijze', label: 'Werkwijze' },
   { href: '/voor-asielen', label: 'Voor asiels' },
   { href: '/prijzen', label: 'Prijzen' },
-  { href: '/ai-assistent', label: 'AI-assistent' },
+  { href: '/ai-assistent', label: 'Dr. Poot' },
   { href: '/kennisbank', label: 'Kennisbank' },
   { href: '/blog', label: 'Blog' },
 ]
