@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Section, SectionHeading, Eyebrow, FeatureCard, CtaBlock } from '@/components/marketing/ui'
+import Image from 'next/image'
+import { Section, SectionHeading, Eyebrow, FeatureCard, ButtonLink, CtaBlock } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
   title: 'Voor asiels — PootGelukkig',
@@ -103,18 +104,46 @@ export default function VoorAsielenPage() {
       />
 
       {/* Hero */}
-      <Section className="!pb-10">
-        <div className="max-w-2xl">
-          <Eyebrow>Voor asiels</Eyebrow>
-          <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">
-            Je team loopt over. PootGelukkig neemt de eerste schifting over.
-          </h1>
-          <p className="mt-5 text-lg leading-relaxed text-[#33335c]/65">
-            Adoptanten vullen zelf hun intake in. Jij ziet per aanvraag een match-score met
-            uitleg, zodat je in seconden ziet welke kandidaten écht bij een dier passen. De
-            telefoon wordt rustiger, de intakes lezen zichzelf, en elke adoptant krijgt 100 dagen
-            nazorg. Jij blijft altijd beslissen.
-          </p>
+      <Section className="!pt-16 sm:!pt-24">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <Eyebrow>Voor asiels</Eyebrow>
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl lg:text-6xl">
+              Je team loopt over. PootGelukkig neemt de eerste schifting over.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
+              Adoptanten vullen zelf hun intake in. Jij ziet per aanvraag een match-score met
+              uitleg, zodat je in seconden ziet welke kandidaten écht bij een dier passen. De
+              telefoon wordt rustiger, de intakes lezen zichzelf, en elke adoptant krijgt 100 dagen
+              nazorg. Jij blijft altijd beslissen.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <ButtonLink href="/voor-asielen/start" variant="primary" icon="arrow_forward">
+                Meld je asiel gratis aan
+              </ButtonLink>
+              <ButtonLink href="/demo-aanvragen" variant="ghost">
+                Plan een demo
+              </ButtonLink>
+            </div>
+          </div>
+
+          {/* Hero visual — echte AI Copilot screenshot */}
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#f8aa25]/20 via-[#33335c]/5 to-[#ee5b2b]/15 blur-2xl"
+            />
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
+              <Image
+                src="/images/hero/voor-asielen-copilot.png"
+                alt="PootGelukkig Copilot voor asiels: dagelijkse briefing, prioriteiten en AI-ondersteuning voor het team"
+                width={1533}
+                height={863}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
+          </div>
         </div>
       </Section>
 
