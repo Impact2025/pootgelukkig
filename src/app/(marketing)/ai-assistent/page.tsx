@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import { Section, SectionHeading, Eyebrow, FeatureCard, CtaBlock } from '@/components/marketing/ui'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Section, SectionHeading, Eyebrow, FeatureCard, ButtonLink, CtaBlock } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
   title: 'AI-assistent — PootGelukkig',
@@ -17,32 +19,43 @@ export const metadata: Metadata = {
 export default function AiAssistentPage() {
   return (
     <>
-      <Section className="!pb-10">
+      <Section className="!pt-16 sm:!pt-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <Eyebrow>AI-assistent</Eyebrow>
-            <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl lg:text-6xl">
               Slim waar het kan, menselijk waar het moet
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-[#33335c]/65">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
               De assistent helpt adoptanten met vragen over het adoptieproces en ondersteunt asiels
               met intake, matchanalyse en nazorg-tips. Hij doet het voorwerk; de mens beslist.
             </p>
-          </div>
-          <div className="rounded-[2rem] border border-[#33335c]/8 bg-white p-6 shadow-[0_10px_40px_rgba(51,51,92,0.07)]">
-            <div className="space-y-3">
-              <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-md bg-[#33335c] px-4 py-3 text-sm text-white">
-                Hoe verloopt het adoptieproces?
-              </div>
-              <div className="max-w-[88%] rounded-2xl rounded-bl-md bg-[#f9fafb] px-4 py-3 text-sm text-[#33335c]/80">
-                In het kort: je doet de intake, je krijgt passende dieren te zien, je dient een
-                aanvraag in en het asiel nodigt je uit voor een kennismaking. Zal ik je naar de
-                intake brengen?
-              </div>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <ButtonLink href="/intake" variant="primary" icon="arrow_forward">
+                Start de intake
+              </ButtonLink>
+              <ButtonLink href="/demo-aanvragen" variant="ghost">
+                Plan een demo
+              </ButtonLink>
             </div>
-            <p className="mt-4 text-center text-xs text-[#33335c]/40">
-              Gebruik de assistent rechtsonder op elke pagina.
-            </p>
+          </div>
+
+          {/* Hero visual — echte AI Copilot screenshot */}
+          <div className="relative">
+            <div
+              aria-hidden
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#f8aa25]/20 via-[#33335c]/5 to-[#ee5b2b]/15 blur-2xl"
+            />
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
+              <Image
+                src="/images/hero/voor-asielen-copilot.png"
+                alt="PootGelukkig Copilot: de AI-assistent geeft de dagelijkse briefing en beantwoordt vragen van het asielteam"
+                width={1533}
+                height={863}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
           </div>
         </div>
       </Section>
