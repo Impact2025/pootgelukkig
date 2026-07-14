@@ -48,10 +48,10 @@ export default function AiAssistentPage() {
             />
             <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
               <Image
-                src="/images/hero/voor-asielen-copilot.png"
-                alt="PootGelukkig Copilot: Dr. Poot geeft de dagelijkse briefing en beantwoordt vragen van het asielteam"
-                width={1533}
-                height={863}
+                src="/images/hero/copilot.png"
+                alt="PootGelukkig Copilot: de AI-assistent geeft de dagelijkse briefing en beantwoordt vragen van het asielteam"
+                width={1480}
+                height={828}
                 priority
                 className="h-auto w-full"
               />

@@ -87,24 +87,13 @@ export default async function HomePage() {
               aria-hidden
               className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#f8aa25]/20 via-[#33335c]/5 to-[#ee5b2b]/15 blur-2xl"
             />
-            {/* Achtergrond: asiel-dashboard venster */}
+            {/* Gelaagd: asiel-dashboard (achter) + dieren-overzicht (voor) */}
             <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
               <Image
-                src="/images/hero/dashboard-raw.png"
-                alt="PootGelukkig asiel-portaal: dashboard met beschikbare dieren, adoptieverzoeken en AI-matches"
+                src="/images/hero/home.png"
+                alt="PootGelukkig: asiel-dashboard met AI-matches en het dieren-overzicht met beschikbare asieldieren"
                 width={1883}
-                height={845}
-                priority
-                className="h-auto w-full"
-              />
-            </div>
-            {/* Voorgrond: dieren-overzicht venster, overlappend */}
-            <div className="absolute -bottom-6 -left-4 w-[78%] overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.22)] sm:-left-8">
-              <Image
-                src="/images/hero/dieren-cards.png"
-                alt="PootGelukkig dieren-overzicht met beschikbare asieldieren en profielen"
-                width={1576}
-                height={844}
+                height={842}
                 priority
                 className="h-auto w-full"
               />

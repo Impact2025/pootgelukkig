@@ -135,10 +135,10 @@ export default function VoorAsielenPage() {
             />
             <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
               <Image
-                src="/images/hero/voor-asielen-copilot.png"
-                alt="PootGelukkig Copilot voor asiels: dagelijkse briefing, prioriteiten en AI-ondersteuning voor het team"
-                width={1533}
-                height={863}
+                src="/images/hero/dashboard.png"
+                alt="PootGelukkig asiel-dashboard: beschikbare dieren, adoptieverzoeken en AI-matches in één overzicht"
+                width={1883}
+                height={842}
                 priority
                 className="h-auto w-full"
               />
