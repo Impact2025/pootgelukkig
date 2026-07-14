@@ -81,40 +81,33 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Hero visual */}
+          {/* Hero visual — echte product screenshots */}
           <div className="relative">
-            <div className="rounded-[2rem] border border-[#33335c]/8 bg-white p-6 shadow-[0_20px_60px_rgba(51,51,92,0.10)]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#f8aa25]/15 text-[#e39207]">
-                    <span className="material-symbols-outlined">pets</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#33335c]">Bram</p>
-                    <p className="text-xs text-[#33335c]/50">Kruising, 3 jaar</p>
-                  </div>
-                </div>
-                <span className="inline-flex items-center rounded-full bg-[#33335c] px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-[#f8aa25]">
-                  94% match
-                </span>
-              </div>
-              <div className="mt-5 space-y-3">
-                {[
-                  { label: 'Leefstijl', value: 'Actief gezin met tuin' },
-                  { label: 'Ervaring', value: 'Past bij jouw profiel' },
-                  { label: 'Nazorg', value: '3-3-3 begeleiding inbegrepen' },
-                ].map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex items-center justify-between rounded-2xl bg-[#f9fafb] px-4 py-3"
-                  >
-                    <span className="text-xs font-semibold uppercase tracking-wide text-[#33335c]/40">
-                      {row.label}
-                    </span>
-                    <span className="text-sm font-semibold text-[#33335c]">{row.value}</span>
-                  </div>
-                ))}
-              </div>
+            <div
+              aria-hidden
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#f8aa25]/20 via-[#33335c]/5 to-[#ee5b2b]/15 blur-2xl"
+            />
+            {/* Achtergrond: asiel-dashboard venster */}
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
+              <Image
+                src="/images/hero/dashboard-raw.png"
+                alt="PootGelukkig asiel-portaal: dashboard met beschikbare dieren, adoptieverzoeken en AI-matches"
+                width={1883}
+                height={845}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
+            {/* Voorgrond: dieren-overzicht venster, overlappend */}
+            <div className="absolute -bottom-6 -left-4 w-[78%] overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.22)] sm:-left-8">
+              <Image
+                src="/images/hero/dieren-cards.png"
+                alt="PootGelukkig dieren-overzicht met beschikbare asieldieren en profielen"
+                width={1576}
+                height={844}
+                priority
+                className="h-auto w-full"
+              />
             </div>
           </div>
         </div>
