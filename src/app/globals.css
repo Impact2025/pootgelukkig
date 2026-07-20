@@ -256,3 +256,69 @@ input[type="password"]:focus {
 .blog-inhoud blockquote strong { @apply text-[#33335c]; }
 .blog-inhoud img { @apply rounded-2xl my-6; }
 .blog-inhoud h1:first-child { @apply mt-0; }
+
+/* ─── Print / PDF ondersteuning (SIDN-aanvraag) ──────────────────────────── */
+@media print {
+  /* Verberg navigatie, footer, floating widgets en print-knop */
+  header,
+  footer,
+  .no-print,
+  .ai-assistent-widget,
+  [class*="AIAssistent"] {
+    display: none !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+
+  /* Lichte wrapper forceert witte achtergrond ongeacht thema */
+  .print-page {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+
+  /* Vermijd pagina-breaks binnen kaarten en tabellen */
+  section,
+  .print-page section,
+  .rounded-3xl,
+  .rounded-2xl,
+  table,
+  tr,
+  .glass-card {
+    break-inside: avoid;
+  }
+
+  /* Compactere sectie-spacing op papier */
+  .print-page section {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+    page-break-inside: auto;
+  }
+
+  /* Zorg dat gekleurde vlakken goed printen (achtergronden tonen) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  a { color: #1a1a1a !important; text-decoration: none; }
+
+  /* Donkere CTA-blokken (CtaBlock + contactkaart) lichter maken voor papier */
+  .print-page .bg-\[\\#33335c\],
+  .print-dark {
+    background: #f3f3f5 !important;
+    color: #1a1a1a !important;
+  }
+  .print-page .bg-\[\\#33335c\] h2,
+  .print-page .bg-\[\\#33335c\] h3,
+  .print-page .bg-\[\\#33335c\] p,
+  .print-page .bg-\[\\#33335c\] strong,
+  .print-dark h2,
+  .print-dark h3,
+  .print-dark p,
+  .print-dark strong {
+    color: #1a1a1a !important;
+  }
+}
