@@ -95,14 +95,14 @@ export default async function AdminAfsprakenPage({
   ]
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-6">
+    <div className="px-4 sm:px-8 py-6 max-w-5xl mx-auto space-y-6">
       <PageHeader
         title="Afspraken"
         icon="calendar_month"
         description="Beheer kennismakings- en thuischeckafspraken met adoptanten"
       />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <StatCard
           label="Aangevraagd"
           value={totaalAangevraagd}
@@ -126,7 +126,7 @@ export default async function AdminAfsprakenPage({
         />
       </div>
 
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-2xl w-fit">
+      <div className="flex gap-1 p-1 bg-gray-100 rounded-2xl w-fit max-w-full overflow-x-auto hide-scrollbar">
         {tabs.map((tab) => (
           <Link
             key={tab.key}
@@ -183,7 +183,7 @@ export default async function AdminAfsprakenPage({
                         <StatusBadge status={rij.status} />
                       </div>
 
-                      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                      <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
                         <InfoRij icon="person" waarde={rij.adoptantNaam} sub={rij.adoptantEmail} />
                         <InfoRij
                           icon={rij.type === 'kennismaking' ? 'home_work' : 'house'}
