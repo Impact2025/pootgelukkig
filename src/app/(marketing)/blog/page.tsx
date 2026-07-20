@@ -1,4 +1,5 @@
-export const dynamic = 'force-dynamic'
+// ISR: de blog-overzichtspagina wordt gecachet en elk uur ververst.
+export const revalidate = 3600
 
 import type { Metadata } from 'next'
 import Link from 'next/link'

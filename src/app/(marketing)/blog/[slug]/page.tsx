@@ -1,4 +1,6 @@
-export const dynamic = 'force-dynamic'
+// ISR: artikel wordt gecachet en elk uur ververst. Cacheable pagina's worden
+// betrouwbaar/snel aan Googlebot geserveerd — beter voor indexering dan force-dynamic.
+export const revalidate = 3600
 
 import type { Metadata } from 'next'
 import Link from 'next/link'

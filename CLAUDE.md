@@ -1,243 +1,199 @@
 # PootGelukkig — Claude Code Instructies
 
 ## Wat is dit project?
-PootGelukkig is een AI-gestuurde matching-webapp die asieldieren koppelt aan adoptiegezinnen in Nederland. Bedacht door Maya van Munster (13 jaar), gebouwd door WeAreImpact. De app werkt als een lifestyle-matching platform: adoptanten beantwoorden vragen over hun leefstijl, en de AI koppelt hen aan het meest passende dier.
+PootGelukkig is een AI-gestuurd adoptieplatform dat asieldieren koppelt aan adoptiegezinnen in
+Nederland. Bedacht door Maya van Munster (13 jaar), gebouwd door WeAreImpact. Live op
+`https://www.pootgelukkig.nl`.
+
+De app is inmiddels veel meer dan een matching-tool: het is een compleet SaaS-platform met vier
+gescheiden portalen (adoptant, asiel, management, publieke marketingsite), acht AI-rollen die
+asielwerk overnemen, een CRM voor asielenwerving en een blog/kennisbank met SEO.
+
+Deze repo (`pootgelukkig/`) is de web-app. Zusterprojecten in de parent-map:
+- `../pootgelukkig-mobile/` — React Native + Expo asiel-app (Android + iOS). **Draait nog volledig
+  op `src/data/mockData.ts`**, nog niet aangesloten op deze API.
+- `../stitch_pootgelukkig_smart_dashboard (5)/` — design-mockups.
 
 ## Tech Stack
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 15 (App Router) + React 19
 - **Language**: TypeScript (strict)
 - **Styling**: Tailwind CSS + custom design tokens
 - **Database**: Neon (PostgreSQL) via Drizzle ORM
-- **Auth**: NextAuth.js v5 (credentials + magic link)
-- **AI**: Anthropic Claude API (matching + intake chatbot)
+- **Auth**: NextAuth.js v5 (credentials provider, rol in de JWT)
+- **AI**: **OpenRouter** (niet de Anthropic SDK direct) — model-agnostisch, default
+  `anthropic/claude-sonnet-4-5`. Verbruik wordt per call gelogd met eurokosten.
+- **E-mail**: Resend + react-email templates
 - **File storage**: Vercel Blob
-- **Deployment**: Vercel
-- **Version control**: GitHub
+- **Validatie**: Zod
+- **Deployment**: Vercel (incl. cron jobs) · **GitHub**: Impact2025/pootgelukkig
 
-## Design System (EXACT overnemen uit mockups)
+## Design System
 
-### Kleuren
+### Kleuren (bron: `tailwind.config.ts`)
 ```
-Primary (neon groen): #13ec13
-Background dark:      #102210
-Background light:     #f6f8f6
-Terracotta accent:    #E2725B / #ee5b2b
-Sage groen:           #9db99d
-Tekst donker:         #102210
+Primary (amber):      #f8aa25   primary-dark: #e39207
+Navy:                 #33335c
+Terracotta accent:    #E2725B   terracotta-dark: #ee5b2b
+Background dark:      #12122a
+Background light:     #f9fafb
+Sage:                 #9db99d   sage-dark: #3b543b   sage-bg: #E9EDC9
 ```
 
 ### Typografie
-- Font: **Plus Jakarta Sans** (Google Fonts)
-- Weights: 400, 500, 600, 700, 800
+- Font: **Plus Jakarta Sans** (`font-display`), weights 400–800
 
 ### UI Regels
-- Dark mode is standaard voor adopters
-- Light mode voor asiel-dashboard
+- Adoptant-view: mobile-first, max-width 430px, bottom navigation (iOS-stijl)
+- Asiel- en management-portaal: light mode, sidebar + topbar + command palette
 - Rounded corners: 2xl/3xl overal
-- Glass cards: `backdrop-blur-md bg-white/5`
-- Bottom navigation: iOS-stijl, fixed bottom
-- Mobile-first: max-width 430px voor adoptant-view
-- Alle tekst in het NEDERLANDS
+- Safe-area utilities beschikbaar: `pb-safe`, `pt-safe`, `pl-safe`, `pr-safe`, `mb-safe`
+- Alle UI-tekst in het **Nederlands**
 
-## Project Structuur
-```
-src/
-├── app/
-│   ├── layout.tsx           # Root layout (font, providers)
-│   ├── page.tsx             # Landing / redirect
-│   ├── globals.css          # Design tokens + base styles
-│   ├── dashboard/           # Adoptant home - match cards
-│   ├── intake/              # AI intake gesprek (stap-voor-stap)
-│   ├── animals/[id]/        # Dierprofielpagina met match-analyse
-│   ├── chat/[id]/           # Chat met asiel over specifiek dier
-│   ├── dossier/             # Documenten na adoptie
-│   ├── nazorg/              # Post-adoptie begeleiding (3-3-3 regel)
-│   ├── auth/                # Login / registratie
-│   ├── admin/               # Asiel dashboard (apart design)
-│   └── api/                 # API routes
-│       ├── animals/         # CRUD dieren
-│       ├── matches/         # Match berekening
-│       ├── intake/          # AI intake verwerking
-│       ├── chat/            # Berichten opslaan
-│       └── medical/         # Medische tijdlijn
-├── components/
-│   ├── layout/
-│   │   ├── BottomNav.tsx    # iOS-stijl navigatie
-│   │   └── TopBar.tsx       # App header
-│   ├── animals/
-│   │   ├── AnimalCard.tsx   # Match kaart (dashboard)
-│   │   └── AnimalProfile.tsx # Volledig dierenprofiel
-│   ├── intake/
-│   │   └── IntakeChat.tsx   # Stap-voor-stap vragenlijst
-│   ├── dashboard/
-│   │   └── MatchStats.tsx   # Match profiel widget
-│   ├── chat/
-│   │   └── MessageBubble.tsx
-│   └── ui/
-│       ├── MatchBadge.tsx   # "94% Match" badge
-│       ├── PersonalityTag.tsx
-│       └── MedicalItem.tsx
-├── lib/
-│   ├── db/
-│   │   ├── index.ts         # Neon/Drizzle connectie
-│   │   └── schema.ts        # Database schema
-│   ├── ai/
-│   │   ├── matching.ts      # Claude matching logica
-│   │   └── intake.ts        # AI intake verwerking
-│   └── utils.ts             # Helpers
-└── types/
-    └── index.ts             # TypeScript types
-```
+## Rollen & routing (`src/middleware.ts`)
 
-## Database Schema (Drizzle + Neon PostgreSQL)
+Drie rollen, elk met een eigen thuisroute:
 
-De volgende tabellen zijn aangemaakt via `src/lib/db/schema.ts`:
+| Rol | Thuisroute | Portaal |
+|---|---|---|
+| `adoptant` | `/dashboard` | Adoptant-app |
+| `asiel` | `/admin` | Asielportaal |
+| `admin` | `/management` | Platformbeheer |
 
-- **users** — adoptanten (id, naam, email, wachtwoord_hash, stad, profiel_voltooid)
-- **adopter_profiles** — leefstijlprofiel na intake (woning_type, tuin, activiteit_niveau, kinderen, andere_dieren, werkuren, ervaring)
-- **shelters** — asielen (id, naam, stad, regio, contactpersoon, email)
-- **animals** — dieren (id, naam, soort, ras, leeftijd, geslacht, foto_url, beschrijving, gedragsprofiel JSON, medisch_paspoort JSON, asiel_id, status)
-- **matches** — berekende matches (user_id, animal_id, score, analyse_tekst, created_at)
-- **conversations** — chat threads (user_id, animal_id, shelter_id)
-- **messages** — chatberichten (conversation_id, verzender_type, inhoud, created_at)
-- **adoptions** — vastgelegde adopties (user_id, animal_id, datum, status)
-- **medical_records** — medische tijdlijn per dier (animal_id, type, datum, beschrijving, status)
-- **aftercare_days** — nazorg dagboek (adoption_id, dag_nummer, tips, checklist)
+De middleware bewaakt de scheiding: een adoptant die `/admin` opvraagt gaat naar `/dashboard`, een
+asiel dat `/management` opvraagt gaat naar `/admin`, enzovoort. Verder geregeld in de middleware:
+- **Publiek zonder login**: marketingroutes, `/blog/*`, `/pitch`, sitemap, robots, OG-images
+- **Publieke API's**: `/api/register`, `/api/postcode`, `/api/cron`, `/api/coupons/valideer`,
+  `/api/blog/agent-os`
+- **Onderhoudsmodus**: `MAINTENANCE_MODE=1` stuurt alles naar `/onderhoud`
 
-## Belangrijke API Routes
+Bij wijzigingen aan navigatie: `src/components/admin/nav.ts` is de **enige bron van waarheid** voor
+sidebar, breadcrumbs en command palette (en wordt getest in `src/__tests__/admin-nav.test.ts`).
 
-### POST /api/intake
-- Ontvangt antwoorden van de intake stap-voor-stap chat
-- Gebruikt Claude API om gedragsprofiel te analyseren
-- Slaat adopter_profile op in database
-- Geeft eerste matches terug
+## Functionaliteit per portaal
 
-### POST /api/matches/calculate
-- Input: adopter_profile + lijst van animals
-- Gebruikt Claude API om compatibiliteitsscore te berekenen per dier
-- Returnt gesorteerde lijst met score + motivatie tekst
+### 1. Adoptant (`/dashboard`, `/intake`, `/animals`, …)
+- **Intake**: 10-staps leefstijlvragenlijst → AI bouwt het adopter-profiel
+- **Dashboard**: matchkaarten met score; **matchbreakdown** per dier; feedback op matches
+- **Zoeken** met filters, **favorieten**, dierprofiel met fotocarrousel
+- **Chat** met het asiel per dier + **afspraak inplannen**
+- **AI-assistent** inline bij een dier
+- Na adoptie: **dossier** (documenten), **nazorg** met AI-gegenereerde dagtips (3-3-3-regel),
+  **medische tijdlijn**
+- Badges, welkomsttour, postcode-lookup
 
-### GET /api/animals/[id]/match-analysis
-- Geeft gedetailleerde match-analyse voor één dier t.o.v. ingelogde gebruiker
-- Genereert AI-tekst over waarom het een match is
+### 2. Asielportaal (`/admin`)
+Dashboard · **AI Copilot** met dagbriefing · Dieren (CRUD, foto-upload, **AI dier-scan/intake** en
+AI-verhaalgenerator) · Adopties (goedkeuren + **contract genereren**) · Afspraken · Berichten ·
+Medisch + **welzijnslogs** · Wachtlijst · **Pleeggezinnen & pleegplaatsingen** · Instellingen.
 
-### POST /api/chat/[conversationId]/messages
-- Slaat berichten op
-- Stuurt notificatie naar asiel
+### 3. AI-rollen (`src/lib/ai/rollen/`)
+Acht benoemde AI-collega's, per asiel aan/uit te zetten via `/management/ai-rollen`
+(tabel `ai_rollen_config`). Elke rol heeft `acties` met een eigen prompt; output kan via
+`sideEffect.ts` in de database landen en komt in de **content-queue** ter goedkeuring.
 
-### GET /api/nazorg/[adoptionId]/day/[dag]
-- Haalt dagelijkse tips op voor specifieke dag na adoptie
-- Genereert AI-tips op basis van het specifieke dier
+| Rol-id | Naam | Titel |
+|---|---|---|
+| `social` | Conny | Communicatie & Social Media Manager |
+| `fundraising` | Sam | Fundraising & Sponsor Manager |
+| `vrijwilligers` | Bram | Vrijwilligers & Wervings Coach |
+| `evenementen` | Eva | Event & Activiteiten Organisator |
+| `medisch` | Dokter | Medisch / Welzijn Assistent |
+| `foto` | Finn | Foto & Content Creator |
+| `rapportage` | Mila | Rapportage & Insights Manager |
+| `chat` | Samen | Chat Support voor Bezoekers & Vrijwilligers |
 
-## AI Matching Logica (src/lib/ai/matching.ts)
+### 4. Management (`/management`)
+Gebruikers · **CRM** (contacten, deals-board, activiteiten, mail) · **Asielenwerving** (import van
+NL-asielen + uitnodigingsmails) · Rapportage met download · Content-queue · Blog-CMS met
+AI-generatie · **Coupons** · AI-rollen activeren.
 
-Het matching algoritme werkt in 3 lagen:
+### 5. Publieke marketingsite (`src/app/(marketing)/`)
+Homepage, werkwijze, voor-asielen (+ zelfaanmelding), prijzen, over-ons, FAQ, contact,
+demo-aanvragen. Plus **blog** en **kennisbank** (8 categorieën, client-side search), RSS-feed,
+dynamische sitemap, schema.org-markup (BlogPosting / FAQPage / HowTo) en OG-images per pagina.
+Zie `PROJECT.md` voor de contentstand en SEO-audit.
 
-**Laag 1: Harde filters** (score = 0 als niet voldaan)
-- Allergie-vereisten
-- Diersoort voorkeur
-- Verbod op grote honden in appartement zonder tuin
+## Achtergrondprocessen (`vercel.json`)
+| Route | Schedule |
+|---|---|
+| `/api/cron/digest` | ma 8:00 — wekelijkse digest |
+| `/api/cron/afspraken` | dagelijks 9:00 — afspraakherinneringen |
+| `/api/cron/asielen-import` | 1e van de maand 6:00 |
+| `/api/cron/management-dag` | dagelijks 7:00 |
+| `/api/cron/management-maand` | 1e van de maand 7:00 |
 
-**Laag 2: Compatibiliteitsscore (0-100)** via Claude prompt:
-```
-Geef een compatibiliteitsscore (0-100) voor:
-Adopter: [profiel data]
-Dier: [gedragsprofiel]
-Geef ook een Nederlandse motivatietekst van 2 zinnen.
-Returneer ALLEEN JSON: {"score": 94, "analyse": "..."}
-```
+Cron-routes authenticeren zich met `Authorization: Bearer $CRON_SECRET`.
+E-mailtemplates staan in `src/emails/` (react-email); zonder `RESEND_API_KEY` worden mails alleen
+gelogd, niet verzonden. Alle verzendingen komen in `mail_log`.
 
-**Laag 3: Lerende gedragslaag** (later)
-- Leert van succesvolle adopties
+## Database (`src/lib/db/schema.ts`)
+~36 Drizzle-tabellen. Kern: `users`, `adopter_profielen`, `asielen`, `dieren`, `matches`,
+`gesprekken`, `berichten`, `adopties`, `medische_records`, `nazorg_dagen`, `favorieten`,
+`afspraken`, `wachtlijst`, `welzijn_logs`, `pleeggezinnen`, `pleegplaatsingen`,
+`wachtwoord_resets`. Platform: `ai_gebruik`, `mail_log`, `app_instellingen`, `crm_contacten`,
+`crm_deals`, `crm_activiteiten`, `blog_categorieen`, `blog_posts`, `coupons`,
+`coupon_inwisselingen`, `ai_rollen_config`, `vrijwilligers`, `sollicitaties`, `donoren`,
+`fondsenwerving_campagnes`, `evenementen`, `evenement_shiften`, `ai_content_queue`.
 
-## Intake Vragen (10 stappen)
+## AI-laag (`src/lib/ai/`)
+- `client.ts` — OpenRouter client (OpenAI-compatibel formaat), `chatCompletion` + `chatStream`.
+  Vereist `OPENROUTER_API_KEY`. Ondersteunt tekst en afbeeldingen (voor de dier-scan).
+- `pricing.ts` — prijstabel per model, rekent USD → EUR (koers 0.92). Gebruikt de echte `cost` van
+  OpenRouter als die meekomt, anders een schatting.
+- `usage.ts` — `logAiGebruik()` schrijft elke call naar `ai_gebruik`.
+- `matching.ts` — matchingalgoritme (harde filters → compatibiliteitsscore 0-100 + NL-motivatie).
+- `intake.ts` — verwerking van de 10 intakevragen naar een adopter-profiel.
+- `rollen/` — de acht AI-rollen (`index.ts` = definities, `context.ts` = datacontext,
+  `sideEffect.ts` = wat er met de output gebeurt).
 
-1. Woningtype: Appartement / Huis met tuin / Boerderij
-2. Gezinssamenstelling: Alleenwonend / Stel / Gezin met kinderen
-3. Activiteitsniveau: Couch potato / Matig actief / Heel actief
-4. Werkuren thuis: Altijd thuis / Deels / Weinig thuis
-5. Andere dieren: Geen / Honden / Katten / Meerdere
-6. Ervaring met dieren: Geen / Beetje / Veel
-7. Budget voor dierenarts: Beperkt / Normaal / Ruim
-8. Allergiën: Nee / Ja (hond) / Ja (kat) / Ja (beide)
-9. Diersoort voorkeur: Hond / Kat / Vogel / Klein dier / Maakt niet uit
-10. Leeftijdsvoorkeur dier: Pup/Kitten / Jong / Volwassen / Senior
+**Nieuwe AI-calls altijd via `client.ts`**, nooit rechtstreeks fetchen — anders mis je de
+kostenlogging.
 
-## Omgevingsvariabelen (.env.local)
+## Beveiliging
+- `src/lib/beheer/guard.ts` — `vereisAdmin()` in elke management-route (server-side, niet alleen
+  middleware)
+- `src/lib/rate-limit.ts` — in-memory rate limiter (per Vercel-instantie; vervang door Upstash
+  Redis bij schaal)
+- `src/lib/security/escape.ts` — escaping voor gebruikersinvoer in e-mails/HTML
 
-```env
-# Database
-DATABASE_URL="postgresql://..."          # Neon connection string
-DATABASE_URL_UNPOOLED="postgresql://..."  # Voor migraties
+## Omgevingsvariabelen
+Zie `.env.example` voor de volledige, actuele lijst met uitleg. Kort:
+`DATABASE_URL` · `DATABASE_URL_UNPOOLED` · `NEXTAUTH_SECRET` · `NEXTAUTH_URL` ·
+`OPENROUTER_API_KEY` · `BLOB_READ_WRITE_TOKEN` · `RESEND_API_KEY` · `CRON_SECRET` ·
+`MANAGEMENT_EMAIL` · `NEXT_PUBLIC_APP_URL` · `NEXT_PUBLIC_APP_NAME` · `DEMO_VIDEO_URL` ·
+`MAINTENANCE_MODE`.
 
-# Auth
-NEXTAUTH_SECRET="..."
-NEXTAUTH_URL="http://localhost:3000"
-
-# Anthropic
-ANTHROPIC_API_KEY="sk-ant-..."
-
-# Vercel Blob (foto uploads)
-BLOB_READ_WRITE_TOKEN="..."
-
-# App
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-```
-
-## Setup Instructies
-
-### 1. Dependencies installeren
+## Commando's
 ```powershell
-cd pootgelukkig
-npm install
-```
+npm run dev                # development
+npm run build              # productie-build
+npm run lint
+npm test                   # node --test over src/**/*.test.ts
 
-### 2. Database opzetten (Neon)
-- Maak gratis account op neon.tech
-- Maak nieuwe database aan: "pootgelukkig"
-- Kopieer connection string naar .env.local
-
-### 3. Database migreren
-```powershell
-npm run db:generate
+npm run db:generate        # drizzle migraties genereren
 npm run db:migrate
-npm run db:seed    # Vult test-dieren in
-```
+npm run db:studio
+npm run db:seed            # testdieren invullen
+npm run db:import-asielen  # NL-asielen importeren
 
-### 4. Development starten
-```powershell
-npm run dev
-```
+npm run test:beheer        # smoke-test management-portaal
+npm run crm:asielen        # asielen in CRM zetten
 
-### 5. Deployen naar Vercel
-```powershell
-vercel --prod
+vercel --prod              # deploy
 ```
 
 ## Code Conventies
-
-- Alle UI-tekst in het Nederlands
+- Alle UI-tekst in het Nederlands, ook foutmeldingen (gebruiksvriendelijk)
 - TypeScript strict mode (geen `any`)
-- Server Components waar mogelijk, Client Components alleen voor interactie
-- API routes returnen altijd `{ data, error }` structuur
-- Datum/tijd in Nederland formaat (NL-nl locale)
-- Foutmeldingen zijn gebruiksvriendelijk in het Nederlands
+- Server Components waar mogelijk; Client Components alleen voor interactie
+- API routes returnen `{ data, error }`
+- Datum/tijd in NL-locale
+- Zod voor input-validatie op API-routes
+- Navigatie/breadcrumbs alleen via `src/components/admin/nav.ts`
+- AI-calls alleen via `src/lib/ai/client.ts`
 
-## Huidige Status
-
-✅ Project structuur opgezet
-✅ Design tokens gedefinieerd
-✅ Database schema aangemaakt
-✅ Basis layouts en navigatie
-✅ Dashboard pagina met mock data
-✅ Dierenprofiel pagina
-✅ Intake chat component
-✅ Chat met asiel pagina
-🔄 AI matching integratie (Anthropic)
-🔄 Authenticatie (NextAuth)
-🔄 Echte database queries
-⬜ Asiel admin dashboard
-⬜ Foto upload (Vercel Blob)
-⬜ Nazorg module
-⬜ Medische tijdlijn
-⬜ Push notificaties
+## Openstaande punten
+- Mobiele app aansluiten op de echte API (nu nog `mockData.ts`)
+- Rate limiting naar Redis/Upstash bij groei
+- Zie `PROJECT.md` voor de contentbacklog (o.a. 23 ontbrekende kennisbank-covers)
+- `ADMIN-PRO-PLAN.md` en `WEBSITE-PLAN.md` bevatten de bredere roadmap
