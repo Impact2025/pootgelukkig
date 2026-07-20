@@ -132,6 +132,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
   const [rollen, setRollen] = useState<Rol[]>([])
   const [rollenLaden, setRollenLaden] = useState(true)
   const [actieveRol, setActieveRol] = useState<string | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const invoerRef = useRef<HTMLTextAreaElement>(null)
@@ -281,10 +282,163 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
   const urgenteTaken = briefing?.taken.filter((t) => t.prioriteit === 'urgent') ?? []
   const overigeTaken = briefing?.taken.filter((t) => t.prioriteit !== 'urgent') ?? []
 
+  // Gedeelde inhoud van het linker paneel (briefing, taken, inzichten, snelle acties).
+  // Wordt op desktop in de vaste zijbalk getoond en op mobiel in een bottom-sheet.
+  const zijPaneelInhoud = (
+    <>
+      {/* Dagelijkse briefing */}
+      <div className="bg-gradient-to-br from-[#33335c] to-[#4a4a8a] rounded-2xl p-4 text-white">
+        <div className="flex items-center gap-2 mb-3">
+          <span
+            className="material-symbols-outlined text-[#f8aa25] text-lg"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            wb_sunny
+          </span>
+          <span className="font-bold text-sm">Goedemorgen, {gebruikerNaam}</span>
+        </div>
+
+        {briefingLaden ? (
+          <div className="space-y-2">
+            {[80, 60, 70].map((w, i) => (
+              <div key={i} className={`h-3 bg-white/10 rounded-full animate-pulse`} style={{ width: `${w}%` }} />
+            ))}
+          </div>
+        ) : briefingFout ? (
+          <p className="text-white/60 text-xs">Briefing kon niet worden geladen.</p>
+        ) : briefing ? (
+          <>
+            <p
+              className="text-white/90 text-xs leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: markdownNaarHtml(briefing.briefingTekst) }}
+            />
+            {briefing.stats && (
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                {[
+                  { label: 'Beschikbaar', waarde: briefing.stats.beschikbaar, icoon: 'pets' },
+                  { label: 'Open adopties', waarde: briefing.stats.openstaandeAdopties, icoon: 'favorite' },
+                  { label: 'Berichten', waarde: briefing.stats.onglezenBerichten, icoon: 'chat' },
+                  { label: 'Med. alerts', waarde: briefing.stats.medischeAlerts, icoon: 'medical_services' },
+                ].map((stat) => (
+                  <div key={stat.label} className="bg-white/10 rounded-xl p-2">
+                    <p className="text-white/50 text-[10px] font-medium">{stat.label}</p>
+                    <p className="text-white font-extrabold text-lg leading-tight tabular-nums">{stat.waarde}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : null}
+      </div>
+
+      {/* Taken */}
+      {briefingLaden ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      ) : (briefing?.taken?.length ?? 0) > 0 ? (
+        <div>
+          <button
+            onClick={() => setToonTaken((v) => !v)}
+            className="flex items-center justify-between w-full mb-2"
+          >
+            <span className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider">
+              Prioriteiten ({briefing!.taken.length})
+            </span>
+            <span className="material-symbols-outlined text-sm text-[#33335c]/30">
+              {toonTaken ? 'expand_less' : 'expand_more'}
+            </span>
+          </button>
+
+          {toonTaken && (
+            <div className="space-y-2">
+              {urgenteTaken.length > 0 && <>{urgenteTaken.map((t) => <TaakKaart key={t.id} taak={t} />)}</>}
+              {overigeTaken.map((t) => <TaakKaart key={t.id} taak={t} />)}
+            </div>
+          )}
+        </div>
+      ) : briefing && !briefingFout ? (
+        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+          <span
+            className="material-symbols-outlined text-emerald-500 text-2xl block mb-1"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            check_circle
+          </span>
+          <p className="text-emerald-800 font-bold text-sm">Alles in orde!</p>
+          <p className="text-emerald-600/60 text-xs mt-0.5">Geen openstaande taken</p>
+        </div>
+      ) : null}
+
+      {/* Inzichten */}
+      {(briefing?.inzichten?.length ?? 0) > 0 && (
+        <div>
+          <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">Inzichten</p>
+          <div className="space-y-1.5">
+            {briefing!.inzichten.map((inzicht, i) => (
+              <div key={i} className="flex gap-2 items-start bg-violet-50 border border-violet-100 rounded-xl p-3">
+                <span
+                  className="material-symbols-outlined text-violet-500 text-sm flex-shrink-0 mt-0.5"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  lightbulb
+                </span>
+                <p className="text-violet-800 text-xs leading-relaxed">{inzicht}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Snelle acties — rol-specifiek of algemeen */}
+      <div>
+        <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">
+          {actieveRol ? `Acties · ${rollen.find((r) => r.id === actieveRol)?.naam ?? ''}` : 'Snelle acties'}
+        </p>
+        <div className="space-y-1">
+          {(actieveRol
+            ? rollen.find((r) => r.id === actieveRol)?.acties.map((a) => ({
+                label: a.label,
+                prompt: a.prompt,
+                icoon: a.icoon,
+                actieId: a.id,
+                sideEffect: a.sideEffect,
+                endpoint: a.endpoint,
+              })) ?? []
+            : SNELLE_ACTIES.map((a) => ({ label: a.label, prompt: a.prompt, icoon: 'bolt', actieId: undefined, sideEffect: false, endpoint: null }))
+          ).map((actie) => (
+            <button
+              key={actie.label}
+              onClick={() =>
+                actie.sideEffect && actie.endpoint
+                  ? voerSideEffectUit(actie.endpoint, actie.label)
+                  : verstuurBericht(actie.prompt, actie.actieId)
+              }
+              disabled={laadt}
+              className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group disabled:opacity-50"
+            >
+              <span
+                className="material-symbols-outlined text-sm text-[#33335c]/30 group-hover:text-[#33335c]/60 transition-colors flex-shrink-0"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                {actie.icoon}
+              </span>
+              <span className="text-xs font-semibold text-[#33335c]/60 group-hover:text-[#33335c] transition-colors">
+                {actie.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+
   return (
     <div className="h-screen flex flex-col bg-[#f6f8f6]">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between flex-shrink-0">
+      <div className="bg-white border-b border-gray-100 px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between flex-shrink-0 gap-2">
         <div className="flex items-center gap-4">
           <div className="size-10 rounded-2xl bg-gradient-to-br from-[#33335c] to-[#5c5c9e] flex items-center justify-center shadow-lg shadow-[#33335c]/20">
             <span
@@ -303,10 +457,19 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs font-semibold text-[#33335c]/40">Online</span>
         </div>
+        {/* Mobiel: briefing/acties openen als sheet */}
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          className="lg:hidden flex items-center gap-1.5 rounded-full bg-white border border-[#33335c]/10 px-3 py-1.5 text-xs font-bold text-[#33335c] shadow-sm"
+        >
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
+          Briefing
+        </button>
       </div>
 
       {/* Rol-switcher: AI-team */}
-      <div className="bg-white/60 border-b border-gray-100 px-8 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
+      <div className="bg-white/60 border-b border-gray-100 px-4 sm:px-8 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
         <span className="text-xs font-extrabold text-[#33335c]/40 uppercase tracking-wider mr-1 flex-shrink-0">
           AI-team
         </span>
@@ -345,162 +508,37 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
       </div>
 
       <div className="flex flex-1 min-h-0">
-        {/* Linker paneel: Briefing + Taken */}
-        <div className="w-80 flex-shrink-0 border-r border-gray-100 bg-white flex flex-col overflow-hidden">
+        {/* Linker paneel: Briefing + Taken — desktop vaste zijbalk, mobiel bottom-sheet */}
+        <div className="hidden lg:flex w-80 flex-shrink-0 border-r border-gray-100 bg-white flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-
-            {/* Dagelijkse briefing */}
-            <div className="bg-gradient-to-br from-[#33335c] to-[#4a4a8a] rounded-2xl p-4 text-white">
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className="material-symbols-outlined text-[#f8aa25] text-lg"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  wb_sunny
-                </span>
-                <span className="font-bold text-sm">Goedemorgen, {gebruikerNaam}</span>
-              </div>
-
-              {briefingLaden ? (
-                <div className="space-y-2">
-                  {[80, 60, 70].map((w, i) => (
-                    <div key={i} className={`h-3 bg-white/10 rounded-full animate-pulse`} style={{ width: `${w}%` }} />
-                  ))}
-                </div>
-              ) : briefingFout ? (
-                <p className="text-white/60 text-xs">Briefing kon niet worden geladen.</p>
-              ) : briefing ? (
-                <>
-                  <p
-                    className="text-white/90 text-xs leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: markdownNaarHtml(briefing.briefingTekst) }}
-                  />
-                  {briefing.stats && (
-                    <div className="grid grid-cols-2 gap-2 mt-3">
-                      {[
-                        { label: 'Beschikbaar', waarde: briefing.stats.beschikbaar, icoon: 'pets' },
-                        { label: 'Open adopties', waarde: briefing.stats.openstaandeAdopties, icoon: 'favorite' },
-                        { label: 'Berichten', waarde: briefing.stats.onglezenBerichten, icoon: 'chat' },
-                        { label: 'Med. alerts', waarde: briefing.stats.medischeAlerts, icoon: 'medical_services' },
-                      ].map((stat) => (
-                        <div key={stat.label} className="bg-white/10 rounded-xl p-2">
-                          <p className="text-white/50 text-[10px] font-medium">{stat.label}</p>
-                          <p className="text-white font-extrabold text-lg leading-tight tabular-nums">{stat.waarde}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : null}
-            </div>
-
-            {/* Taken */}
-            {briefingLaden ? (
-              <div className="space-y-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : (briefing?.taken?.length ?? 0) > 0 ? (
-              <div>
-                <button
-                  onClick={() => setToonTaken((v) => !v)}
-                  className="flex items-center justify-between w-full mb-2"
-                >
-                  <span className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider">
-                    Prioriteiten ({briefing!.taken.length})
-                  </span>
-                  <span className="material-symbols-outlined text-sm text-[#33335c]/30">
-                    {toonTaken ? 'expand_less' : 'expand_more'}
-                  </span>
-                </button>
-
-                {toonTaken && (
-                  <div className="space-y-2">
-                    {urgenteTaken.length > 0 && (
-                      <>
-                        {urgenteTaken.map((t) => <TaakKaart key={t.id} taak={t} />)}
-                      </>
-                    )}
-                    {overigeTaken.map((t) => <TaakKaart key={t.id} taak={t} />)}
-                  </div>
-                )}
-              </div>
-            ) : briefing && !briefingFout ? (
-              <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                <span
-                  className="material-symbols-outlined text-emerald-500 text-2xl block mb-1"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  check_circle
-                </span>
-                <p className="text-emerald-800 font-bold text-sm">Alles in orde!</p>
-                <p className="text-emerald-600/60 text-xs mt-0.5">Geen openstaande taken</p>
-              </div>
-            ) : null}
-
-            {/* Inzichten */}
-            {(briefing?.inzichten?.length ?? 0) > 0 && (
-              <div>
-                <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">Inzichten</p>
-                <div className="space-y-1.5">
-                  {briefing!.inzichten.map((inzicht, i) => (
-                    <div key={i} className="flex gap-2 items-start bg-violet-50 border border-violet-100 rounded-xl p-3">
-                      <span
-                        className="material-symbols-outlined text-violet-500 text-sm flex-shrink-0 mt-0.5"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        lightbulb
-                      </span>
-                      <p className="text-violet-800 text-xs leading-relaxed">{inzicht}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Snelle acties — rol-specifiek of algemeen */}
-            <div>
-              <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">
-                {actieveRol ? `Acties · ${rollen.find((r) => r.id === actieveRol)?.naam ?? ''}` : 'Snelle acties'}
-              </p>
-              <div className="space-y-1">
-                {(actieveRol
-                  ? rollen.find((r) => r.id === actieveRol)?.acties.map((a) => ({
-                      label: a.label,
-                      prompt: a.prompt,
-                      icoon: a.icoon,
-                      actieId: a.id,
-                      sideEffect: a.sideEffect,
-                      endpoint: a.endpoint,
-                    })) ?? []
-                  : SNELLE_ACTIES.map((a) => ({ label: a.label, prompt: a.prompt, icoon: 'bolt', actieId: undefined, sideEffect: false, endpoint: null }))
-                ).map((actie) => (
-                  <button
-                    key={actie.label}
-                    onClick={() =>
-                      actie.sideEffect && actie.endpoint
-                        ? voerSideEffectUit(actie.endpoint, actie.label)
-                        : verstuurBericht(actie.prompt, actie.actieId)
-                    }
-                    disabled={laadt}
-                    className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group disabled:opacity-50"
-                  >
-                    <span
-                      className="material-symbols-outlined text-sm text-[#33335c]/30 group-hover:text-[#33335c]/60 transition-colors flex-shrink-0"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      {actie.icoon}
-                    </span>
-                    <span className="text-xs font-semibold text-[#33335c]/60 group-hover:text-[#33335c] transition-colors">
-                      {actie.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {zijPaneelInhoud}
           </div>
         </div>
+
+        {/* Mobiel: bottom-sheet overlay met dezelfde inhoud */}
+        {drawerOpen && (
+          <div className="lg:hidden fixed inset-0 z-[60] flex flex-col justify-end">
+            <button
+              type="button"
+              aria-label="Sluiten"
+              onClick={() => setDrawerOpen(false)}
+              className="absolute inset-0 bg-[#33335c]/40 backdrop-blur-sm"
+            />
+            <div className="relative max-h-[85vh] bg-[#f6f8f6] rounded-t-3xl shadow-2xl flex flex-col">
+              <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-100">
+                <p className="text-sm font-extrabold text-[#33335c]">Briefing & snelle acties</p>
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(false)}
+                  className="flex size-8 items-center justify-center rounded-full bg-gray-100 text-[#33335c]"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">{zijPaneelInhoud}</div>
+            </div>
+          </div>
+        )}
 
         {/* Chat gebied */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -510,7 +548,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
             if (!r) return null
             return (
               <div
-                className="px-6 py-2.5 flex items-center gap-2 text-white text-sm font-semibold flex-shrink-0"
+                className="px-4 sm:px-6 py-2.5 flex items-center gap-2 text-white text-sm font-semibold flex-shrink-0"
                 style={{ backgroundColor: r.kleur }}
               >
                 <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -523,7 +561,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           })()}
 
           {/* Berichten */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             {berichten.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center py-12">
                 <div className="size-16 rounded-3xl bg-[#33335c]/5 flex items-center justify-center mb-4">
@@ -605,8 +643,8 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           </div>
 
           {/* Input */}
-          <div className="border-t border-gray-100 bg-white p-4">
-            <div className="flex gap-3 items-end max-w-4xl mx-auto">
+          <div className="border-t border-gray-100 bg-white p-3 sm:p-4">
+            <div className="flex gap-2 sm:gap-3 items-end max-w-4xl mx-auto">
               <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-[#33335c]/30 focus-within:bg-white transition-all">
                 <textarea
                   ref={invoerRef}
