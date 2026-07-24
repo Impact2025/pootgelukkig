@@ -35,6 +35,7 @@ export async function generateMetadata({
   return {
     title: `${dier.naam} — ${omschrijving} | PootGelukkig`,
     description: `Ontmoet ${dier.naam}, een ${omschrijving} die een thuis zoekt. Adopteer via PootGelukkig.`,
+    alternates: { canonical: `/animals/${id}` },
     openGraph: {
       title: `${dier.naam} zoekt een thuis`,
       description: `${dier.naam} is een ${omschrijving} in het asiel. Bekijk het profiel en start een match.`,

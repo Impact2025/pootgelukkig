@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
 import { db } from '@/lib/db'
 import { asielen, dieren } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
@@ -7,6 +8,38 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import BottomNav from '@/components/layout/BottomNav'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const [asiel] = await db
+    .select({ naam: asielen.naam, stad: asielen.stad, regio: asielen.regio, beschrijving: asielen.beschrijving, logoUrl: asielen.logoUrl })
+    .from(asielen)
+    .where(eq(asielen.id, parseInt(id)))
+    .limit(1)
+
+  if (!asiel) return { title: 'Asiel niet gevonden — PootGelukkig' }
+
+  const beschrijving =
+    asiel.beschrijving?.trim() ||
+    `Bekijk de dieren die een thuis zoeken bij ${asiel.naam} in ${asiel.stad}, ${asiel.regio}. Adopteer een asieldier via PootGelukkig.`
+
+  return {
+    title: `${asiel.naam} — Asiel in ${asiel.stad} | PootGelukkig`,
+    description: beschrijving.slice(0, 160),
+    alternates: { canonical: `/asielen/${id}` },
+    openGraph: {
+      title: `${asiel.naam} in ${asiel.stad}`,
+      description: `Ontdek de asieldieren van ${asiel.naam} die een nieuw thuis zoeken.`,
+      images: asiel.logoUrl ? [{ url: asiel.logoUrl }] : [],
+    },
+  }
+}
 
 export default async function AsielPage({
   params,
@@ -50,8 +83,36 @@ export default async function AsielPage({
     zeer_hoog: 'Heel actief',
   }
 
+  // schema.org AnimalShelter — sterke lokale-SEO-signalen ("asiel [stad]")
+  const shelterSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'AnimalShelter',
+    name: asiel.naam,
+    url: `${APP_URL}/asielen/${asiel.id}`,
+    ...(asiel.beschrijving ? { description: asiel.beschrijving } : {}),
+    ...(asiel.logoUrl ? { image: asiel.logoUrl, logo: asiel.logoUrl } : {}),
+    ...(asiel.telefoon ? { telephone: asiel.telefoon } : {}),
+    ...(asiel.email ? { email: asiel.email } : {}),
+    ...(asiel.website ? { sameAs: [asiel.website] } : {}),
+    address: {
+      '@type': 'PostalAddress',
+      ...(asiel.adres ? { streetAddress: asiel.adres } : {}),
+      addressLocality: asiel.stad,
+      addressRegion: asiel.regio,
+      ...(asiel.postcode ? { postalCode: asiel.postcode } : {}),
+      addressCountry: 'NL',
+    },
+    ...(asiel.lat != null && asiel.lng != null
+      ? { geo: { '@type': 'GeoCoordinates', latitude: asiel.lat, longitude: asiel.lng } }
+      : {}),
+  }
+
   return (
     <div className="mobile-container bg-bg-dark">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(shelterSchema) }}
+      />
       {/* Header */}
       <nav className="sticky top-0 z-50 ios-blur border-b border-white/10 px-4 py-3 flex items-center gap-3 bg-bg-dark/80">
         <Link href="/zoeken">

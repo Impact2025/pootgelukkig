@@ -54,11 +54,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/werkwijze`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${APP_URL}/prijzen`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${APP_URL}/faq`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/intake`, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${APP_URL}/over-ons`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${APP_URL}/contact`, changeFrequency: 'yearly', priority: 0.5 },
     { url: `${APP_URL}/demo-aanvragen`, changeFrequency: 'yearly', priority: 0.6 },
-    { url: `${APP_URL}/zoeken`, changeFrequency: 'monthly', priority: 0.4 },
+    // /intake en /zoeken bewust weggelaten: die routes vereisen login (307 → /auth/login)
+    // en zijn dus niet indexeerbaar. Nooit loginmuren in de sitemap zetten.
   ]
 
   const artikelen: MetadataRoute.Sitemap = posts.map((p) => {

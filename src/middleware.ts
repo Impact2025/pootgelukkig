@@ -9,9 +9,13 @@ const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron', '/api/
 const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
 const MANAGEMENT_ROUTES = ['/management']
-const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/animals', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
+const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
 // Publieke marketing-site — altijd toegankelijk, ook uitgelogd
 const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact', '/demo-aanvragen']
+// Publieke content-pagina's: dier- en asielprofielen. Volledig indexeerbaar voor SEO.
+// Renderen zonder sessie (alleen publieke dier/asiel-data); ingelogde adoptanten
+// krijgen dezelfde pagina verrijkt met matchscore, favorieten en afspraken.
+const PUBLIC_CONTENT_ROUTES = ['/animals', '/asielen']
 
 function thuisRoute(rol?: string) {
   return rol === 'admin' ? '/management' : rol === 'asiel' ? '/admin' : '/dashboard'
@@ -51,6 +55,11 @@ export default auth((req) => {
 
   // Marketing-subpagina's: altijd publiek, ook voor ingelogde gebruikers
   if (MARKETING_ROUTES.some((r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + '/'))) {
+    return NextResponse.next()
+  }
+
+  // Publieke dier- en asielprofielen: altijd toegankelijk (ook uitgelogd, voor SEO)
+  if (PUBLIC_CONTENT_ROUTES.some((r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + '/'))) {
     return NextResponse.next()
   }
 
