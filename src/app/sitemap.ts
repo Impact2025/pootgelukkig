@@ -4,7 +4,7 @@ import { blogPosts, dieren, asielen } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { CATEGORIEEN, ARTIKELEN } from '@/lib/kennisbank/content'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
 
 // ISR i.p.v. force-dynamic: de sitemap wordt gecachet en elk uur ververst.
 // Zo krijgt Googlebot altijd een snelle, volledige sitemap i.p.v. een verse

@@ -49,7 +49,7 @@ export async function chatCompletion(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl',
       'X-Title': 'PootGelukkig',
     },
     body: JSON.stringify({
@@ -91,7 +91,7 @@ export async function chatStream(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl',
       'X-Title': 'PootGelukkig',
     },
     body: JSON.stringify({

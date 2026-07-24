@@ -22,7 +22,7 @@ export default function ContactPage() {
     '@type': 'ContactPoint',
     contactType: 'customer service',
     email: 'info@pootgelukkig.nl',
-    url: 'https://pootgelukkig.nl/contact',
+    url: 'https://www.pootgelukkig.nl/contact',
     availableLanguage: 'Dutch',
   }
 

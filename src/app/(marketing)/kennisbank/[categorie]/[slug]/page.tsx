@@ -11,7 +11,7 @@ import {
   artikelenVoorCategorie,
 } from '@/lib/kennisbank/content'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
 
 type TocEntry = { id: string; text: string; level: number }
 

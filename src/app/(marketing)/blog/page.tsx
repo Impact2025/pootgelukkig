@@ -63,7 +63,7 @@ export default async function BlogIndexPage(props: {
       ? (alleCats.find((c) => c.slug === catSlug)?.naam + ' — Blog PootGelukkig')
       : 'Blog — PootGelukkig',
     description: 'Tips, verhalen en gidsen over het adopteren van asieldieren in Nederland.',
-    url: `https://pootgelukkig.nl/blog${catSlug ? `?categorie=${catSlug}` : ''}`,
+    url: `https://www.pootgelukkig.nl/blog${catSlug ? `?categorie=${catSlug}` : ''}`,
   }
 
   return (

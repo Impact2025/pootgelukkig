@@ -11,7 +11,7 @@ import { db } from '@/lib/db'
 import { blogPosts, blogCategorieen } from '@/lib/db/schema'
 import { and, eq, desc, ne } from 'drizzle-orm'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

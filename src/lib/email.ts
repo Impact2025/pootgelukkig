@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { mailLog } from '@/lib/db/schema'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
 const VAN = 'PootGelukkig <no-reply@pootgelukkig.nl>'
 
 interface MailMeta {

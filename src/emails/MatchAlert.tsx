@@ -71,7 +71,7 @@ export function MatchAlert({
         <Text style={{ margin: 0, fontSize: '12px', color: '#aaa', fontFamily: "'Plus Jakarta Sans', Arial, sans-serif" }}>
           Je ontvangt deze melding omdat {adoptantNaam} een hoge AI-match heeft met een dier in jouw asiel.
           Login op{' '}
-          <a href={process.env.NEXT_PUBLIC_APP_URL ?? 'https://pootgelukkig.nl'} style={{ color: '#33335c' }}>
+          <a href={process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'} style={{ color: '#33335c' }}>
             pootgelukkig.nl
           </a>{' '}
           om te reageren.
