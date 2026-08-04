@@ -110,5 +110,12 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|jpeg|ico|webp)$).*)'],
+  // `txt` staat in deze lijst omdat statische bestanden uit `public/` anders
+  // door de auth-middleware gaan en op /auth/login uitkomen. Dat gebeurde met
+  // het IndexNow-keybestand (4 aug 2026): het stond correct in public/, gaf
+  // netjes HTTP 200, maar leverde de ingelogde-schil terug in plaats van de
+  // sleutel — waardoor Bing, Yandex en Naver elke URL-aanmelding van deze site
+  // weigerden. /robots.txt en /sitemap.xml ontsnapten daaraan alleen doordat ze
+  // hierboven met naam op de allowlist staan; elk ánder statisch bestand niet.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|jpeg|ico|webp|txt|xml)$).*)'],
 }
