@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Section, Eyebrow } from '@/components/marketing/ui'
 import { FaqAccordion } from '@/components/marketing/FaqAccordion'
+import { faqPageSchema, breadcrumbSchema } from '@/lib/seo-kit'
 
 export const metadata: Metadata = {
   title: 'Veelgestelde vragen — PootGelukkig',
@@ -52,22 +53,25 @@ const GROEPEN = [
   },
 ]
 
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl').replace(/\/+$/, '')
+
 export default function FaqPage() {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: GROEPEN.flatMap((g) =>
-      g.items.map((i) => ({
-        '@type': 'Question',
-        name: i.vraag,
-        acceptedAnswer: { '@type': 'Answer', text: i.antwoord },
-      })),
-    ),
-  }
+  const faqItems = GROEPEN.flatMap((g) =>
+    g.items.map((i) => ({ question: i.vraag, answer: i.antwoord })),
+  )
+  const jsonLd = [
+    faqPageSchema(faqItems),
+    breadcrumbSchema([
+      { name: 'Home', url: `${APP_URL}/` },
+      { name: 'FAQ', url: `${APP_URL}/faq` },
+    ]),
+  ]
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {jsonLd.map((s, idx) => (
+        <script key={idx} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
+      ))}
       <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Veelgestelde vragen</Eyebrow>
