@@ -2,3 +2,4 @@
 export * from './schema'
 export * from './keyword-framework'
 export * from './aio'
+export * from './entity-graph'

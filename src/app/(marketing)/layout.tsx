@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { MarketingNav } from '@/components/marketing/MarketingNav'
 import { MarketingFooter } from '@/components/marketing/MarketingFooter'
+import { portfolioSameAs } from '@/lib/seo-kit'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
 
@@ -30,6 +31,7 @@ export default async function MarketingLayout({ children }: { children: ReactNod
       description:
         'AI-gestuurde matching die asiels helpt om de juiste adoptant bij het juiste dier te vinden.',
       parentOrganization: { '@type': 'Organization', name: 'WeAreImpact' },
+      sameAs: [...portfolioSameAs],
     },
     {
       '@context': 'https://schema.org',
