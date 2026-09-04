@@ -22,7 +22,7 @@ export default function GlobalError({
       <div className="space-y-2">
         <h1 className="text-2xl font-extrabold text-white">Oeps, er ging iets mis</h1>
         <p className="text-white/50 text-sm leading-relaxed">
-          Er is een onverwachte fout opgetreden. Probeer het opnieuw of ga terug naar het dashboard.
+          Er is een onverwachte fout opgetreden. Probeer het opnieuw of ga terug naar het startscherm.
         </p>
       </div>
       <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -32,9 +32,9 @@ export default function GlobalError({
         >
           Probeer opnieuw
         </button>
-        <Link href="/dashboard">
+        <Link href="/admin">
           <button className="w-full bg-white/5 border border-white/10 text-white font-medium py-3.5 rounded-2xl">
-            Terug naar dashboard
+            Terug naar het overzicht
           </button>
         </Link>
       </div>

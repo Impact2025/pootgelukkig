@@ -14,11 +14,20 @@ function getApiKey(): string {
 }
 
 // Standaard model — pas aan naar eigen voorkeur:
-// 'anthropic/claude-sonnet-4-5'
-// 'anthropic/claude-3.5-sonnet'
+// 'anthropic/claude-sonnet-4.5'
 // 'openai/gpt-4o'
 // 'google/gemini-flash-1.5'
-export const DEFAULT_MODEL = 'anthropic/claude-sonnet-4-5'
+// Let op: OpenRouter verwijdert oudere model-ID's uit zijn catalogus (3.5-generatie is per
+// sept. 2026 niet meer beschikbaar — gaf een stille 404 die door chatJSON/chatCompletion
+// alleen als "leeg antwoord"/fout naar boven kwam). Controleer bij vreemde AI-fouten eerst
+// https://openrouter.ai/api/v1/models of de hier gebruikte ID's nog bestaan.
+export const DEFAULT_MODEL = 'anthropic/claude-sonnet-4.5'
+
+// Model-routering voor de AI-rollen-engine:
+// - Haiku: routing/triage, vrijwilligers-intake-screening en de 'chat'-webassistent
+// - Sonnet: complexe schrijf- en analysetaken (fundraising, rapportage, social)
+export const MODEL_HAIKU = 'anthropic/claude-haiku-4.5'
+export const MODEL_SONNET = 'anthropic/claude-sonnet-4.5'
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
@@ -28,8 +37,8 @@ interface ChatMessage {
 interface ChatOptions {
   model?: string
   maxTokens?: number
-  // Optioneel: koppelt deze call aan een module/gebruiker voor kostentracking.
-  meta?: AiMeta
+  // Verplicht: koppelt deze call aan een organisatie (+ actie/gebruiker) voor kostentracking.
+  meta: AiMeta
 }
 
 interface OpenRouterResponse {
@@ -39,7 +48,7 @@ interface OpenRouterResponse {
 
 export async function chatCompletion(
   messages: ChatMessage[],
-  options: ChatOptions = {}
+  options: ChatOptions
 ): Promise<string> {
   const apiKey = getApiKey()
   const model = options.model ?? DEFAULT_MODEL
@@ -49,8 +58,8 @@ export async function chatCompletion(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl',
-      'X-Title': 'PootGelukkig',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl',
+      'X-Title': 'ImpactOS',
     },
     body: JSON.stringify({
       model,
@@ -78,10 +87,109 @@ export async function chatCompletion(
   return content
 }
 
+/**
+ * Zelfde als chatCompletion, maar dwingt een JSON-object-antwoord af (OpenRouter/OpenAI
+ * response_format). Gebruikt voor gestructureerde extractie tijdens een gesprek (bv. de
+ * chat-onboarding), waarbij elke beurt meteen een stukje bruikbare data teruggeeft i.p.v.
+ * vrije tekst die achteraf geparsed moet worden.
+ */
+export async function chatJSON<T>(messages: ChatMessage[], options: ChatOptions): Promise<T> {
+  const eersteContent = await chatJSONRuw(messages, options)
+
+  try {
+    return parseJsonAntwoord<T>(eersteContent)
+  } catch {
+    // Sommige modellen negeren response_format bij een lang antwoord (bv. een opsomming die
+    // niet meer in de JSON-envelop past) en leveren platte tekst. Eén herstelpoging: leg het
+    // mislukte antwoord terug voor en vraag expliciet om alleen het JSON-object.
+    const herstelContent = await chatJSONRuw(
+      [
+        ...messages,
+        { role: 'assistant', content: eersteContent },
+        {
+          role: 'user',
+          content:
+            'Dat was geen geldige JSON. Geef ALLEEN het JSON-object opnieuw, gebaseerd op wat je hierboven bedoelde — geen markdown, geen uitleg, geen codeblok.',
+        },
+      ],
+      options
+    )
+    return parseJsonAntwoord<T>(herstelContent)
+  }
+}
+
+async function chatJSONRuw(messages: ChatMessage[], options: ChatOptions): Promise<string> {
+  const apiKey = getApiKey()
+  const model = options.model ?? DEFAULT_MODEL
+
+  const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl',
+      'X-Title': 'ImpactOS',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: options.maxTokens ?? 500,
+      messages,
+      response_format: { type: 'json_object' },
+      usage: { include: true },
+    }),
+  })
+
+  if (!response.ok) {
+    const fout = await response.text()
+    throw new Error(`OpenRouter fout ${response.status}: ${fout}`)
+  }
+
+  const data = (await response.json()) as OpenRouterResponse
+  const content = data.choices[0]?.message?.content
+
+  if (!content) {
+    throw new Error('Leeg antwoord van OpenRouter')
+  }
+
+  void logAiGebruik(options.meta, model, data.usage)
+  return content
+}
+
+// Modellen houden zich niet altijd exact aan response_format: json_object en wrappen het
+// object soms alsnog in een ```json-codeblok. Eerst kaal proberen, dan het codeblok (of het
+// eerste {...}-blok) eruit strippen voor we het als mislukt beschouwen.
+export function parseJsonAntwoord<T>(content: string): T {
+  try {
+    return JSON.parse(content) as T
+  } catch {
+    // val door naar de opschoonpoging hieronder
+  }
+
+  const zonderFences = content
+    .trim()
+    .replace(/^```[a-z]*\n?/i, '')
+    .replace(/```\s*$/, '')
+    .trim()
+
+  try {
+    return JSON.parse(zonderFences) as T
+  } catch {
+    const eersteBlok = zonderFences.match(/\{[\s\S]*\}/)
+    if (eersteBlok) {
+      try {
+        return JSON.parse(eersteBlok[0]) as T
+      } catch {
+        // valt door naar de finale fout hieronder
+      }
+    }
+    throw new Error(`Ongeldige JSON van model: ${content.slice(0, 300)}`)
+  }
+}
+
 // Streaming variant — geeft een ReadableStream terug voor live typing-effect
 export async function chatStream(
   messages: ChatMessage[],
-  options: ChatOptions = {}
+  options: ChatOptions
 ): Promise<ReadableStream<Uint8Array>> {
   const apiKey = getApiKey()
   const model = options.model ?? DEFAULT_MODEL
@@ -91,8 +199,8 @@ export async function chatStream(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl',
-      'X-Title': 'PootGelukkig',
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl',
+      'X-Title': 'ImpactOS',
     },
     body: JSON.stringify({
       model,

@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-/* Herbruikbare, lichte marketing-UI primitives. Navy tekst (#33335c),
-   amber accent (#f8aa25), terracotta CTA (#ee5b2b). Geen emoji's. */
+/* Herbruikbare, lichte marketing-UI primitives. Navy tekst (#1E293B),
+   amber accent (#3B82F6), terracotta CTA (#2563EB). Geen emoji's. */
 
 export function Container({
   children,
@@ -32,7 +32,7 @@ export function Section({
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-[#ee5b2b]">
+    <span className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-[#2563EB]">
       {children}
     </span>
   )
@@ -52,10 +52,10 @@ export function SectionHeading({
   return (
     <div className={`max-w-2xl ${center ? 'mx-auto text-center' : ''}`}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#33335c] sm:text-4xl">
+      <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#1E293B] sm:text-4xl">
         {title}
       </h2>
-      {intro && <p className="mt-4 text-lg leading-relaxed text-[#33335c]/65">{intro}</p>}
+      {intro && <p className="mt-4 text-lg leading-relaxed text-[#1E293B]/65">{intro}</p>}
     </div>
   )
 }
@@ -78,9 +78,9 @@ export function ButtonLink({
   const base =
     'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all active:scale-[0.97]'
   const styles = {
-    primary: 'bg-[#ee5b2b] text-white shadow-sm hover:bg-[#d94e22]',
-    secondary: 'bg-[#33335c] text-white hover:bg-[#26264a]',
-    ghost: 'border border-[#33335c]/15 bg-white text-[#33335c] hover:border-[#33335c]/30',
+    primary: 'bg-[#2563EB] text-white shadow-sm hover:bg-[#1D4ED8]',
+    secondary: 'bg-[#1E293B] text-white hover:bg-[#0F172A]',
+    ghost: 'border border-[#1E293B]/15 bg-white text-[#1E293B] hover:border-[#1E293B]/30',
   }[variant]
   const isInternal = href.startsWith('/')
   const content = (
@@ -110,12 +110,12 @@ export function FeatureCard({
   children: ReactNode
 }) {
   return (
-    <div className="rounded-3xl border border-[#33335c]/8 bg-white p-7 shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)]">
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-[#f8aa25]/12 text-[#e39207]">
+    <div className="rounded-3xl border border-[#1E293B]/8 bg-white p-7 shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)]">
+      <div className="flex size-12 items-center justify-center rounded-2xl bg-[#3B82F6]/12 text-[#2563EB]">
         <span className="material-symbols-outlined">{icon}</span>
       </div>
-      <h3 className="mt-5 text-lg font-bold text-[#33335c]">{title}</h3>
-      <p className="mt-2 text-[15px] leading-relaxed text-[#33335c]/65">{children}</p>
+      <h3 className="mt-5 text-lg font-bold text-[#1E293B]">{title}</h3>
+      <p className="mt-2 text-[15px] leading-relaxed text-[#1E293B]/65">{children}</p>
     </div>
   )
 }
@@ -131,11 +131,11 @@ export function StepItem({
 }) {
   return (
     <div className="relative pl-16">
-      <div className="absolute left-0 top-0 flex size-11 items-center justify-center rounded-2xl bg-[#33335c] text-base font-extrabold text-white">
+      <div className="absolute left-0 top-0 flex size-11 items-center justify-center rounded-2xl bg-[#1E293B] text-base font-extrabold text-white">
         {step}
       </div>
-      <h3 className="text-lg font-bold text-[#33335c]">{title}</h3>
-      <p className="mt-2 text-[15px] leading-relaxed text-[#33335c]/65">{children}</p>
+      <h3 className="text-lg font-bold text-[#1E293B]">{title}</h3>
+      <p className="mt-2 text-[15px] leading-relaxed text-[#1E293B]/65">{children}</p>
     </div>
   )
 }
@@ -153,7 +153,7 @@ export function CtaBlock({
 }) {
   return (
     <Section>
-      <div className="overflow-hidden rounded-[2rem] bg-[#33335c] px-8 py-14 text-center sm:px-16">
+      <div className="overflow-hidden rounded-[2rem] bg-[#1E293B] px-8 py-14 text-center sm:px-16">
         <h2 className="mx-auto max-w-xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">
           {title}
         </h2>

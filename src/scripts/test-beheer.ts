@@ -26,14 +26,14 @@ async function run() {
   // SEO
   const slechteSeo = berekenSeoScore({ titel: 'x', inhoudMd: 'kort' })
   const vulzin = 'Een rustige introductie thuis helpt je nieuwe huisgenoot om vertrouwen op te bouwen en zich veilig te voelen in de eerste periode. '
-  const goedeMd = `# Kat adopteren\n\nEen kat adopteren uit het asiel is een prachtige keuze voor wie een trouwe huisgenoot zoekt. ${vulzin.repeat(8)}\n\n## Waarom een kat adopteren uit het asiel\n\n${vulzin.repeat(10)} Bekijk ook onze [beschikbare dieren](/zoeken) en de tips van de [Dierenbescherming](https://dierenbescherming.nl).\n\n## De eerste weken thuis\n\n${vulzin.repeat(10)}\n\n## Kosten en verzorging\n\n${vulzin.repeat(8)}`
+  const goedeMd = `# Kat adopteren\n\nEen kat adopteren uit het asiel is een prachtige keuze voor wie een trouwe huisgenoot zoekt. ${vulzin.repeat(8)}\n\n## Waarom een kat adopteren uit het asiel\n\n${vulzin.repeat(10)} Bekijk ook onze [onze aanpak](/werkwijze) en de tips van de [Dierenbescherming](https://dierenbescherming.nl).\n\n## De eerste weken thuis\n\n${vulzin.repeat(10)}\n\n## Kosten en verzorging\n\n${vulzin.repeat(8)}`
   const goedeSeo = berekenSeoScore({
     titel: 'Kat adopteren: de complete gids',
     inhoudMd: goedeMd,
     metaTitle: 'Kat adopteren: de complete gids voor beginners',
     metaDescription: 'Alles over een kat adopteren uit het asiel: waar let je op, kosten en de eerste weken thuis met je nieuwe maatje.',
     focusKeyword: 'kat adopteren',
-    interneLinks: [{ tekst: 'zoek', url: '/zoeken' }],
+    interneLinks: [{ tekst: 'werkwijze', url: '/werkwijze' }],
     externeLinks: [{ tekst: 'bron', url: 'https://dierenbescherming.nl' }],
   })
   check('SEO slechte post < 40', slechteSeo.score < 40, slechteSeo.score)

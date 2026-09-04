@@ -23,12 +23,12 @@ export async function GET(req: Request) {
     stats: {
       nieuweGebruikers: kpis.nieuweGebruikers,
       nieuweMatches: kpis.nieuweMatches,
-      nieuweAdopties: kpis.nieuweAdopties,
+      nieuweBegeleidingen: kpis.nieuweBegeleidingen,
       verzondenMails: kpis.verzondenMails,
     },
     aiKosten: euro(kpis.aiKostenEuro),
     aiCalls: kpis.aiCalls,
-    aiPerModule: kpis.aiPerModule.map((m) => ({ module: m.module, kosten: euro(m.kosten), calls: m.calls })),
+    aiPerActie: kpis.aiPerActie.map((m) => ({ actie: m.actie, kosten: euro(m.kosten), calls: m.calls })),
   })
 
   return NextResponse.json({ ok: result.ok, kpis })

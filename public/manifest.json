@@ -1,14 +1,14 @@
 {
-  "name": "PootGelukkig",
-  "short_name": "PootGelukkig",
-  "description": "AI-gestuurde matching tussen mensen en asieldieren",
-  "start_url": "/dashboard",
+  "name": "ImpactOS",
+  "short_name": "ImpactOS",
+  "description": "AI-gestuurd platform voor het sociaal domein",
+  "start_url": "/admin",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#102210",
-  "theme_color": "#102210",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
   "lang": "nl",
-  "categories": ["lifestyle", "social"],
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -35,24 +35,15 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard.png",
-      "sizes": "430x932",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Dashboard met AI matches"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Matches bekijken",
-      "url": "/dashboard",
+      "name": "Dossiers",
+      "url": "/admin/dossiers",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Zoeken",
-      "url": "/zoeken",
+      "name": "Wachtrij",
+      "url": "/admin/content-queue",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]

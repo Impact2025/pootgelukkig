@@ -1,144 +1,140 @@
 import { db } from '@/lib/db'
 import {
-  dieren,
-  medischeRecords,
+  dossiers,
+  begeleidingen,
   welzijnLogs,
-  adopties,
-  afspraken,
   vrijwilligers,
   donoren,
   fondsenwervingCampagnes,
-  evenementen,
+  aiRollenConfig,
+  kenniskluisDocumenten,
 } from '@/lib/db/schema'
-import { and, eq, ne, lt, gte, desc, sql } from 'drizzle-orm'
+import { and, eq, ne, desc, sql } from 'drizzle-orm'
+import type { AiRolId } from './types'
 
-// ─── Dieren ───────────────────────────────────────────────────────────────────
+// ─── Kenniskluis (organisatie-brondocumenten: beleidsplan, Wmo-kader, fondsaanvragen) ──
 
-export async function haalDierenSamenvatting(asielId: number, limiet = 30): Promise<string> {
+// Prompt-budget over alle documenten samen — voorkomt dat veel PDF's het contextvenster opblazen.
+const KENNISKLUIS_TOTAAL_BUDGET = 24_000
+
+export async function haalKenniskluisContext(organisatieId: string): Promise<string> {
+  const documenten = await db
+    .select({ bestandsnaam: kenniskluisDocumenten.bestandsnaam, tekstInhoud: kenniskluisDocumenten.tekstInhoud })
+    .from(kenniskluisDocumenten)
+    .where(and(eq(kenniskluisDocumenten.organisatieId, organisatieId), eq(kenniskluisDocumenten.status, 'verwerkt')))
+    .orderBy(desc(kenniskluisDocumenten.aangemaaktOp))
+
+  if (documenten.length === 0) return '  Geen brondocumenten geüpload in de kenniskluis'
+
+  let budgetOver = KENNISKLUIS_TOTAAL_BUDGET
+  const secties: string[] = []
+  for (const doc of documenten) {
+    if (budgetOver <= 0 || !doc.tekstInhoud) continue
+    const tekst = doc.tekstInhoud.slice(0, budgetOver)
+    budgetOver -= tekst.length
+    secties.push(`### ${doc.bestandsnaam}\n${tekst}`)
+  }
+  return secties.join('\n\n')
+}
+
+// ─── Dossiers (zorg-/hulpverleningstrajecten) ─────────────────────────────────
+
+export async function haalDossiersSamenvatting(organisatieId: string, limiet = 30): Promise<string> {
   const rijen = await db
     .select({
-      naam: dieren.naam,
-      soort: dieren.soort,
-      status: dieren.status,
-      binnen: dieren.binnengekomentOp,
+      titel: dossiers.titel,
+      categorie: dossiers.categorie,
+      status: dossiers.status,
+      samenvatting: dossiers.samenvatting,
+      aangemaakt: dossiers.createdAt,
     })
-    .from(dieren)
-    .where(and(eq(dieren.asielId, asielId), ne(dieren.status, 'geadopteerd')))
-    .orderBy(desc(dieren.binnengekomentOp))
+    .from(dossiers)
+    .where(and(eq(dossiers.organisatieId, organisatieId), ne(dossiers.status, 'afgerond')))
+    .orderBy(desc(dossiers.createdAt))
     .limit(limiet)
-  if (rijen.length === 0) return '  Geen dieren in opvang'
-  const vandaag = Date.now()
+  if (rijen.length === 0) return '  Geen actieve dossiers'
   return rijen
-    .map((d) => {
-      const dagen = d.binnen
-        ? Math.floor((vandaag - new Date(d.binnen).getTime()) / 86400000)
-        : null
-      return `- ${d.naam} (${d.soort}) — ${d.status}${dagen != null ? `, ${dagen} dagen in asiel` : ''}`
-    })
+    .map((d) => `- ${d.titel} (${d.categorie}, ${d.status})${d.samenvatting ? ` — ${d.samenvatting.slice(0, 140)}` : ''}`)
     .join('\n')
 }
 
-export async function haalLangsteWachters(asielId: number, drempelDagen = 60, limiet = 10): Promise<string> {
+/** Geanonimiseerde recent-afgeronde dossiers — bruikbaar als storytelling-materiaal (Conny) */
+export async function haalAfgerondeDossiersSamenvatting(organisatieId: string, limiet = 10): Promise<string> {
   const rijen = await db
-    .select({ naam: dieren.naam, soort: dieren.soort, binnen: dieren.binnengekomentOp })
-    .from(dieren)
-    .where(and(eq(dieren.asielId, asielId), eq(dieren.status, 'beschikbaar')))
-    .limit(100)
-  const grens = Date.now() - drempelDagen * 86400000
-  const lang = rijen
-    .filter((d) => d.binnen && new Date(d.binnen).getTime() < grens)
-    .slice(0, limiet)
-  if (lang.length === 0) return '  Geen dieren boven drempel'
-  return lang.map((d) => `- ${d.naam} (${d.soort})`).join('\n')
+    .select({ categorie: dossiers.categorie, samenvatting: dossiers.samenvatting, updatedAt: dossiers.updatedAt })
+    .from(dossiers)
+    .where(and(eq(dossiers.organisatieId, organisatieId), eq(dossiers.status, 'afgerond')))
+    .orderBy(desc(dossiers.updatedAt))
+    .limit(limiet)
+  if (rijen.length === 0) return '  Geen recent afgeronde trajecten'
+  return rijen
+    .map((d) => `- Traject (${d.categorie}): ${d.samenvatting ? d.samenvatting.slice(0, 200) : 'geen samenvatting beschikbaar'}`)
+    .join('\n')
 }
 
-// ─── Medisch / Welzijn ──────────────────────────────────────────────────────
-
-export async function haalMedischOpen(asielId: number): Promise<string> {
+/** Trajectcijfers (begeleidingen) per status — basis voor rapportages (Mila) */
+export async function haalBegeleidingCijfers(organisatieId: string): Promise<string> {
   const rijen = await db
-    .select({
-      titel: medischeRecords.titel,
-      dierId: medischeRecords.dierId,
-      volgende: medischeRecords.volgendeDatum,
-      status: medischeRecords.status,
-    })
-    .from(medischeRecords)
-    .innerJoin(dieren, eq(medischeRecords.dierId, dieren.id))
-    .where(and(eq(dieren.asielId, asielId), eq(medischeRecords.status, 'aankomend'), lt(medischeRecords.volgendeDatum, new Date())))
-    .limit(15)
-  if (rijen.length === 0) return '  Geen openstaande medische acties'
-  return rijen.map((r) => `- ${r.titel} (${r.status})`).join('\n')
+    .select({ status: begeleidingen.status, aantal: sql<number>`count(*)::int` })
+    .from(begeleidingen)
+    .where(eq(begeleidingen.organisatieId, organisatieId))
+    .groupBy(begeleidingen.status)
+  if (rijen.length === 0) return '  Nog geen begeleidingen geregistreerd'
+  return rijen.map((r) => `- ${r.status}: ${r.aantal}`).join('\n')
 }
 
-export async function haalWelzijnStatus(asielId: number): Promise<string> {
-  const zevenDagenGeleden = new Date(Date.now() - 7 * 86400000)
-  const recent = await db
-    .select({ dierId: welzijnLogs.dierId })
+/** Veldlogs (voortgangs-/welzijnsregistraties, dossier-gebonden) van de laatste periode */
+export async function haalVeldlogsSamenvatting(organisatieId: string, dagen = 30, limiet = 20): Promise<string> {
+  const sinds = new Date(Date.now() - dagen * 86400000)
+  const rijen = await db
+    .select({ notitie: welzijnLogs.notitie, gelogdOp: welzijnLogs.gelogdOp, dossierTitel: dossiers.titel })
     .from(welzijnLogs)
-    .innerJoin(dieren, eq(welzijnLogs.dierId, dieren.id))
-    .where(and(eq(dieren.asielId, asielId), gte(welzijnLogs.gelogdOp, zevenDagenGeleden)))
-  const recentIds = new Set(recent.map((r) => r.dierId))
-  const beschikbaar = await db
-    .select({ id: dieren.id, naam: dieren.naam })
-    .from(dieren)
-    .where(and(eq(dieren.asielId, asielId), eq(dieren.status, 'beschikbaar')))
-    .limit(50)
-  const zonder = beschikbaar.filter((d) => !recentIds.has(d.id)).slice(0, 10)
-  if (zonder.length === 0) return '  Alle beschikbare dieren hebben recent een welzijn-log'
-  return zonder.map((d) => `- ${d.naam}`).join('\n')
+    .innerJoin(dossiers, eq(welzijnLogs.dossierId, dossiers.id))
+    .where(and(eq(dossiers.organisatieId, organisatieId), sql`${welzijnLogs.gelogdOp} >= ${sinds}`))
+    .orderBy(desc(welzijnLogs.gelogdOp))
+    .limit(limiet)
+  if (rijen.length === 0) return '  Geen veldlogs in deze periode'
+  return rijen.map((r) => `- ${r.dossierTitel}: ${r.notitie ?? 'geen notitie'} (${new Date(r.gelogdOp).toLocaleDateString('nl-NL')})`).join('\n')
 }
 
-// ─── Vrijwilligers ────────────────────────────────────────────────────────────
+// ─── Vrijwilligers / maatjes ────────────────────────────────────────────────────
 
-export async function haalVrijwilligersSamenvatting(asielId: number): Promise<string> {
+export async function haalVrijwilligersSamenvatting(organisatieId: string): Promise<string> {
   const rijen = await db
     .select({ naam: vrijwilligers.naam, functie: vrijwilligers.functie, status: vrijwilligers.status, uren: vrijwilligers.urenPerWeek })
     .from(vrijwilligers)
-    .where(eq(vrijwilligers.asielId, asielId))
+    .where(eq(vrijwilligers.organisatieId, organisatieId))
     .limit(30)
-  if (rijen.length === 0) return '  Geen vrijwilligers geregistreerd'
+  if (rijen.length === 0) return '  Geen vrijwilligers/maatjes geregistreerd'
   const totaalUren = rijen.reduce((s, r) => s + (r.uren ?? 0), 0)
-  return `${rijen.length} vrijwilligers (${totaalUren} uur/week totaal)\n` +
+  return `${rijen.length} vrijwilligers/maatjes (${totaalUren} uur/week totaal)\n` +
     rijen.map((r) => `- ${r.naam} — ${r.functie} (${r.status}, ${r.uren ?? 0} u/u)`).join('\n')
 }
 
-// ─── Donoren / Campagnes ──────────────────────────────────────────────────────
+// ─── Donoren / fondsen / subsidiecampagnes ──────────────────────────────────────
 
-export async function haalDonorenSamenvatting(asielId: number): Promise<string> {
+export async function haalFondsenSamenvatting(organisatieId: string): Promise<string> {
   const d = await db
-    .select({ id: donoren.id, naam: donoren.naam, segment: donoren.segment, totaal: donoren.totaalGedoneerd })
+    .select({ naam: donoren.naam, segment: donoren.segment, totaal: donoren.totaalGedoneerd })
     .from(donoren)
-    .where(eq(donoren.asielId, asielId))
+    .where(eq(donoren.organisatieId, organisatieId))
     .orderBy(desc(donoren.totaalGedoneerd))
     .limit(20)
   const c = await db
-    .select({ naam: fondsenwervingCampagnes.naam, opgehaald: fondsenwervingCampagnes.opgehaaldBedrag, doel: fondsenwervingCampagnes.doelBedrag })
+    .select({ naam: fondsenwervingCampagnes.naam, type: fondsenwervingCampagnes.type, opgehaald: fondsenwervingCampagnes.opgehaaldBedrag, doel: fondsenwervingCampagnes.doelBedrag })
     .from(fondsenwervingCampagnes)
-    .where(eq(fondsenwervingCampagnes.asielId, asielId))
+    .where(eq(fondsenwervingCampagnes.organisatieId, organisatieId))
     .limit(10)
   const donorStr = d.length
     ? d.map((x) => `- ${x.naam} (${x.segment}) — €${x.totaal ?? 0}`).join('\n')
-    : '  Geen donoren'
+    : '  Geen donoren/fondsen geregistreerd'
   const campStr = c.length
-    ? c.map((x) => `- ${x.naam}: €${x.opgehaald ?? 0}/€${x.doel ?? 0}`).join('\n')
-    : '  Geen campagnes'
-  return `DONOREN (top 20):\n${donorStr}\n\nCAMPAGNES:\n${campStr}`
+    ? c.map((x) => `- ${x.naam} (${x.type}): €${x.opgehaald ?? 0}/€${x.doel ?? 0}`).join('\n')
+    : '  Geen lopende campagnes/subsidietrajecten'
+  return `DONOREN/FONDSEN (top 20):\n${donorStr}\n\nCAMPAGNES/SUBSIDIES:\n${campStr}`
 }
 
-// ─── Evenementen ──────────────────────────────────────────────────────────────
-
-export async function haalEvenementenSamenvatting(asielId: number): Promise<string> {
-  const rijen = await db
-    .select({ titel: evenementen.titel, type: evenementen.type, startOp: evenementen.startOp, status: evenementen.status })
-    .from(evenementen)
-    .where(eq(evenementen.asielId, asielId))
-    .orderBy(desc(evenementen.startOp))
-    .limit(10)
-  if (rijen.length === 0) return '  Geen evenementen gepland'
-  return rijen.map((e) => `- ${e.titel} (${e.type}) op ${e.startOp ? new Date(e.startOp).toLocaleDateString('nl-NL') : '?'} — ${e.status}`).join('\n')
-}
-
-// ─── Lichte kennisbank-retrieve (voor tekst-rollen) ───────────────────────────
+// ─── Lichte kennisbank-retrieve (voor de webassistent 'Samen') ────────────────
 
 export async function retrieveKennisbank(query: string, max = 5): Promise<string> {
   const term = `%${query.replace(/\s+/g, '%')}%`
@@ -154,20 +150,24 @@ export async function retrieveKennisbank(query: string, max = 5): Promise<string
   }
 }
 
-// ─── Adoptie-cijfers (voor rapportage) ────────────────────────────────────────
+// ─── Organisatie-specifieke rol-configuratie (custom system-prompt/instellingen) ─
 
-export async function haalAdoptieCijfers(asielId: number): Promise<string> {
-  const [afgerond] = await db
-    .select({ aantal: sql<number>`count(*)::int` })
-    .from(adopties)
-    .where(and(eq(adopties.asielId, asielId), eq(adopties.status, 'afgerond')))
-  const [aangevraagd] = await db
-    .select({ aantal: sql<number>`count(*)::int` })
-    .from(adopties)
-    .where(and(eq(adopties.asielId, asielId), eq(adopties.status, 'aangevraagd')))
-  const [bevestigd] = await db
-    .select({ aantal: sql<number>`count(*)::int` })
-    .from(afspraken)
-    .where(and(eq(afspraken.asielId, asielId), eq(afspraken.status, 'bevestigd')))
-  return `Adopties afgerond: ${afgerond?.aantal ?? 0}\nAdopties aangevraagd (open): ${aangevraagd?.aantal ?? 0}\nBevestigde afspraken: ${bevestigd?.aantal ?? 0}`
+export interface RolConfig {
+  actief: boolean
+  systemPrompt: string | null
+  instellingen: Record<string, unknown>
+}
+
+export async function haalRolConfig(organisatieId: string, rol: AiRolId): Promise<RolConfig | null> {
+  const [rij] = await db
+    .select({
+      actief: aiRollenConfig.actief,
+      systemPrompt: aiRollenConfig.systemPrompt,
+      instellingen: aiRollenConfig.instellingen,
+    })
+    .from(aiRollenConfig)
+    .where(and(eq(aiRollenConfig.organisatieId, organisatieId), eq(aiRollenConfig.rol, rol)))
+    .limit(1)
+  if (!rij) return null
+  return { actief: rij.actief, systemPrompt: rij.systemPrompt, instellingen: rij.instellingen ?? {} }
 }

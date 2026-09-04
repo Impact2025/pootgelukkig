@@ -5,8 +5,7 @@ export const dynamic = 'force-dynamic'
 // Sam (fundraising) — gepersonaliseerde donateurs-mail als concept.
 export const POST = maakSideEffectRoute({
   rol: 'fundraising',
-  type: 'mail',
-  platform: 'email',
+  type: 'email',
   bouwTitel: () => `Donateurs-mail — ${new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}`,
   bouwPrompt: () =>
     'Stel een gepersonaliseerde mail op voor onze "major"-donoren (structurele/grote gevers). ' +

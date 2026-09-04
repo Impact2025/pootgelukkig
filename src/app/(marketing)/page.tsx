@@ -10,7 +10,6 @@ import {
   Eyebrow,
   ButtonLink,
   FeatureCard,
-  StepItem,
   CtaBlock,
 } from '@/components/marketing/ui'
 
@@ -37,19 +36,32 @@ async function haalLaatstePosts() {
 }
 
 export const metadata: Metadata = {
-  title: 'PootGelukkig — Slimme matching voor asieldieren',
+  title: 'ImpactOS — Het Complete Platform voor het Sociaal Domein',
   description:
-    'PootGelukkig helpt asiels om sneller en beter de juiste adoptant bij het juiste dier te vinden. Gratis voor adoptanten. Een initiatief van WeAreImpact.',
+    'ImpactOS combineert een Pro CRM, 24/7 AI-webassistent en vijf AI-collega\'s in één platform voor sociaal ondernemers en zorgkwartiermakers. Minder bureaucratie, meer maatschappelijke impact. Een initiatief van WeAreImpact.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'PootGelukkig — Slimme matching voor asieldieren',
-    description:
-      'AI-gestuurde matching die asiels helpt om de juiste adoptant bij het juiste dier te vinden.',
+    title: 'ImpactOS — Het Complete Platform voor het Sociaal Domein',
+    description: 'Minder bureaucratie, 24/7 bereikbaarheid en tot 70% minder administratieve lasten.',
     url: '/',
     type: 'website',
     images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
   },
 }
+
+const STATS = [
+  { waarde: '-70%', label: 'Minder administratie & dubbele invoer' },
+  { waarde: '24/7', label: 'Directe bereikbaarheid voor cliënten' },
+  { waarde: '5-10 uur', label: 'Wekelijkse structurele tijdwinst' },
+]
+
+const AI_COLLEGAS = [
+  { naam: 'Sam', rol: 'Fondsen & Subsidies', icoon: 'volunteer_activism', omschrijving: 'Schrijft concept-subsidieaanvragen, projectbegrotingen en fondsverantwoordingen op basis van jouw dossier- en projectdata.' },
+  { naam: 'Mila', rol: 'Impact & Verantwoording', icoon: 'bar_chart', omschrijving: 'Bundelt veldlogs, uren en resultaten tot gestructureerde Wmo-/SROI-rapportages voor financiers en gemeenten.' },
+  { naam: 'Conny', rol: 'Communicatie & PR', icoon: 'campaign', omschrijving: 'Vertaalt praktijksuccesjes naar geanonimiseerde LinkedIn-artikelen, nieuwsbrieven en persberichten.' },
+  { naam: 'Bram', rol: 'Vrijwilligers & Welzijn', icoon: 'groups', omschrijving: 'Screent aanmeldingen, stelt onboarding-checklists op en houdt vrijwilligers/maatjes betrokken.' },
+  { naam: 'Samen', rol: '24/7 Eerstelijns Support', icoon: 'forum', omschrijving: 'Beantwoordt veelgestelde vragen van cliënten en bezoekers direct op je website, dag en nacht.' },
+]
 
 export default async function HomePage() {
   const posts = await haalLaatstePosts()
@@ -60,177 +72,154 @@ export default async function HomePage() {
       <Section className="!pt-16 sm:!pt-24">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <Eyebrow>Voor adoptanten en asiels</Eyebrow>
-            <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-[#33335c] sm:text-5xl lg:text-6xl">
-              Sneller een gelukkig thuis voor ieder asieldier
+            <Eyebrow>Voor sociaal ondernemers &amp; zorgkwartiermakers</Eyebrow>
+            <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-[#1E293B] sm:text-5xl lg:text-6xl">
+              ImpactOS: Het Complete Platform voor het Sociaal Domein
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
-              PootGelukkig koppelt mens en dier op basis van leefstijl in plaats van toeval.
-              Het asiel beslist, altijd. Wij helpen ze sneller tot een goede match te komen.
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#1E293B]/65">
+              Minder bureaucratie, 24/7 bereikbaarheid en tot 70% minder administratieve lasten. Eén
+              platform met een Pro CRM, AI-webassistent en vijf AI-collega&apos;s die concepten
+              voorbereiden — de mens beslist altijd.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <ButtonLink href="/intake" variant="primary" icon="arrow_forward">
-                Vind jouw match
+              <ButtonLink href="/contact?onderwerp=doorbraak-sprint" variant="primary" icon="arrow_forward">
+                Plan een Doorbraak Sprint
               </ButtonLink>
-              <ButtonLink href="/voor-asielen/start" variant="ghost">
-                Voor asiels
+              <ButtonLink href="/demo-aanvragen" variant="ghost">
+                Bekijk Demo / Intake
               </ButtonLink>
             </div>
-            <p className="mt-4 text-sm font-medium text-[#33335c]/45">
-              Gratis voor adoptanten. Geen account nodig om rond te kijken.
+            <p className="mt-4 text-sm font-medium text-[#1E293B]/45">
+              Human-in-the-loop gegarandeerd. Er vertrekt niets zonder jouw akkoord.
             </p>
           </div>
 
-          {/* Hero visual — echte product screenshots */}
+          {/* Hero visual — kernstatistieken */}
           <div className="relative">
             <div
               aria-hidden
-              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#f8aa25]/20 via-[#33335c]/5 to-[#ee5b2b]/15 blur-2xl"
+              className="absolute -inset-6 -z-10 rounded-[3rem] bg-gradient-to-br from-[#3B82F6]/20 via-[#1E293B]/5 to-[#2563EB]/15 blur-2xl"
             />
-            {/* Gelaagd: asiel-dashboard (achter) + dieren-overzicht (voor) */}
-            <div className="overflow-hidden rounded-[1.5rem] border border-[#33335c]/10 bg-white shadow-[0_30px_70px_rgba(51,51,92,0.18)]">
-              <Image
-                src="/images/hero/home.png"
-                alt="PootGelukkig: asiel-dashboard met AI-matches en het dieren-overzicht met beschikbare asieldieren"
-                width={1883}
-                height={842}
-                priority
-                className="h-auto w-full"
-              />
+            <div className="overflow-hidden rounded-[1.5rem] border border-[#1E293B]/10 bg-white p-8 shadow-[0_30px_70px_rgba(30,41,59,0.18)]">
+              <div className="grid gap-5">
+                {STATS.map((s) => (
+                  <div key={s.label} className="flex items-center gap-5 rounded-2xl bg-[#F8FAFC] px-5 py-4">
+                    <span className="text-3xl font-extrabold tracking-tight text-[#2563EB]">{s.waarde}</span>
+                    <span className="text-sm font-semibold leading-snug text-[#1E293B]/70">{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+        </div>
+      </Section>
+
+      {/* Kernstatistieken (herhaald, prominent op mobiel) */}
+      <Section className="!pt-0 sm:hidden">
+        <div className="grid gap-4">
+          {STATS.map((s) => (
+            <div key={s.label} className="rounded-2xl border border-[#1E293B]/8 bg-white px-5 py-4 text-center">
+              <p className="text-2xl font-extrabold text-[#2563EB]">{s.waarde}</p>
+              <p className="mt-1 text-sm font-semibold text-[#1E293B]/60">{s.label}</p>
+            </div>
+          ))}
         </div>
       </Section>
 
       {/* Probleem -> oplossing */}
       <Section className="!pt-0">
         <SectionHeading
-          eyebrow="Waarom PootGelukkig"
-          title="Matchen op gevoel kost tijd en goede matches"
-          intro="Nederlandse asiels zitten vol en het personeel loopt over. Het koppelen van mens en dier gebeurt grotendeels met de hand. Daar gaat tijd verloren, en soms een dier dat net niet op de juiste plek terechtkomt."
+          eyebrow="Waarom ImpactOS"
+          title="Te veel tijd naar formulieren, te weinig naar mensen"
+          intro="Sociaal ondernemers en zorgkwartiermakers besteden een groot deel van hun week aan dubbele invoer, rapportages en losse Excel-bestanden. ImpactOS bundelt CRM, dossiers en AI-ondersteuning in één platform, zodat die tijd weer naar cliënten kan."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-3">
-          <FeatureCard icon="favorite" title="Matching op leefstijl">
-            Adoptanten beantwoorden vragen over hun woonsituatie, ervaring en ritme. Wij vertalen dat
-            naar dieren die echt passen.
+          <FeatureCard icon="bolt" title="Minder dubbele invoer">
+            Eén centrale plek voor dossiers, cliënten en begeleidingen — geen los CRM, spreadsheet en
+            mailbox meer naast elkaar.
           </FeatureCard>
-          <FeatureCard icon="schedule" title="Minder handwerk">
-            Het asiel ziet in één oogopslag welke aanvragen kansrijk zijn en bespaart tijd op
-            de intake.
+          <FeatureCard icon="schedule" title="24/7 bereikbaar">
+            De &quot;Samen&quot;-webassistent beantwoordt veelgestelde vragen van cliënten direct op je
+            website, ook buiten kantooruren.
           </FeatureCard>
-          <FeatureCard icon="verified_user" title="Het asiel beslist">
-            De AI neemt het oordeel niet over. De medewerker houdt altijd de regie over wie welk dier
-            adopteert.
+          <FeatureCard icon="verified_user" title="Jij houdt de regie">
+            AI-collega&apos;s bereiden concepten voor — subsidies, rapportages, communicatie. Niets
+            vertrekt zonder jouw goedkeuring.
           </FeatureCard>
         </div>
       </Section>
 
-      {/* Werkwijze compact */}
+      {/* De 5 AI-collega's */}
       <div className="bg-white">
-        <Section>
+        <Section id="ai-collegas" className="scroll-mt-20">
           <SectionHeading
-            eyebrow="Werkwijze"
-            title="Van eerste vraag tot een blijvend thuis"
-            intro="Vier stappen die de match net zo zorgvuldig maken als snel."
+            eyebrow="Jouw AI-team"
+            title="Vijf AI-collega's die het zware werk voorbereiden"
+            intro="Elke AI-collega is gespecialiseerd in één taak en werkt met de data uit jouw eigen dossiers. Activeer ze per organisatie via AI Rollen."
           />
-          <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            <StepItem step={1} title="Intake">
-              Een kort gesprek over je leefstijl, ervaring en wensen.
-            </StepItem>
-            <StepItem step={2} title="AI-matching">
-              Je profiel wordt gekoppeld aan de dieren die het beste passen.
-            </StepItem>
-            <StepItem step={3} title="Contact met het asiel">
-              Je neemt contact op en het asiel beoordeelt de aanvraag.
-            </StepItem>
-            <StepItem step={4} title="Adoptie en nazorg">
-              Na de adoptie helpt de 3-3-3 begeleiding bij het wennen.
-            </StepItem>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {AI_COLLEGAS.map((c) => (
+              <div key={c.naam} className="rounded-3xl border border-[#1E293B]/8 bg-[#F8FAFC] p-7">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-11 items-center justify-center rounded-2xl bg-[#1E293B] text-[#3B82F6]">
+                    <span className="material-symbols-outlined">{c.icoon}</span>
+                  </span>
+                  <div>
+                    <p className="text-lg font-extrabold text-[#1E293B]">{c.naam}</p>
+                    <p className="text-xs font-bold uppercase tracking-wide text-[#2563EB]">{c.rol}</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-[15px] leading-relaxed text-[#1E293B]/65">{c.omschrijving}</p>
+              </div>
+            ))}
           </div>
-          <div className="mt-12">
-            <Link
-              href="/werkwijze"
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#ee5b2b] hover:text-[#d94e22]"
-            >
-              Lees de volledige werkwijze
-              <span className="material-symbols-outlined text-[1.1rem]">arrow_forward</span>
-            </Link>
+
+          <div className="mt-10 flex items-start gap-4 rounded-3xl border border-[#2563EB]/20 bg-[#2563EB]/5 p-6">
+            <span className="material-symbols-outlined mt-0.5 text-[#2563EB]">shield</span>
+            <div>
+              <p className="font-bold text-[#1E293B]">Human-in-the-loop garantie</p>
+              <p className="mt-1 text-sm leading-relaxed text-[#1E293B]/65">
+                Sam, Mila en Conny leveren altijd een concept — geen enkele e-mail, aanvraag of post
+                wordt automatisch verstuurd. Elk concept staat klaar in de wachtrij, wachtend op jouw
+                goedkeuring.
+              </p>
+            </div>
           </div>
         </Section>
       </div>
 
-      {/* AI-assistent teaser */}
+      {/* Doorbraak Sprint teaser */}
       <Section>
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-center gap-10 rounded-[2rem] border border-[#1E293B]/8 bg-[#F8FAFC] p-8 sm:p-12 lg:grid-cols-[1.3fr_1fr]">
           <div>
-            <Eyebrow>Dr. Poot</Eyebrow>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#33335c] sm:text-4xl">
-              Een slimme assistent die nooit het oordeel overneemt
+            <Eyebrow>Doorbraak Sprint</Eyebrow>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#1E293B] sm:text-4xl">
+              In één dagdeel je administratie op orde
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-[#33335c]/65">
-              Dr. Poot helpt adoptanten met vragen en helpt asiels met intake, matchanalyse en
-              nazorg-tips. Transparant over wat de AI wel en niet doet, met de mens altijd aan het
-              stuur.
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#1E293B]/65">
+              We komen op locatie, richten ImpactOS samen met je team in en vertrekken met een werkend
+              platform. Gemiddeld 5-10 uur per week structureel terug.
             </p>
-            <div className="mt-7">
-              <ButtonLink href="/ai-assistent" variant="secondary" icon="arrow_forward">
-                Maak kennis met Dr. Poot
-              </ButtonLink>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <ButtonLink href="/contact?onderwerp=doorbraak-sprint" variant="primary">Plan een Doorbraak Sprint</ButtonLink>
+              <ButtonLink href="/tarieven" variant="ghost">Bekijk tarieven</ButtonLink>
             </div>
           </div>
-          <div className="rounded-[2rem] border border-[#33335c]/8 bg-white p-6 shadow-[0_10px_40px_rgba(51,51,92,0.07)]">
-            <div className="space-y-3">
-              <div className="ml-auto max-w-[80%] rounded-2xl rounded-br-md bg-[#33335c] px-4 py-3 text-sm text-white">
-                Past een hond bij een appartement zonder tuin?
-              </div>
-              <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-[#f9fafb] px-4 py-3 text-sm text-[#33335c]/80">
-                Dat hangt af van het ras en de energie van de hond. Op basis van je profiel laat ik je
-                de rassen zien die zich prettig voelen in een appartement, en welke dagelijkse
-                beweging ze nodig hebben.
-              </div>
-            </div>
-          </div>
+          <ul className="space-y-3">
+            {[
+              '1 dagdeel, op locatie',
+              'Direct werkend platform + ingerichte AI-collega\'s',
+              'Team meteen aan de slag',
+              '5-10 uur per week structurele tijdwinst',
+            ].map((item) => (
+              <li key={item} className="flex items-center gap-3 rounded-2xl border border-[#1E293B]/8 bg-white px-4 py-3">
+                <span className="material-symbols-outlined text-[#2563EB]">check_circle</span>
+                <span className="text-sm font-semibold text-[#1E293B]">{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
-
-      {/* Voor asiels teaser */}
-      <div className="bg-white">
-        <Section>
-          <div className="grid items-center gap-10 rounded-[2rem] border border-[#33335c]/8 bg-[#f9fafb] p-8 sm:p-12 lg:grid-cols-[1.3fr_1fr]">
-            <div>
-              <Eyebrow>Voor asiels</Eyebrow>
-              <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#33335c] sm:text-4xl">
-                Een dashboard dat tijd bespaart bij elke adoptie
-              </h2>
-              <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#33335c]/65">
-                Beheer dieren, lees aanvragen met AI-score, gebruik de Copilot voor briefings en
-                dossiers, en volg je adopties met heldere statistieken. Gratis starten, AI-matching
-                en Copilot vanaf de Asiel-tier.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <ButtonLink href="/voor-asielen/start" variant="primary">Meld je asiel gratis aan</ButtonLink>
-                <ButtonLink href="/prijzen" variant="ghost">Bekijk de prijzen</ButtonLink>
-              </div>
-            </div>
-            <ul className="space-y-3">
-              {[
-                "Tot 5 dieren in de gratis Start-tier",
-                'AI-matching en aanvragenbeheer',
-                'Copilot voor briefings en dossiers',
-                'Statistieken en rapportage',
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-3 rounded-2xl border border-[#33335c]/8 bg-white px-4 py-3"
-                >
-                  <span className="material-symbols-outlined text-[#e39207]">check_circle</span>
-                  <span className="text-sm font-semibold text-[#33335c]">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Section>
-      </div>
 
       {/* Laatste uit de blog */}
       {posts.length > 0 && (
@@ -239,7 +228,7 @@ export default async function HomePage() {
             <SectionHeading eyebrow="Kennis en verhalen" title="Laatste uit de blog" />
             <Link
               href="/blog"
-              className="hidden shrink-0 items-center gap-1.5 text-sm font-bold text-[#ee5b2b] hover:text-[#d94e22] sm:inline-flex"
+              className="hidden shrink-0 items-center gap-1.5 text-sm font-bold text-[#2563EB] hover:text-[#1D4ED8] sm:inline-flex"
             >
               Alle artikelen
               <span className="material-symbols-outlined text-[1.1rem]">arrow_forward</span>
@@ -250,7 +239,7 @@ export default async function HomePage() {
               <Link
                 key={p.id}
                 href={`/blog/${p.slug}`}
-                className="group flex flex-col overflow-hidden rounded-3xl border border-[#33335c]/8 bg-white shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)]"
+                className="group flex flex-col overflow-hidden rounded-3xl border border-[#1E293B]/8 bg-white shadow-[0_1px_3px_rgba(30,41,59,0.04)] transition-shadow hover:shadow-[0_8px_30px_rgba(30,41,59,0.08)]"
               >
                 {p.coverUrl ? (
                   <div className="relative aspect-[16/9] bg-[#f1f1f5]">
@@ -262,14 +251,14 @@ export default async function HomePage() {
                     />
                   </div>
                 ) : (
-                  <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-[#33335c] to-[#1a1a3e]">
-                    <span className="material-symbols-outlined text-4xl text-[#f8aa25]">pets</span>
+                  <div className="flex aspect-[16/9] items-center justify-center bg-gradient-to-br from-[#1E293B] to-[#0F172A]">
+                    <span className="material-symbols-outlined text-4xl text-[#3B82F6]">auto_awesome</span>
                   </div>
                 )}
                 <div className="flex flex-1 flex-col p-6">
-                  <h3 className="text-lg font-bold leading-tight text-[#33335c]">{p.titel}</h3>
+                  <h3 className="text-lg font-bold leading-tight text-[#1E293B]">{p.titel}</h3>
                   {p.excerpt && (
-                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#33335c]/55">{p.excerpt}</p>
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#1E293B]/55">{p.excerpt}</p>
                   )}
                 </div>
               </Link>
@@ -279,10 +268,10 @@ export default async function HomePage() {
       )}
 
       <CtaBlock
-        title="Klaar om jouw match te vinden?"
-        intro="Begin met een kort intakegesprek. Gratis, en je zit nergens aan vast."
-        primary={{ href: '/intake', label: 'Start de intake' }}
-        secondary={{ href: '/werkwijze', label: 'Hoe het werkt' }}
+        title="Klaar om je administratie te halveren?"
+        intro="Plan een vrijblijvend gesprek en ontdek wat ImpactOS voor jouw organisatie kan betekenen."
+        primary={{ href: '/contact?onderwerp=doorbraak-sprint', label: 'Plan een Doorbraak Sprint' }}
+        secondary={{ href: '/demo-aanvragen', label: 'Bekijk demo / intake' }}
       />
     </>
   )

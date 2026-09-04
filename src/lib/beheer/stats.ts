@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { users, dieren, aiGebruik, mailLog, matches, adopties } from '@/lib/db/schema'
+import { users, dossiers, aiGebruik, mailLog, matches, begeleidingen } from '@/lib/db/schema'
 import { and, eq, gte, lt, count, sum, desc, sql, type SQL } from 'drizzle-orm'
 import type { AnyPgColumn } from 'drizzle-orm/pg-core'
 
@@ -11,14 +11,14 @@ export interface GebruikerRij {
   email: string
   rol: string
   stad: string | null
-  asielId: number | null
+  organisatieId: string | null
   aangemeldOp: Date
-  aantalDieren: number
+  aantalDossiers: number
   aiKostenEuro: number
   aiCalls: number
   mailVolume: number
   matchesAantal: number
-  adoptiesAantal: number
+  begeleidingenAantal: number
 }
 
 function num(v: unknown): number {
@@ -33,12 +33,12 @@ function num(v: unknown): number {
 export async function getGebruikersOverzicht(): Promise<GebruikerRij[]> {
   const [
     alleUsers,
-    dierenPerAsiel,
+    dossiersPerOrganisatie,
     aiPerUser,
-    aiPerAsiel,
+    aiPerOrganisatie,
     mailPerUser,
     matchesPerUser,
-    adoptiesPerUser,
+    begeleidingenPerOrganisatie,
   ] = await Promise.all([
     db
       .select({
@@ -47,23 +47,23 @@ export async function getGebruikersOverzicht(): Promise<GebruikerRij[]> {
         email: users.email,
         rol: users.rol,
         stad: users.stad,
-        asielId: users.asielId,
+        organisatieId: users.organisatieId,
         aangemeldOp: users.aangemeldOp,
       })
       .from(users)
       .orderBy(desc(users.aangemeldOp)),
     db
-      .select({ asielId: dieren.asielId, aantal: count() })
-      .from(dieren)
-      .groupBy(dieren.asielId),
+      .select({ organisatieId: dossiers.organisatieId, aantal: count() })
+      .from(dossiers)
+      .groupBy(dossiers.organisatieId),
     db
       .select({ userId: aiGebruik.userId, kosten: sum(aiGebruik.kostenEuro), calls: count() })
       .from(aiGebruik)
       .groupBy(aiGebruik.userId),
     db
-      .select({ asielId: aiGebruik.asielId, kosten: sum(aiGebruik.kostenEuro), calls: count() })
+      .select({ organisatieId: aiGebruik.organisatieId, kosten: sum(aiGebruik.kostenEuro), calls: count() })
       .from(aiGebruik)
-      .groupBy(aiGebruik.asielId),
+      .groupBy(aiGebruik.organisatieId),
     db
       .select({ userId: mailLog.userId, aantal: count() })
       .from(mailLog)
@@ -73,29 +73,29 @@ export async function getGebruikersOverzicht(): Promise<GebruikerRij[]> {
       .from(matches)
       .groupBy(matches.userId),
     db
-      .select({ userId: adopties.userId, aantal: count() })
-      .from(adopties)
-      .groupBy(adopties.userId),
+      .select({ organisatieId: begeleidingen.organisatieId, aantal: count() })
+      .from(begeleidingen)
+      .groupBy(begeleidingen.organisatieId),
   ])
 
-  const dierenMap = new Map(dierenPerAsiel.map((r) => [r.asielId, num(r.aantal)]))
+  const dossiersMap = new Map(dossiersPerOrganisatie.map((r) => [r.organisatieId, num(r.aantal)]))
   const aiUserMap = new Map(aiPerUser.map((r) => [r.userId, { kosten: num(r.kosten), calls: num(r.calls) }]))
-  const aiAsielMap = new Map(aiPerAsiel.map((r) => [r.asielId, { kosten: num(r.kosten), calls: num(r.calls) }]))
+  const aiOrganisatieMap = new Map(aiPerOrganisatie.map((r) => [r.organisatieId, { kosten: num(r.kosten), calls: num(r.calls) }]))
   const mailMap = new Map(mailPerUser.map((r) => [r.userId, num(r.aantal)]))
   const matchMap = new Map(matchesPerUser.map((r) => [r.userId, num(r.aantal)]))
-  const adoptieMap = new Map(adoptiesPerUser.map((r) => [r.userId, num(r.aantal)]))
+  const begeleidingenMap = new Map(begeleidingenPerOrganisatie.map((r) => [r.organisatieId, num(r.aantal)]))
 
   return alleUsers.map((u) => {
     const aiUser = aiUserMap.get(u.id) ?? { kosten: 0, calls: 0 }
-    const aiAsiel = u.asielId ? aiAsielMap.get(u.asielId) ?? { kosten: 0, calls: 0 } : { kosten: 0, calls: 0 }
+    const aiOrganisatie = u.organisatieId ? aiOrganisatieMap.get(u.organisatieId) ?? { kosten: 0, calls: 0 } : { kosten: 0, calls: 0 }
     return {
       ...u,
-      aantalDieren: u.asielId ? dierenMap.get(u.asielId) ?? 0 : 0,
-      aiKostenEuro: aiUser.kosten + aiAsiel.kosten,
-      aiCalls: aiUser.calls + aiAsiel.calls,
+      aantalDossiers: u.organisatieId ? dossiersMap.get(u.organisatieId) ?? 0 : 0,
+      aiKostenEuro: aiUser.kosten + aiOrganisatie.kosten,
+      aiCalls: aiUser.calls + aiOrganisatie.calls,
       mailVolume: mailMap.get(u.id) ?? 0,
       matchesAantal: matchMap.get(u.id) ?? 0,
-      adoptiesAantal: adoptieMap.get(u.id) ?? 0,
+      begeleidingenAantal: u.organisatieId ? begeleidingenMap.get(u.organisatieId) ?? 0 : 0,
     }
   })
 }
@@ -103,13 +103,13 @@ export async function getGebruikersOverzicht(): Promise<GebruikerRij[]> {
 // ─── Detail per gebruiker ─────────────────────────────────────────────────────
 
 export interface GebruikerDetail {
-  user: { id: number; naam: string; email: string; rol: string; stad: string | null; asielId: number | null; aangemeldOp: Date }
-  aiPerModule: { module: string; kosten: number; calls: number }[]
+  user: { id: number; naam: string; email: string; rol: string; stad: string | null; organisatieId: string | null; aangemeldOp: Date }
+  aiPerActie: { actie: string; kosten: number; calls: number }[]
   aiKostenTotaal: number
   recenteMails: { onderwerp: string; status: string; naar: string; verzondenOp: Date }[]
   matchesAantal: number
-  adoptiesAantal: number
-  aantalDieren: number
+  begeleidingenAantal: number
+  aantalDossiers: number
 }
 
 export async function getGebruikerDetail(userId: number): Promise<GebruikerDetail | null> {
@@ -120,7 +120,7 @@ export async function getGebruikerDetail(userId: number): Promise<GebruikerDetai
       email: users.email,
       rol: users.rol,
       stad: users.stad,
-      asielId: users.asielId,
+      organisatieId: users.organisatieId,
       aangemeldOp: users.aangemeldOp,
     })
     .from(users)
@@ -129,17 +129,17 @@ export async function getGebruikerDetail(userId: number): Promise<GebruikerDetai
 
   if (!user) return null
 
-  const asielId = user.asielId
-  const [aiPerModule, recenteMails, [matchCount], [adoptieCount], [dierCount]] = await Promise.all([
+  const organisatieId = user.organisatieId
+  const [aiPerActie, recenteMails, [matchCount], [begeleidingenCount], [dossierCount]] = await Promise.all([
     db
-      .select({ module: aiGebruik.module, kosten: sum(aiGebruik.kostenEuro), calls: count() })
+      .select({ actie: aiGebruik.actie, kosten: sum(aiGebruik.kostenEuro), calls: count() })
       .from(aiGebruik)
       .where(
-        asielId
-          ? sql`(${aiGebruik.userId} = ${userId} OR ${aiGebruik.asielId} = ${asielId})`
+        organisatieId
+          ? sql`(${aiGebruik.userId} = ${userId} OR ${aiGebruik.organisatieId} = ${organisatieId})`
           : eq(aiGebruik.userId, userId)
       )
-      .groupBy(aiGebruik.module)
+      .groupBy(aiGebruik.actie)
       .orderBy(desc(sql`sum(${aiGebruik.kostenEuro})`)),
     db
       .select({ onderwerp: mailLog.onderwerp, status: mailLog.status, naar: mailLog.naar, verzondenOp: mailLog.verzondenOp })
@@ -148,22 +148,24 @@ export async function getGebruikerDetail(userId: number): Promise<GebruikerDetai
       .orderBy(desc(mailLog.verzondenOp))
       .limit(10),
     db.select({ aantal: count() }).from(matches).where(eq(matches.userId, userId)),
-    db.select({ aantal: count() }).from(adopties).where(eq(adopties.userId, userId)),
-    asielId
-      ? db.select({ aantal: count() }).from(dieren).where(eq(dieren.asielId, asielId))
+    organisatieId
+      ? db.select({ aantal: count() }).from(begeleidingen).where(eq(begeleidingen.organisatieId, organisatieId))
+      : Promise.resolve([{ aantal: 0 }]),
+    organisatieId
+      ? db.select({ aantal: count() }).from(dossiers).where(eq(dossiers.organisatieId, organisatieId))
       : Promise.resolve([{ aantal: 0 }]),
   ])
 
-  const aiModules = aiPerModule.map((r) => ({ module: r.module, kosten: num(r.kosten), calls: num(r.calls) }))
+  const aiActies = aiPerActie.map((r) => ({ actie: r.actie, kosten: num(r.kosten), calls: num(r.calls) }))
 
   return {
     user,
-    aiPerModule: aiModules,
-    aiKostenTotaal: aiModules.reduce((s, m) => s + m.kosten, 0),
+    aiPerActie: aiActies,
+    aiKostenTotaal: aiActies.reduce((s, m) => s + m.kosten, 0),
     recenteMails,
     matchesAantal: num(matchCount?.aantal),
-    adoptiesAantal: num(adoptieCount?.aantal),
-    aantalDieren: num(dierCount?.aantal),
+    begeleidingenAantal: num(begeleidingenCount?.aantal),
+    aantalDossiers: num(dossierCount?.aantal),
   }
 }
 
@@ -172,11 +174,11 @@ export async function getGebruikerDetail(userId: number): Promise<GebruikerDetai
 export interface ManagementKpis {
   nieuweGebruikers: number
   nieuweMatches: number
-  nieuweAdopties: number
+  nieuweBegeleidingen: number
   verzondenMails: number
   aiKostenEuro: number
   aiCalls: number
-  aiPerModule: { module: string; kosten: number; calls: number }[]
+  aiPerActie: { actie: string; kosten: number; calls: number }[]
 }
 
 /**
@@ -190,14 +192,14 @@ export async function getManagementKpis(sinds: Date, tot?: Date): Promise<Manage
   const [
     [nieuweGebruikers],
     [nieuweMatches],
-    [nieuweAdopties],
+    [nieuweBegeleidingen],
     [verzondenMails],
     [aiTotaal],
-    aiPerModule,
+    aiPerActie,
   ] = await Promise.all([
     db.select({ aantal: count() }).from(users).where(inPeriode(users.aangemeldOp)),
     db.select({ aantal: count() }).from(matches).where(inPeriode(matches.berekendOp)),
-    db.select({ aantal: count() }).from(adopties).where(inPeriode(adopties.aangevraagdOp)),
+    db.select({ aantal: count() }).from(begeleidingen).where(inPeriode(begeleidingen.createdAt)),
     db
       .select({ aantal: count() })
       .from(mailLog)
@@ -207,21 +209,51 @@ export async function getManagementKpis(sinds: Date, tot?: Date): Promise<Manage
       .from(aiGebruik)
       .where(inPeriode(aiGebruik.aangemaaktOp)),
     db
-      .select({ module: aiGebruik.module, kosten: sum(aiGebruik.kostenEuro), calls: count() })
+      .select({ actie: aiGebruik.actie, kosten: sum(aiGebruik.kostenEuro), calls: count() })
       .from(aiGebruik)
       .where(inPeriode(aiGebruik.aangemaaktOp))
-      .groupBy(aiGebruik.module)
+      .groupBy(aiGebruik.actie)
       .orderBy(desc(sql`sum(${aiGebruik.kostenEuro})`)),
   ])
 
   return {
     nieuweGebruikers: num(nieuweGebruikers?.aantal),
     nieuweMatches: num(nieuweMatches?.aantal),
-    nieuweAdopties: num(nieuweAdopties?.aantal),
+    nieuweBegeleidingen: num(nieuweBegeleidingen?.aantal),
     verzondenMails: num(verzondenMails?.aantal),
     aiKostenEuro: num(aiTotaal?.kosten),
     aiCalls: num(aiTotaal?.calls),
-    aiPerModule: aiPerModule.map((r) => ({ module: r.module, kosten: num(r.kosten), calls: num(r.calls) })),
+    aiPerActie: aiPerActie.map((r) => ({ actie: r.actie, kosten: num(r.kosten), calls: num(r.calls) })),
+  }
+}
+
+// ─── AI-verbruik per organisatie (dashboard-widget) ────────────────────────────
+
+const INBEGREPEN_BUDGET_EURO = 35
+
+export interface OrganisatieAiVerbruik {
+  kostenEuro: number
+  calls: number
+  budgetEuro: number
+  percentage: number
+}
+
+/** AI-kosten van de lopende kalendermaand voor één organisatie, afgezet tegen het inbegrepen budget. */
+export async function getOrganisatieAiVerbruikDezeMaand(organisatieId: string): Promise<OrganisatieAiVerbruik> {
+  const nu = new Date()
+  const beginMaand = new Date(nu.getFullYear(), nu.getMonth(), 1)
+
+  const [rij] = await db
+    .select({ kosten: sum(aiGebruik.kostenEuro), calls: count() })
+    .from(aiGebruik)
+    .where(and(eq(aiGebruik.organisatieId, organisatieId), gte(aiGebruik.aangemaaktOp, beginMaand)))
+
+  const kostenEuro = num(rij?.kosten)
+  return {
+    kostenEuro,
+    calls: num(rij?.calls),
+    budgetEuro: INBEGREPEN_BUDGET_EURO,
+    percentage: Math.min(100, Math.round((kostenEuro / INBEGREPEN_BUDGET_EURO) * 100)),
   }
 }
 

@@ -12,7 +12,7 @@ function LoginForm() {
   const [laden, setLaden] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard'
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/admin'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -57,8 +57,8 @@ function LoginForm() {
               pets
             </span>
           </div>
-          <h1 className="text-4xl font-extrabold text-white tracking-tight">PootGelukkig</h1>
-          <p className="text-white/40 mt-2 text-sm font-medium">AI-gestuurde dieren adoptie</p>
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">ImpactOS</h1>
+          <p className="text-white/40 mt-2 text-sm font-medium">AI-gestuurd platform voor het sociaal domein</p>
         </div>
 
         {/* Formulier kaart */}
@@ -131,7 +131,7 @@ function LoginForm() {
             <p className="text-white/30 text-sm">
               Nog geen account?{' '}
               <Link
-                href="/auth/register"
+                href="/voor-organisaties/start"
                 className="text-primary font-semibold hover:text-primary/80 transition-colors"
               >
                 Gratis aanmelden

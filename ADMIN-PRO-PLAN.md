@@ -1,8 +1,14 @@
 # Admin Pro — Plan voor een wereldklasse asiel-admin
 
 Doel: van de bestaande, functionele admin een coherente, snelle, toegankelijke en
-verzorgde pro-tool maken — zonder de werkende datalaag te breken. Licht thema, navy
-`#33335c` + amber `#f8aa25`, Plus Jakarta Sans, Material Symbols.
+verzorgde pro-tool maken — zonder de werkende datalaag te breken. Licht thema, Plus
+Jakarta Sans, Material Symbols.
+
+**Update (Sprint 6 — branding fix):** de kleuren zijn omgezet naar de ImpactOS-huisstijl
+kobalt/navy — `#1E293B` (voorheen `#33335c`) + `#1D4ED8` (voorheen `#f8aa25`) — in
+`src/components/admin/ui.tsx` en alle bestanden onder `src/app/admin/`. `ManagementSidebar.tsx`
+(en de losse kleurliteralen in overige `/management`-pagina's) zijn bewust ongemoeid gelaten;
+die vallen buiten de scope van deze sprint.
 
 ## Audit (feitelijk)
 - Sterke datalaag en ~3.500 regels werkende pagina's, maar **geen gedeelde componenten**

@@ -1,16 +1,16 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --color-primary: #f8aa25;
-  --color-primary-dark: #e39207;
-  --color-navy: #33335c;
-  --color-terracotta: #E2725B;
-  --color-terracotta-dark: #ee5b2b;
-  --color-bg-dark: #12122a;
-  --color-bg-light: #f9fafb;
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-navy: #1E293B;
+  --color-accent: #3B82F6;
+  --color-accent-dark: #2563EB;
+  --color-bg-dark: #0F172A;
+  --color-bg-light: #F8FAFC;
   --color-sage: #9db99d;
 }
 
@@ -96,7 +96,7 @@ button, a, [role="button"] {
 /* Adopteer button */
 .btn-adopteer {
   @apply font-bold py-3 px-5 rounded-xl transition-all active:scale-95 text-sm;
-  background: var(--color-terracotta);
+  background: var(--color-accent);
   color: white;
 }
 
@@ -230,30 +230,30 @@ html {
 input[type="email"]:focus,
 input[type="text"]:focus,
 input[type="password"]:focus {
-  box-shadow: 0 0 0 3px rgba(248, 170, 37, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 /* Admin form inputs */
 .admin-input {
-  @apply w-full px-4 py-2.5 text-sm text-[#33335c] bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#33335c]/40 focus:ring-2 focus:ring-[#33335c]/5 transition-colors placeholder:text-[#33335c]/25;
+  @apply w-full px-4 py-2.5 text-sm text-[#1E293B] bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#1E293B]/40 focus:ring-2 focus:ring-[#1E293B]/5 transition-colors placeholder:text-[#1E293B]/25;
 }
 
 /* ─── Blog artikel typografie ─────────────────────────────────────────────── */
-.blog-inhoud h1 { @apply text-3xl font-extrabold text-[#33335c] mt-8 mb-4 leading-tight; }
-.blog-inhoud h2 { @apply text-2xl font-extrabold text-[#33335c] mt-8 mb-3 leading-tight scroll-mt-28; }
-.blog-inhoud h3 { @apply text-xl font-bold text-[#33335c] mt-6 mb-2 scroll-mt-28; }
-.blog-inhoud h4 { @apply text-lg font-semibold text-[#33335c] mt-4 mb-1 scroll-mt-28; }
+.blog-inhoud h1 { @apply text-3xl font-extrabold text-[#1E293B] mt-8 mb-4 leading-tight; }
+.blog-inhoud h2 { @apply text-2xl font-extrabold text-[#1E293B] mt-8 mb-3 leading-tight scroll-mt-28; }
+.blog-inhoud h3 { @apply text-xl font-bold text-[#1E293B] mt-6 mb-2 scroll-mt-28; }
+.blog-inhoud h4 { @apply text-lg font-semibold text-[#1E293B] mt-4 mb-1 scroll-mt-28; }
 .blog-inhoud p { @apply mb-4; }
-.blog-inhoud a { @apply text-[#ee5b2b] font-semibold underline underline-offset-2 hover:text-[#33335c]; }
+.blog-inhoud a { @apply text-[#2563EB] font-semibold underline underline-offset-2 hover:text-[#1E293B]; }
 .blog-inhoud ul { @apply list-disc pl-6 mb-4 space-y-1; }
 .blog-inhoud ol { @apply list-decimal pl-6 mb-4 space-y-1; }
-.blog-inhoud li { @apply text-[#33335c]/80; }
-.blog-inhoud strong { @apply font-bold text-[#33335c]; }
+.blog-inhoud li { @apply text-[#1E293B]/80; }
+.blog-inhoud strong { @apply font-bold text-[#1E293B]; }
 .blog-inhoud blockquote {
-  @apply my-8 rounded-r-2xl border-l-4 border-[#E2725B] bg-[#fef6f3] p-5 not-italic text-[#33335c]/80 leading-relaxed text-base;
+  @apply my-8 rounded-r-2xl border-l-4 border-[#3B82F6] bg-[#eff6ff] p-5 not-italic text-[#1E293B]/80 leading-relaxed text-base;
 }
 .blog-inhoud blockquote p:last-child { @apply mb-0; }
-.blog-inhoud blockquote strong { @apply text-[#33335c]; }
+.blog-inhoud blockquote strong { @apply text-[#1E293B]; }
 .blog-inhoud img { @apply rounded-2xl my-6; }
 .blog-inhoud h1:first-child { @apply mt-0; }
 
@@ -306,15 +306,15 @@ input[type="password"]:focus {
   a { color: #1a1a1a !important; text-decoration: none; }
 
   /* Donkere CTA-blokken (CtaBlock + contactkaart) lichter maken voor papier */
-  .print-page .bg-\[\\#33335c\],
+  .print-page .bg-\[\\#1E293B\],
   .print-dark {
     background: #f3f3f5 !important;
     color: #1a1a1a !important;
   }
-  .print-page .bg-\[\\#33335c\] h2,
-  .print-page .bg-\[\\#33335c\] h3,
-  .print-page .bg-\[\\#33335c\] p,
-  .print-page .bg-\[\\#33335c\] strong,
+  .print-page .bg-\[\\#1E293B\] h2,
+  .print-page .bg-\[\\#1E293B\] h3,
+  .print-page .bg-\[\\#1E293B\] p,
+  .print-page .bg-\[\\#1E293B\] strong,
   .print-dark h2,
   .print-dark h3,
   .print-dark p,

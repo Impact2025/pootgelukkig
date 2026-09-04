@@ -8,11 +8,7 @@ import { cx } from '@/components/admin/ui'
 import { ToastProvider } from '@/components/admin/Toast'
 
 export interface AdminCounts {
-  openstaand: number
-  ongelezen: number
-  medisch: number
-  wachtlijst: number
-  afspraken: number
+  wachtrij: number
 }
 
 export interface AdminUser {

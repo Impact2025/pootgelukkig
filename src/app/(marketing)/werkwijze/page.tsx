@@ -1,15 +1,14 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { Section, SectionHeading, Eyebrow, StepItem, CtaBlock } from '@/components/marketing/ui'
 
 export const metadata: Metadata = {
-  title: 'Werkwijze — Zo werkt PootGelukkig',
+  title: 'Werkwijze — Zo werkt ImpactOS',
   description:
-    'Van intakegesprek tot nazorg: zo helpt PootGelukkig om mens en dier zorgvuldig én snel aan elkaar te koppelen.',
+    'Van intake tot veilige publicatie: zo helpt ImpactOS organisaties in het sociaal domein om processen te structureren, zonder de menselijke beoordeling uit handen te geven.',
   alternates: { canonical: '/werkwijze' },
   openGraph: {
-    title: 'Werkwijze — Zo werkt PootGelukkig',
-    description: 'Van intake tot nazorg in vijf stappen.',
+    title: 'Werkwijze — Zo werkt ImpactOS',
+    description: 'Van intake tot verantwoording in vier stappen.',
     url: '/werkwijze',
     type: 'website',
     images: [{ url: '/images/og-default.jpg', width: 1200, height: 675 }],
@@ -18,44 +17,39 @@ export const metadata: Metadata = {
 
 const STAPPEN = [
   {
-    title: 'Intakegesprek',
+    title: 'Slimme intake & kenniskluis',
     tekst:
-      'Je beantwoordt korte vragen over je woonsituatie, gezinssamenstelling, activiteitsniveau, ervaring en wensen. Dit duurt een paar minuten en bepaalt waar we op matchen.',
+      'Cliëntgegevens komen binnen via een gestructureerd intakeformulier. Bestaande formulieren en PDF-documenten laad je in de kenniskluis, zodat je AI-collega\'s vanaf dag één met de juiste context werken.',
   },
   {
-    title: 'AI-matching',
+    title: 'AI-voorbereiding',
     tekst:
-      'Je profiel wordt vergeleken met de beschikbare dieren. Harde voorwaarden zoals allergieën filteren we eerst weg, daarna berekenen we een compatibiliteitsscore met een korte uitleg waarom een dier past.',
+      'Sam, Mila en Conny gaan aan de slag met jouw dossier- en projectdata: een concept-subsidieaanvraag, een Wmo-rapportage of een geanonimiseerd verhaal voor social media — volledig voorbereid.',
   },
   {
-    title: 'Contact met het asiel',
+    title: 'Human-in-the-loop review',
     tekst:
-      'Past een dier? Je neemt contact op via het platform. Het asiel ziet je profiel en de match-score en beoordeelt de aanvraag. De medewerker beslist, altijd.',
+      'Elk concept landt in de wachtrij. Een medewerker leest, past aan waar nodig, en keurt goed of wijst af. Niets vertrekt zonder die menselijke klik.',
   },
   {
-    title: 'Adoptie en dossier',
+    title: 'Veilige publicatie & verantwoording',
     tekst:
-      'Na een geslaagde kennismaking leg je de adoptie vast. Documenten en het medisch paspoort van het dier verzamel je op één plek in je dossier.',
-  },
-  {
-    title: 'Nazorg',
-    tekst:
-      'De eerste periode is bepalend. Met de 3-3-3 begeleiding krijg je tips voor de eerste drie dagen, drie weken en drie maanden, zodat je dier rustig went aan zijn nieuwe thuis.',
+      'Na goedkeuring gaat het concept de deur uit: naar de gemeente, de subsidiegever, of live op het web. Elke stap blijft herleidbaar in het dossier voor latere verantwoording.',
   },
 ]
 
-const LAGEN = [
+const ONDER_DE_MOTORKAP = [
   {
-    title: 'Harde voorwaarden',
-    tekst: 'Allergieën, diersoortvoorkeur en woonsituatie. Past het niet, dan tonen we het dier niet.',
+    title: 'RAG-lite context',
+    tekst: 'Elke AI-collega werkt met actuele data uit jouw eigen dossiers en veldlogs — geen generieke tekst, maar concepten die kloppen met de praktijk.',
   },
   {
-    title: 'Compatibiliteitsscore',
-    tekst: 'Een score van 0 tot 100 met een korte, leesbare motivatie waarom een dier bij je past.',
+    title: 'Modelroutering',
+    tekst: 'Lichte taken (triage, screening, de webassistent) lopen via een snel model; complexe schrijf- en analysetaken via een krachtiger model. Jij merkt daar niets van, behalve de snelheid.',
   },
   {
-    title: 'Lerende laag',
-    tekst: 'Op termijn leert het systeem van geslaagde adopties om matches verder te verbeteren.',
+    title: 'Altijd een concept, nooit een besluit',
+    tekst: 'De AI beslist niet en verstuurt niet. Ze bereidt voor. De beoordeling en verantwoordelijkheid blijven bij jouw organisatie.',
   },
 ]
 
@@ -63,10 +57,10 @@ export default function WerkwijzePage() {
   const siteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'PootGelukkig',
-    alternateName: 'PootGelukkig — Zo werkt de matching',
-    url: 'https://www.pootgelukkig.nl/werkwijze',
-    description: 'Van intake tot nazorg: hoe PootGelukkig werkt.',
+    name: 'ImpactOS',
+    alternateName: 'ImpactOS — Zo werkt de methode',
+    url: 'https://www.impactos.nl/werkwijze',
+    description: 'Van intake tot verantwoording: hoe ImpactOS werkt.',
   }
 
   return (
@@ -78,18 +72,18 @@ export default function WerkwijzePage() {
       <Section className="!pb-10">
         <div className="max-w-2xl">
           <Eyebrow>Werkwijze</Eyebrow>
-          <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#33335c] sm:text-5xl">
-            Zorgvuldig matchen, sneller dan met de hand
+          <h1 className="mt-4 text-4xl font-extrabold leading-[1.1] tracking-tight text-[#1E293B] sm:text-5xl">
+            Structuur en snelheid, zonder de controle uit handen te geven
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-[#33335c]/65">
-            PootGelukkig versnelt het werk zonder de zorgvuldigheid uit handen te geven. Dit zijn de
-            stappen van eerste vraag tot een blijvend thuis.
+          <p className="mt-5 text-lg leading-relaxed text-[#1E293B]/65">
+            ImpactOS versnelt het voorbereidende werk zonder de zorgvuldigheid uit handen te geven. Dit
+            zijn de vier stappen van intake tot verantwoording.
           </p>
         </div>
       </Section>
 
       <Section className="!pt-0">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {STAPPEN.map((s, i) => (
             <StepItem key={s.title} step={i + 1} title={s.title}>
               {s.tekst}
@@ -102,14 +96,14 @@ export default function WerkwijzePage() {
         <Section>
           <SectionHeading
             eyebrow="Onder de motorkap"
-            title="Hoe de matching werkt"
-            intro="Drie lagen die samen bepalen welke dieren je te zien krijgt en waarom."
+            title="Hoe de AI-collega's werken"
+            intro="Drie principes die samen bepalen hoe ImpactOS voorbereidt — en waarom jij altijd de laatste stap zet."
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-3">
-            {LAGEN.map((laag) => (
-              <div key={laag.title} className="rounded-3xl border border-[#33335c]/8 bg-[#f9fafb] p-7">
-                <h3 className="text-lg font-bold text-[#33335c]">{laag.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-[#33335c]/65">{laag.tekst}</p>
+            {ONDER_DE_MOTORKAP.map((item) => (
+              <div key={item.title} className="rounded-3xl border border-[#1E293B]/8 bg-[#F8FAFC] p-7">
+                <h3 className="text-lg font-bold text-[#1E293B]">{item.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-[#1E293B]/65">{item.tekst}</p>
               </div>
             ))}
           </div>
@@ -117,26 +111,11 @@ export default function WerkwijzePage() {
       </div>
 
       <CtaBlock
-        title="Klaar voor je eerste match?"
-        intro="Het intakegesprek duurt een paar minuten en is volledig gratis."
-        primary={{ href: '/intake', label: 'Start de intake' }}
+        title="Klaar om te structureren?"
+        intro="Plan een Doorbraak Sprint of vraag een demo aan — we laten zien hoe het in jullie werkweek past."
+        primary={{ href: '/contact?onderwerp=doorbraak-sprint', label: 'Plan een Doorbraak Sprint' }}
         secondary={{ href: '/faq', label: 'Veelgestelde vragen' }}
       />
-
-      {/* Blog links */}
-      <Section className="!pt-12 !pb-16">
-        <SectionHeading
-          eyebrow="Verder lezen"
-          title="Meer weten over matching?"
-          intro="Lees hoe de matching werkt en wat je kunt verwachten."
-        />
-        <ul className="mt-6 space-y-3 text-[15px]">
-          <li>→ <Link href="/blog/hoe-de-ai-matching-van-pootgelukkig-werkt" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hoe de AI-matching werkt — uitgebreide uitleg</Link> <span className="text-[#33335c]/40">— 6 min lezen</span></li>
-          <li>→ <Link href="/blog/hond-adopteren-uit-het-asiel-complete-gids" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Hond adopteren: complete gids</Link> <span className="text-[#33335c]/40">— 10 min lezen</span></li>
-          <li>→ <Link href="/blog/retourpercentage-verlagen-met-3-3-3-nazorgaanpak" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Waarom nazorg het retourpercentage verlaagt</Link> <span className="text-[#33335c]/40">— 5 min lezen</span></li>
-          <li>→ <Link href="/kennisbank/intake/zo-werkt-de-intake" className="font-semibold text-[#ee5b2b] hover:text-[#d94e22]">Zo werkt de intake — kennisbank</Link></li>
-        </ul>
-      </Section>
     </>
   )
 }

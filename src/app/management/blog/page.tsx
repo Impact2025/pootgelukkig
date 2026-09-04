@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { db } from '@/lib/db'
 import { blogPosts } from '@/lib/db/schema'
-import { desc } from 'drizzle-orm'
+import { desc, isNull } from 'drizzle-orm'
 import { PageHeader, EmptyState, StatusBadge, Card } from '@/components/admin/ui'
 import BlogActies from './BlogActies'
 
@@ -14,7 +14,9 @@ function scoreKleur(score: number) {
 }
 
 export default async function BlogPage() {
-  const posts = await db.select().from(blogPosts).orderBy(desc(blogPosts.bijgewerktOp))
+  // Alleen het platformblog (organisatie_id leeg) — artikelen van organisaties zelf
+  // worden beheerd via /admin/blog.
+  const posts = await db.select().from(blogPosts).where(isNull(blogPosts.organisatieId)).orderBy(desc(blogPosts.bijgewerktOp))
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">

@@ -16,8 +16,8 @@ interface Props {
 
 function badgeFor(item: NavItem, counts: AdminCounts): { value: number; tone: 'rood' | 'navy' } | null {
   switch (item.badge) {
-    case 'openstaand':
-      return counts.openstaand > 0 ? { value: counts.openstaand, tone: 'rood' } : null
+    case 'wachtrij':
+      return counts.wachtrij > 0 ? { value: counts.wachtrij, tone: 'navy' } : null
     default:
       return null
   }

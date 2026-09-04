@@ -47,7 +47,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           </Container>
           <Container style={{ maxWidth: '560px', margin: '0 auto', padding: '24px 0 48px' }}>
             <p style={{ textAlign: 'center', color: '#999', fontSize: '12px', margin: 0 }}>
-              PootGelukkig · Bedacht door Maya van Munster · WeAreImpact
+              ImpactOS · Een initiatief van WeAreImpact
             </p>
           </Container>
         </Body>

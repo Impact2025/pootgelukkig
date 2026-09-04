@@ -24,7 +24,7 @@ export default async function GebruikerDetailPage({ params }: { params: Promise<
   const detail = await getGebruikerDetail(Number(id))
   if (!detail) notFound()
 
-  const { user, aiPerModule, aiKostenTotaal, recenteMails, matchesAantal, adoptiesAantal, aantalDieren } = detail
+  const { user, aiPerActie, aiKostenTotaal, recenteMails, matchesAantal, begeleidingenAantal, aantalDossiers } = detail
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-4">
@@ -58,22 +58,22 @@ export default async function GebruikerDetailPage({ params }: { params: Promise<
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="AI-kosten" value={euro(aiKostenTotaal)} icon="psychology" tone="warning" />
-        <StatCard label="Dieren" value={aantalDieren} icon="pets" tone="neutral" />
+        <StatCard label="Dieren" value={aantalDossiers} icon="pets" tone="neutral" />
         <StatCard label="Matches" value={matchesAantal} icon="auto_awesome" tone="info" />
-        <StatCard label="Adopties" value={adoptiesAantal} icon="favorite" tone="success" />
+        <StatCard label="Adopties" value={begeleidingenAantal} icon="favorite" tone="success" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
         <Card>
           <p className="text-sm font-bold text-[#33335c] mb-3">AI-kosten per module</p>
-          {aiPerModule.length === 0 ? (
+          {aiPerActie.length === 0 ? (
             <p className="text-[#33335c]/40 text-sm">Geen AI-gebruik geregistreerd.</p>
           ) : (
             <div className="space-y-2">
-              {aiPerModule.map((m) => (
-                <div key={m.module} className="flex items-center justify-between text-sm">
+              {aiPerActie.map((m) => (
+                <div key={m.actie} className="flex items-center justify-between text-sm">
                   <span className="text-[#33335c]/70 font-medium">
-                    {moduleLabels[m.module] ?? m.module}
+                    {moduleLabels[m.actie] ?? m.actie}
                   </span>
                   <span className="text-[#33335c]/40 text-xs">
                     {m.calls}×{' '}

@@ -38,9 +38,9 @@ function markdownNaarHtml(tekst: string): string {
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<div class="font-bold text-sm mt-3 mb-1 text-[#33335c]">$1</div>')
-    .replace(/^## (.+)$/gm, '<div class="font-bold text-base mt-4 mb-1 text-[#33335c]">$1</div>')
-    .replace(/^- (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#33335c]/40 flex-shrink-0">•</span><span>$1</span></div>')
+    .replace(/^### (.+)$/gm, '<div class="font-bold text-sm mt-3 mb-1 text-[#1E293B]">$1</div>')
+    .replace(/^## (.+)$/gm, '<div class="font-bold text-base mt-4 mb-1 text-[#1E293B]">$1</div>')
+    .replace(/^- (.+)$/gm, '<div class="flex gap-2 my-0.5"><span class="text-[#1E293B]/40 flex-shrink-0">•</span><span>$1</span></div>')
     .replace(/\n\n/g, '<div class="my-2"></div>')
     .replace(/\n/g, '<br/>')
 }
@@ -81,16 +81,16 @@ function TaakKaart({ taak }: { taak: CopilotTaak }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-            <p className="font-bold text-[#33335c] text-sm leading-tight">{taak.titel}</p>
+            <p className="font-bold text-[#1E293B] text-sm leading-tight">{taak.titel}</p>
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${stijl.badge}`}>
               {taak.prioriteit === 'urgent' ? 'Urgent' : taak.prioriteit === 'normaal' ? 'Normaal' : 'Info'}
             </span>
           </div>
-          <p className="text-[#33335c]/60 text-xs leading-relaxed">{taak.beschrijving}</p>
+          <p className="text-[#1E293B]/60 text-xs leading-relaxed">{taak.beschrijving}</p>
           {taak.link && (
             <Link
               href={taak.link}
-              className="inline-flex items-center gap-1 mt-2 text-[#33335c] text-xs font-bold hover:underline"
+              className="inline-flex items-center gap-1 mt-2 text-[#1E293B] text-xs font-bold hover:underline"
             >
               {taak.linkTekst ?? 'Bekijk'}
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -108,7 +108,7 @@ function TypingIndicator() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="size-2 rounded-full bg-[#33335c]/30 animate-bounce"
+          className="size-2 rounded-full bg-[#1E293B]/30 animate-bounce"
           style={{ animationDelay: `${i * 0.15}s` }}
         />
       ))}
@@ -287,10 +287,10 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
   const zijPaneelInhoud = (
     <>
       {/* Dagelijkse briefing */}
-      <div className="bg-gradient-to-br from-[#33335c] to-[#4a4a8a] rounded-2xl p-4 text-white">
+      <div className="bg-gradient-to-br from-[#1E293B] to-[#4a4a8a] rounded-2xl p-4 text-white">
         <div className="flex items-center gap-2 mb-3">
           <span
-            className="material-symbols-outlined text-[#f8aa25] text-lg"
+            className="material-symbols-outlined text-[#1D4ED8] text-lg"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             wb_sunny
@@ -315,8 +315,8 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
             {briefing.stats && (
               <div className="grid grid-cols-2 gap-2 mt-3">
                 {[
-                  { label: 'Beschikbaar', waarde: briefing.stats.beschikbaar, icoon: 'pets' },
-                  { label: 'Open adopties', waarde: briefing.stats.openstaandeAdopties, icoon: 'favorite' },
+                  { label: 'Actief', waarde: briefing.stats.actief, icoon: 'folder' },
+                  { label: 'Open begeleidingen', waarde: briefing.stats.openstaandeBegeleidingen, icoon: 'favorite' },
                   { label: 'Berichten', waarde: briefing.stats.onglezenBerichten, icoon: 'chat' },
                   { label: 'Med. alerts', waarde: briefing.stats.medischeAlerts, icoon: 'medical_services' },
                 ].map((stat) => (
@@ -344,10 +344,10 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
             onClick={() => setToonTaken((v) => !v)}
             className="flex items-center justify-between w-full mb-2"
           >
-            <span className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider">
+            <span className="text-xs font-extrabold text-[#1E293B]/50 uppercase tracking-wider">
               Prioriteiten ({briefing!.taken.length})
             </span>
-            <span className="material-symbols-outlined text-sm text-[#33335c]/30">
+            <span className="material-symbols-outlined text-sm text-[#1E293B]/30">
               {toonTaken ? 'expand_less' : 'expand_more'}
             </span>
           </button>
@@ -375,7 +375,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
       {/* Inzichten */}
       {(briefing?.inzichten?.length ?? 0) > 0 && (
         <div>
-          <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">Inzichten</p>
+          <p className="text-xs font-extrabold text-[#1E293B]/50 uppercase tracking-wider mb-2">Inzichten</p>
           <div className="space-y-1.5">
             {briefing!.inzichten.map((inzicht, i) => (
               <div key={i} className="flex gap-2 items-start bg-violet-50 border border-violet-100 rounded-xl p-3">
@@ -394,7 +394,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
 
       {/* Snelle acties — rol-specifiek of algemeen */}
       <div>
-        <p className="text-xs font-extrabold text-[#33335c]/50 uppercase tracking-wider mb-2">
+        <p className="text-xs font-extrabold text-[#1E293B]/50 uppercase tracking-wider mb-2">
           {actieveRol ? `Acties · ${rollen.find((r) => r.id === actieveRol)?.naam ?? ''}` : 'Snelle acties'}
         </p>
         <div className="space-y-1">
@@ -420,12 +420,12 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
               className="w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors group disabled:opacity-50"
             >
               <span
-                className="material-symbols-outlined text-sm text-[#33335c]/30 group-hover:text-[#33335c]/60 transition-colors flex-shrink-0"
+                className="material-symbols-outlined text-sm text-[#1E293B]/30 group-hover:text-[#1E293B]/60 transition-colors flex-shrink-0"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 {actie.icoon}
               </span>
-              <span className="text-xs font-semibold text-[#33335c]/60 group-hover:text-[#33335c] transition-colors">
+              <span className="text-xs font-semibold text-[#1E293B]/60 group-hover:text-[#1E293B] transition-colors">
                 {actie.label}
               </span>
             </button>
@@ -440,28 +440,28 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between flex-shrink-0 gap-2">
         <div className="flex items-center gap-4">
-          <div className="size-10 rounded-2xl bg-gradient-to-br from-[#33335c] to-[#5c5c9e] flex items-center justify-center shadow-lg shadow-[#33335c]/20">
+          <div className="size-10 rounded-2xl bg-gradient-to-br from-[#1E293B] to-[#5c5c9e] flex items-center justify-center shadow-lg shadow-[#1E293B]/20">
             <span
-              className="material-symbols-outlined text-[#f8aa25] text-xl"
+              className="material-symbols-outlined text-[#1D4ED8] text-xl"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               auto_awesome
             </span>
           </div>
           <div>
-            <h1 className="text-lg font-extrabold text-[#33335c] leading-tight">Asiel Copilot</h1>
-            <p className="text-[#33335c]/40 text-xs font-medium">{asielNaam} · AI-assistent voor medewerkers</p>
+            <h1 className="text-lg font-extrabold text-[#1E293B] leading-tight">Asiel Copilot</h1>
+            <p className="text-[#1E293B]/40 text-xs font-medium">{asielNaam} · AI-assistent voor medewerkers</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-semibold text-[#33335c]/40">Online</span>
+          <span className="text-xs font-semibold text-[#1E293B]/40">Online</span>
         </div>
         {/* Mobiel: briefing/acties openen als sheet */}
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
-          className="lg:hidden flex items-center gap-1.5 rounded-full bg-white border border-[#33335c]/10 px-3 py-1.5 text-xs font-bold text-[#33335c] shadow-sm"
+          className="lg:hidden flex items-center gap-1.5 rounded-full bg-white border border-[#1E293B]/10 px-3 py-1.5 text-xs font-bold text-[#1E293B] shadow-sm"
         >
           <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
           Briefing
@@ -470,15 +470,15 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
 
       {/* Rol-switcher: AI-team */}
       <div className="bg-white/60 border-b border-gray-100 px-4 sm:px-8 py-2.5 flex items-center gap-2 overflow-x-auto flex-shrink-0">
-        <span className="text-xs font-extrabold text-[#33335c]/40 uppercase tracking-wider mr-1 flex-shrink-0">
+        <span className="text-xs font-extrabold text-[#1E293B]/40 uppercase tracking-wider mr-1 flex-shrink-0">
           AI-team
         </span>
         <button
           onClick={() => setActieveRol(null)}
           className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
             actieveRol === null
-              ? 'bg-[#33335c] text-white shadow-sm'
-              : 'bg-white border border-gray-200 text-[#33335c]/60 hover:bg-gray-50'
+              ? 'bg-[#1E293B] text-white shadow-sm'
+              : 'bg-white border border-gray-200 text-[#1E293B]/60 hover:bg-gray-50'
           }`}
         >
           <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -494,7 +494,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
               onClick={() => setActieveRol(actief ? null : r.id)}
               title={`${r.naam} — ${r.titel}`}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                actief ? 'text-white shadow-sm' : 'bg-white border border-gray-200 text-[#33335c]/60 hover:bg-gray-50'
+                actief ? 'text-white shadow-sm' : 'bg-white border border-gray-200 text-[#1E293B]/60 hover:bg-gray-50'
               }`}
               style={actief ? { backgroundColor: r.kleur } : undefined}
             >
@@ -522,15 +522,15 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
               type="button"
               aria-label="Sluiten"
               onClick={() => setDrawerOpen(false)}
-              className="absolute inset-0 bg-[#33335c]/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#1E293B]/40 backdrop-blur-sm"
             />
             <div className="relative max-h-[85vh] bg-[#f6f8f6] rounded-t-3xl shadow-2xl flex flex-col">
               <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-100">
-                <p className="text-sm font-extrabold text-[#33335c]">Briefing & snelle acties</p>
+                <p className="text-sm font-extrabold text-[#1E293B]">Briefing & snelle acties</p>
                 <button
                   type="button"
                   onClick={() => setDrawerOpen(false)}
-                  className="flex size-8 items-center justify-center rounded-full bg-gray-100 text-[#33335c]"
+                  className="flex size-8 items-center justify-center rounded-full bg-gray-100 text-[#1E293B]"
                 >
                   <span className="material-symbols-outlined text-lg">close</span>
                 </button>
@@ -564,16 +564,16 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             {berichten.length === 0 && (
               <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                <div className="size-16 rounded-3xl bg-[#33335c]/5 flex items-center justify-center mb-4">
+                <div className="size-16 rounded-3xl bg-[#1E293B]/5 flex items-center justify-center mb-4">
                   <span
-                    className="material-symbols-outlined text-3xl text-[#33335c]/20"
+                    className="material-symbols-outlined text-3xl text-[#1E293B]/20"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                   >
                     auto_awesome
                   </span>
                 </div>
-                <h2 className="font-extrabold text-[#33335c] text-xl mb-2">Hallo, {gebruikerNaam}!</h2>
-                <p className="text-[#33335c]/40 text-sm max-w-sm leading-relaxed">
+                <h2 className="font-extrabold text-[#1E293B] text-xl mb-2">Hallo, {gebruikerNaam}!</h2>
+                <p className="text-[#1E293B]/40 text-sm max-w-sm leading-relaxed">
                   Ik ben je AI-copilot. Stel me een vraag, laat me een tekst schrijven, of klik op een snelle actie links.
                 </p>
                 <div className="grid grid-cols-2 gap-2 mt-6 max-w-md w-full">
@@ -581,9 +581,9 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                     <button
                       key={actie.label}
                       onClick={() => verstuurBericht(actie.prompt)}
-                      className="text-left bg-white border border-gray-100 rounded-2xl px-4 py-3 hover:border-[#33335c]/20 hover:shadow-sm transition-all group"
+                      className="text-left bg-white border border-gray-100 rounded-2xl px-4 py-3 hover:border-[#1E293B]/20 hover:shadow-sm transition-all group"
                     >
-                      <span className="text-xs font-bold text-[#33335c]/60 group-hover:text-[#33335c] transition-colors block">
+                      <span className="text-xs font-bold text-[#1E293B]/60 group-hover:text-[#1E293B] transition-colors block">
                         {actie.label}
                       </span>
                     </button>
@@ -600,17 +600,17 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                 {/* Avatar */}
                 <div className="flex-shrink-0 mt-1">
                   {bericht.rol === 'assistant' ? (
-                    <div className="size-8 rounded-xl bg-gradient-to-br from-[#33335c] to-[#5c5c9e] flex items-center justify-center shadow-sm">
+                    <div className="size-8 rounded-xl bg-gradient-to-br from-[#1E293B] to-[#5c5c9e] flex items-center justify-center shadow-sm">
                       <span
-                        className="material-symbols-outlined text-[#f8aa25] text-base"
+                        className="material-symbols-outlined text-[#1D4ED8] text-base"
                         style={{ fontVariationSettings: "'FILL' 1" }}
                       >
                         auto_awesome
                       </span>
                     </div>
                   ) : (
-                    <div className="size-8 rounded-xl bg-[#f8aa25] flex items-center justify-center shadow-sm">
-                      <span className="text-[#33335c] font-extrabold text-sm leading-none">
+                    <div className="size-8 rounded-xl bg-[#1D4ED8] flex items-center justify-center shadow-sm">
+                      <span className="text-[#1E293B] font-extrabold text-sm leading-none">
                         {gebruikerNaam.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -621,8 +621,8 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                 <div
                   className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     bericht.rol === 'user'
-                      ? 'bg-[#33335c] text-white rounded-tr-sm'
-                      : 'bg-white border border-gray-100 text-[#33335c] rounded-tl-sm shadow-sm'
+                      ? 'bg-[#1E293B] text-white rounded-tr-sm'
+                      : 'bg-white border border-gray-100 text-[#1E293B] rounded-tl-sm shadow-sm'
                   }`}
                 >
                   {bericht.laden ? (
@@ -630,7 +630,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                   ) : bericht.rol === 'assistant' ? (
                     <div
                       dangerouslySetInnerHTML={{ __html: markdownNaarHtml(bericht.inhoud) }}
-                      className="[&_strong]:font-bold [&_strong]:text-[#33335c] [&_em]:italic"
+                      className="[&_strong]:font-bold [&_strong]:text-[#1E293B] [&_em]:italic"
                     />
                   ) : (
                     <p className="whitespace-pre-wrap">{bericht.inhoud}</p>
@@ -645,7 +645,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
           {/* Input */}
           <div className="border-t border-gray-100 bg-white p-3 sm:p-4">
             <div className="flex gap-2 sm:gap-3 items-end max-w-4xl mx-auto">
-              <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-[#33335c]/30 focus-within:bg-white transition-all">
+              <div className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 focus-within:border-[#1E293B]/30 focus-within:bg-white transition-all">
                 <textarea
                   ref={invoerRef}
                   value={invoer}
@@ -654,7 +654,7 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
                   placeholder="Stel een vraag of vraag om een tekst... (Enter om te sturen)"
                   rows={1}
                   disabled={laadt}
-                  className="w-full bg-transparent text-sm text-[#33335c] placeholder-[#33335c]/30 resize-none outline-none max-h-32 disabled:opacity-50"
+                  className="w-full bg-transparent text-sm text-[#1E293B] placeholder-[#1E293B]/30 resize-none outline-none max-h-32 disabled:opacity-50"
                   style={{ minHeight: '24px' }}
                   onInput={(e) => {
                     const t = e.target as HTMLTextAreaElement
@@ -666,14 +666,14 @@ export default function CopilotClient({ gebruikerNaam, asielNaam }: Props) {
               <button
                 onClick={() => verstuurBericht(invoer)}
                 disabled={!invoer.trim() || laadt}
-                className="size-11 bg-[#33335c] text-white rounded-2xl flex items-center justify-center hover:bg-[#33335c]/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-[#33335c]/20 flex-shrink-0"
+                className="size-11 bg-[#1E293B] text-white rounded-2xl flex items-center justify-center hover:bg-[#1E293B]/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-[#1E293B]/20 flex-shrink-0"
               >
                 <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
                   {laadt ? 'hourglass_empty' : 'send'}
                 </span>
               </button>
             </div>
-            <p className="text-center text-[#33335c]/20 text-[10px] mt-2 font-medium">
+            <p className="text-center text-[#1E293B]/20 text-[10px] mt-2 font-medium">
               Copilot heeft toegang tot alle actuele data van {asielNaam}
             </p>
           </div>

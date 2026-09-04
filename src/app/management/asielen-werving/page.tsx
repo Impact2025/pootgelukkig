@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/db'
-import { asielen } from '@/lib/db/schema'
+import { organisaties } from '@/lib/db/schema'
 import { eq, count } from 'drizzle-orm'
 import { PageHeader, StatCard } from '@/components/admin/ui'
 import WervingClient from './WervingClient'
@@ -14,16 +14,23 @@ export default async function AsielenWervingPage() {
     redirect('/admin')
   }
 
-  const nieuweAsielen = await db
+  const nieuweOrganisatiesRaw = await db
     .select()
-    .from(asielen)
-    .where(eq(asielen.wervingStatus, 'nieuw'))
-    .orderBy(asielen.regio, asielen.naam)
+    .from(organisaties)
+    .where(eq(organisaties.wervingStatus, 'nieuw'))
+    .orderBy(organisaties.naam)
+
+  const nieuweAsielen = nieuweOrganisatiesRaw.map((o) => ({
+    id: o.id,
+    naam: o.naam,
+    email: o.contactEmail,
+    website: o.website,
+  }))
 
   const [uitgenodigd] = await db
     .select({ aantal: count() })
-    .from(asielen)
-    .where(eq(asielen.wervingStatus, 'uitgenodigd'))
+    .from(organisaties)
+    .where(eq(organisaties.wervingStatus, 'uitgenodigd'))
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6">

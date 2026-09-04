@@ -4,13 +4,13 @@ import { db } from '@/lib/db'
 import { mailLog } from '@/lib/db/schema'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
-const VAN = 'PootGelukkig <no-reply@pootgelukkig.nl>'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl'
+const VAN = 'ImpactOS <no-reply@impactos.nl>'
 
 interface MailMeta {
   template?: string
   userId?: number | null
-  asielId?: number | null
+  organisatieId?: string | null
   contactId?: number | null
   van?: string
 }
@@ -34,7 +34,7 @@ async function logMail(args: {
       status: args.status,
       resendId: args.resendId ?? null,
       contactId: args.meta?.contactId ?? null,
-      asielId: args.meta?.asielId ?? null,
+      organisatieId: args.meta?.organisatieId ?? null,
       userId: args.meta?.userId ?? null,
       fout: args.fout ?? null,
     })
@@ -96,10 +96,10 @@ export async function stuurManagementRapport(props: {
   periode: 'dag' | 'maand'
   periodeLabel: string
   periodeTitel: string
-  stats: { nieuweGebruikers: number; nieuweMatches: number; nieuweAdopties: number; verzondenMails: number }
+  stats: { nieuweGebruikers: number; nieuweMatches: number; nieuweBegeleidingen: number; verzondenMails: number }
   aiKosten: string
   aiCalls: number
-  aiPerModule: { module: string; kosten: string; calls: number }[]
+  aiPerActie: { actie: string; kosten: string; calls: number }[]
   samenvatting?: string
   trends?: { label: string; waarde: string }[]
 }) {
@@ -111,7 +111,7 @@ export async function stuurManagementRapport(props: {
       stats: props.stats,
       aiKosten: props.aiKosten,
       aiCalls: props.aiCalls,
-      aiPerModule: props.aiPerModule,
+      aiPerActie: props.aiPerActie,
       samenvatting: props.samenvatting,
       trends: props.trends,
       portaalUrl: `${APP_URL}/management`,
@@ -119,75 +119,9 @@ export async function stuurManagementRapport(props: {
   )
   const prefix = props.periode === 'dag' ? '📊 Dagrapport' : '📈 Maandrapport'
   return stuurEmail(
-    { naar: MANAGEMENT_EMAIL, onderwerp: `${prefix} PootGelukkig — ${props.periodeTitel}`, html },
+    { naar: MANAGEMENT_EMAIL, onderwerp: `${prefix} ImpactOS — ${props.periodeTitel}`, html },
     { template: `management-${props.periode}` }
   )
-}
-
-// ─── Match alert voor asiel ───────────────────────────────────────────────────
-
-export async function stuurMatchAlert({
-  asielEmail,
-  asielNaam,
-  dierNaam,
-  dierSoort,
-  dierSlug,
-  adoptantNaam,
-  matchScore,
-  analyseTekst,
-}: {
-  asielEmail: string
-  asielNaam: string
-  dierNaam: string
-  dierSoort: string
-  dierSlug: string | number
-  adoptantNaam: string
-  matchScore: number
-  analyseTekst: string
-}) {
-  const { MatchAlert } = await import('@/emails/MatchAlert')
-  const html = await render(
-    MatchAlert({
-      asielNaam,
-      dierNaam,
-      dierSoort,
-      adoptantNaam,
-      matchScore,
-      analyseTekst,
-      dierUrl: `${APP_URL}/admin/dieren/${dierSlug}`,
-    })
-  )
-  return stuurEmail({
-    naar: asielEmail,
-    onderwerp: `🐾 ${adoptantNaam} matcht ${Math.round(matchScore)}% met ${dierNaam}`,
-    html,
-  }, { template: 'match-alert' })
-}
-
-// ─── Welkomstmail asiel ───────────────────────────────────────────────────────
-
-export async function stuurWelkomAsiel({
-  asielEmail,
-  asielNaam,
-  contactpersoonNaam,
-}: {
-  asielEmail: string
-  asielNaam: string
-  contactpersoonNaam: string
-}) {
-  const { WelkomAsiel } = await import('@/emails/WelkomAsiel')
-  const html = await render(
-    WelkomAsiel({
-      asielNaam,
-      contactpersoonNaam,
-      loginUrl: `${APP_URL}/auth/login`,
-    })
-  )
-  return stuurEmail({
-    naar: asielEmail,
-    onderwerp: `Welkom bij PootGelukkig, ${asielNaam}! 🎉`,
-    html,
-  }, { template: 'welkom-asiel' })
 }
 
 // ─── Wekelijkse digest ────────────────────────────────────────────────────────
@@ -224,113 +158,7 @@ export async function stuurWeekelijkseDigest({
   }, { template: 'weekdigest' })
 }
 
-// ─── Afspraak herinnering ─────────────────────────────────────────────────────
-
-export async function stuurAfspraakHerinnering({
-  email,
-  naam,
-  dierNaam,
-  dierSoort,
-  asielNaam,
-  asielAdres,
-  afspraakDatum,
-  rol,
-}: {
-  email: string
-  naam: string
-  dierNaam: string
-  dierSoort: string
-  asielNaam: string
-  asielAdres: string
-  afspraakDatum: Date
-  rol: 'adoptant' | 'asiel'
-}) {
-  const { AfspraakHerinnering } = await import('@/emails/AfspraakHerinnering')
-  const html = await render(
-    AfspraakHerinnering({
-      ontvangerNaam: naam,
-      dierNaam,
-      dierSoort,
-      asielNaam,
-      asielAdres,
-      afspraakDatum,
-      portaalUrl: rol === 'asiel' ? `${APP_URL}/admin/berichten` : `${APP_URL}/dashboard`,
-      rol,
-    })
-  )
-  return stuurEmail({
-    naar: email,
-    onderwerp: `⏰ Morgen: kennismaking met ${dierNaam} bij ${asielNaam}`,
-    html,
-  }, { template: 'afspraak-herinnering' })
-}
-
-// ─── Nazorg emails (3-3-3 regel) ──────────────────────────────────────────────
-
-export async function stuurNazorgEmail({
-  adoptantEmail,
-  adoptantNaam,
-  dierNaam,
-  dierSoort,
-  fase,
-  aiTips,
-}: {
-  adoptantEmail: string
-  adoptantNaam: string
-  dierNaam: string
-  dierSoort: string
-  fase: 'dag3' | 'week3' | 'maand3'
-  aiTips: string[]
-}) {
-  const { NazorgEmail } = await import('@/emails/NazorgEmail')
-  const faseLabels = { dag3: 'Dag 3', week3: 'Week 3', maand3: 'Maand 3' }
-  const html = await render(
-    NazorgEmail({
-      adoptantNaam,
-      dierNaam,
-      dierSoort,
-      fase,
-      aiTips,
-      nazorgUrl: `${APP_URL}/nazorg`,
-    })
-  )
-  return stuurEmail({
-    naar: adoptantEmail,
-    onderwerp: `${faseLabels[fase]} met ${dierNaam} — hoe gaat het? 🐾`,
-    html,
-  }, { template: 'nazorg' })
-}
-
-// ─── Uitnodiging voor nieuw asiel (cold outreach) — V1 ─────────────────────────
-
-export async function stuurUitnodigingAsiel({
-  asielEmail,
-  asielNaam,
-  stad,
-  asielId,
-}: {
-  asielEmail: string
-  asielNaam: string
-  stad: string
-  asielId: number
-}) {
-  const { UitnodigingAsiel } = await import('@/emails/UitnodigingAsiel')
-  const html = await render(
-    UitnodigingAsiel({
-      asielNaam,
-      stad,
-      aanmeldUrl: `${APP_URL}/auth/register?type=asiel&asielId=${asielId}`,
-      afmeldUrl: `${APP_URL}/asiel-afmelden?asielId=${asielId}`,
-    })
-  )
-  return stuurEmail({
-    naar: asielEmail,
-    onderwerp: `${asielNaam}, help dieren sneller aan het juiste thuis 🐾`,
-    html,
-  }, { template: 'uitnodiging-asiel' })
-}
-
-// ─── Uitnodiging voor nieuw asiel (cold outreach) — V2 met demo-link ──────────
+// ─── Uitnodiging voor nieuwe organisatie (cold outreach) ──────────────────────
 
 const DEMO_VIDEO_URL = process.env.DEMO_VIDEO_URL ?? 'https://www.youtube.com/watch?v=DEMO_VIDEO_PLACEHOLDER'
 
@@ -338,21 +166,21 @@ export async function stuurUitnodigingAsielV2({
   asielEmail,
   asielNaam,
   stad,
-  asielId,
+  organisatieId,
 }: {
   asielEmail: string
   asielNaam: string
   stad: string
-  asielId: number
+  organisatieId: string
 }) {
   const { UitnodigingAsielV2 } = await import('@/emails/UitnodigingAsielV2')
   const html = await render(
     UitnodigingAsielV2({
       asielNaam,
       stad,
-      aanmeldUrl: `${APP_URL}/auth/register?type=asiel&asielId=${asielId}`,
+      aanmeldUrl: `${APP_URL}/auth/register?type=asiel&organisatieId=${organisatieId}`,
       demoUrl: DEMO_VIDEO_URL,
-      afmeldUrl: `${APP_URL}/asiel-afmelden?asielId=${asielId}`,
+      afmeldUrl: `${APP_URL}/asiel-afmelden?organisatieId=${organisatieId}`,
     })
   )
   return stuurEmail({
@@ -385,44 +213,78 @@ export async function stuurWachtwoordReset({
   )
   return stuurEmail({
     naar: email,
-    onderwerp: 'Stel je PootGelukkig-wachtwoord opnieuw in 🔑',
+    onderwerp: 'Stel je ImpactOS-wachtwoord opnieuw in 🔑',
     html,
   }, { template: 'wachtwoord-reset' })
 }
 
-// ─── Adoptie status update ────────────────────────────────────────────────────
+// ─── Onboarding afgerond (welkomstmail na het gesprek met Noor) ──────────────
 
-export async function stuurAdoptieStatusUpdate({
-  adoptantEmail,
-  adoptantNaam,
-  dierNaam,
-  isGoedgekeurd,
-}: {
-  adoptantEmail: string
-  adoptantNaam: string
-  dierNaam: string
-  isGoedgekeurd: boolean
-}) {
-  const html = `
-    <div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #ebebf0">
-      <div style="background:linear-gradient(135deg,#33335c,#1a1a3e);padding:28px 32px">
-        <p style="margin:0;font-size:20px;font-weight:800;color:#fff">🐾 PootGelukkig</p>
-      </div>
-      <div style="padding:32px">
-        <h2 style="color:#1a1a2e;font-size:20px;margin:0 0 12px">Update over jouw adoptie van ${dierNaam}</h2>
-        <p style="color:#555;font-size:14px;line-height:1.6;margin:0 0 24px">Hallo ${adoptantNaam},<br/><br/>
-          ${isGoedgekeurd
-            ? `Goed nieuws! Je adoptie van <strong>${dierNaam}</strong> is <strong style="color:#22c55e">goedgekeurd</strong>. Het asiel neemt snel contact met je op voor de overdracht.`
-            : `Je adoptie van <strong>${dierNaam}</strong> is helaas niet doorgegaan. Neem contact op met het asiel voor meer informatie.`}
-        </p>
-        <a href="${APP_URL}/dossier" style="display:inline-block;background:#f8aa25;color:#33335c;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;font-size:14px">
-          Bekijk je dossier →
-        </a>
-      </div>
-    </div>`
-  return stuurEmail({
-    naar: adoptantEmail,
-    onderwerp: isGoedgekeurd ? `🎉 Adoptie van ${dierNaam} goedgekeurd!` : `Update over je adoptie van ${dierNaam}`,
-    html,
-  }, { template: 'adoptie-status' })
+const ROL_LABELS: Record<string, string> = {
+  fundraising: 'Sam — Fondsen & Subsidies',
+  rapportage: 'Mila — Impact & Verantwoording',
+  social: 'Conny — Communicatie & Storytelling',
+  vrijwilligers: 'Bram — Werving & Vrijwilligers',
+  chat: 'Samen — 24/7 Webassistent',
 }
+
+export async function stuurOnboardingWelkom({
+  email,
+  organisatieNaam,
+  contactNaam,
+  geactiveerdeRolIds,
+  organisatieId,
+}: {
+  email: string
+  organisatieNaam: string
+  contactNaam: string
+  geactiveerdeRolIds: string[]
+  organisatieId: string
+}) {
+  const { OnboardingWelkom } = await import('@/emails/OnboardingWelkom')
+  const geactiveerdeRollen = geactiveerdeRolIds.map((r) => ROL_LABELS[r] ?? r)
+  const html = await render(
+    OnboardingWelkom({
+      organisatieNaam,
+      contactNaam,
+      geactiveerdeRollen,
+      dashboardUrl: `${APP_URL}/admin`,
+    })
+  )
+  return stuurEmail(
+    { naar: email, onderwerp: `${organisatieNaam} is ingericht op ImpactOS 🚀`, html },
+    { template: 'onboarding-welkom', organisatieId }
+  )
+}
+
+// ─── Teamuitnodiging ──────────────────────────────────────────────────────────
+
+export async function stuurTeamUitnodiging({
+  email,
+  organisatieNaam,
+  uitgenodigdDoorNaam,
+  token,
+  geldigDagen,
+}: {
+  email: string
+  organisatieNaam: string
+  uitgenodigdDoorNaam: string
+  token: string
+  geldigDagen: number
+}) {
+  const { TeamUitnodiging } = await import('@/emails/TeamUitnodiging')
+  const html = await render(
+    TeamUitnodiging({
+      organisatieNaam,
+      uitgenodigdDoorNaam,
+      accepteerUrl: `${APP_URL}/auth/uitnodiging?token=${token}`,
+      geldigDagen,
+    })
+  )
+  return stuurEmail({
+    naar: email,
+    onderwerp: `${uitgenodigdDoorNaam} nodigt je uit voor ${organisatieNaam} op ImpactOS`,
+    html,
+  }, { template: 'team-uitnodiging' })
+}
+

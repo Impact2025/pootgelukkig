@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation'
 
 const LINKS = [
   { href: '/werkwijze', label: 'Werkwijze' },
-  { href: '/voor-asielen', label: 'Voor asiels' },
-  { href: '/prijzen', label: 'Prijzen' },
-  { href: '/ai-assistent', label: 'Dr. Poot' },
+  { href: '/voor-organisaties', label: 'Voor organisaties' },
+  { href: '/tarieven', label: 'Tarieven' },
+  { href: '/#ai-collegas', label: 'AI-collega\'s' },
   { href: '/kennisbank', label: 'Kennisbank' },
   { href: '/blog', label: 'Blog' },
 ]
@@ -33,16 +33,16 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
     <header
       className={`sticky top-0 z-50 transition-colors ${
         scrolled || open
-          ? 'border-b border-[#33335c]/8 bg-[#f9fafb]/90 backdrop-blur-md'
+          ? 'border-b border-[#1E293B]/8 bg-[#f9fafb]/90 backdrop-blur-md'
           : 'border-b border-transparent bg-[#f9fafb]'
       }`}
     >
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
-        <Link href="/" className="flex items-center gap-2" aria-label="PootGelukkig home">
-          <span className="flex size-8 items-center justify-center rounded-xl bg-[#33335c] text-[#f8aa25]">
-            <span className="material-symbols-outlined text-[1.25rem]">pets</span>
+        <Link href="/" className="flex items-center gap-2" aria-label="ImpactOS home">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-[#1E293B] text-[#3B82F6]">
+            <span className="material-symbols-outlined text-[1.25rem]">bolt</span>
           </span>
-          <span className="text-lg font-extrabold tracking-tight text-[#33335c]">PootGelukkig</span>
+          <span className="text-lg font-extrabold tracking-tight text-[#1E293B]">ImpactOS</span>
         </Link>
 
         <ul className="hidden items-center gap-7 lg:flex">
@@ -54,7 +54,7 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
                   className={`text-sm font-semibold transition-colors ${
-                    active ? 'text-[#33335c]' : 'text-[#33335c]/55 hover:text-[#33335c]'
+                    active ? 'text-[#1E293B]' : 'text-[#1E293B]/55 hover:text-[#1E293B]'
                   }`}
                 >
                   {link.label}
@@ -67,22 +67,22 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
         <div className="hidden items-center gap-3 lg:flex">
           {isLoggedIn ? (
             <Link
-              href="/dashboard"
-              className="inline-flex items-center gap-2 rounded-full bg-[#ee5b2b] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#d94e22]"
+              href="/admin"
+              className="inline-flex items-center gap-2 rounded-full bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8]"
             >
-              Naar mijn dashboard
+              Naar mijn portaal
             </Link>
           ) : (
             <>
               <Link
                 href="/auth/login"
-                className="text-sm font-semibold text-[#33335c]/70 transition-colors hover:text-[#33335c]"
+                className="text-sm font-semibold text-[#1E293B]/70 transition-colors hover:text-[#1E293B]"
               >
                 Inloggen
               </Link>
               <Link
-                href="/demo-aanvragen"
-                className="inline-flex items-center gap-2 rounded-full bg-[#ee5b2b] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#d94e22]"
+                href="/contact?onderwerp=demo"
+                className="inline-flex items-center gap-2 rounded-full bg-[#2563EB] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#1D4ED8]"
               >
                 <span className="material-symbols-outlined text-[1.05rem]">calendar_month</span>
                 Plan een demo
@@ -94,7 +94,7 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex size-10 items-center justify-center rounded-xl text-[#33335c] lg:hidden"
+          className="flex size-10 items-center justify-center rounded-xl text-[#1E293B] lg:hidden"
           aria-label={open ? 'Menu sluiten' : 'Menu openen'}
           aria-expanded={open}
         >
@@ -103,11 +103,11 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
       </nav>
 
       {open && (
-        <div className="border-t border-[#33335c]/8 lg:hidden">
+        <div className="border-t border-[#1E293B]/8 lg:hidden">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-5 py-4 sm:px-8">
             <Link
-              href="/demo-aanvragen"
-              className="mb-1 flex items-center justify-center gap-2 rounded-xl bg-[#ee5b2b] px-5 py-3 text-center text-sm font-bold text-white"
+              href="/contact?onderwerp=demo"
+              className="mb-1 flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-5 py-3 text-center text-sm font-bold text-white"
             >
               <span className="material-symbols-outlined text-[1.05rem]">calendar_month</span>
               Plan een demo
@@ -116,7 +116,7 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-xl px-3 py-2.5 text-base font-semibold text-[#33335c]/80 hover:bg-[#33335c]/5"
+                className="rounded-xl px-3 py-2.5 text-base font-semibold text-[#1E293B]/80 hover:bg-[#1E293B]/5"
               >
                 {link.label}
               </Link>
@@ -124,22 +124,22 @@ export function MarketingNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             <div className="mt-3 flex flex-col gap-2">
               {isLoggedIn ? (
                 <Link
-                  href="/dashboard"
-                  className="rounded-full bg-[#ee5b2b] px-5 py-3 text-center text-sm font-bold text-white"
+                  href="/admin"
+                  className="rounded-full bg-[#2563EB] px-5 py-3 text-center text-sm font-bold text-white"
                 >
-                  Naar mijn dashboard
+                  Naar mijn portaal
                 </Link>
               ) : (
                 <>
                   <Link
                     href="/auth/login"
-                    className="rounded-full border border-[#33335c]/15 px-5 py-3 text-center text-sm font-bold text-[#33335c]"
+                    className="rounded-full border border-[#1E293B]/15 px-5 py-3 text-center text-sm font-bold text-[#1E293B]"
                   >
                     Inloggen
                   </Link>
                   <Link
-                    href="/auth/register"
-                    className="rounded-full bg-[#ee5b2b] px-5 py-3 text-center text-sm font-bold text-white"
+                    href="/voor-organisaties/start"
+                    className="rounded-full bg-[#2563EB] px-5 py-3 text-center text-sm font-bold text-white"
                   >
                     Aan de slag
                   </Link>

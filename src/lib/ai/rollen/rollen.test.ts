@@ -1,9 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { AI_ROLLEN, AI_ROLLEN_LIJST, haalRol, isGeldigeRol } from './index'
+import { AI_ROLLEN_LIJST, haalRol, isGeldigeRol } from './index'
 
-test('registry bevat 8 rollen', () => {
-  assert.equal(AI_ROLLEN_LIJST.length, 8)
+test('registry bevat de 5 actieve ImpactOS-rollen', () => {
+  assert.equal(AI_ROLLEN_LIJST.length, 5)
 })
 
 test('elke rol heeft naam, titel en minstens 1 actie', () => {
@@ -16,18 +16,28 @@ test('elke rol heeft naam, titel en minstens 1 actie', () => {
   }
 })
 
-test('rol-ids komen overeen met aiRolEnum-waarden', () => {
-  const verwacht = ['social', 'fundraising', 'vrijwilligers', 'evenementen', 'medisch', 'foto', 'rapportage', 'chat']
+test('rol-ids zijn de actieve ImpactOS-rollen (asiel-specifieke rollen zijn verwijderd)', () => {
+  const verwacht = ['social', 'fundraising', 'vrijwilligers', 'rapportage', 'chat']
   assert.deepEqual(AI_ROLLEN_LIJST.map((r) => r.id).sort(), verwacht.sort())
 })
 
-test('haalRol retourneert rol of undefined', () => {
+test('Sam, Mila en Conny vereisen ALTIJD goedkeuring (human-in-the-loop)', () => {
+  for (const id of ['fundraising', 'rapportage', 'social']) {
+    assert.equal(haalRol(id)?.vereistGoedkeuring, true, `${id} moet vereistGoedkeuring=true hebben`)
+  }
+})
+
+test('haalRol retourneert rol of undefined, gedeactiveerde rollen geven undefined', () => {
   assert.equal(haalRol('social')?.naam, 'Conny')
+  assert.equal(haalRol('foto'), undefined)
+  assert.equal(haalRol('medisch'), undefined)
+  assert.equal(haalRol('evenementen'), undefined)
   assert.equal(haalRol('bestaat-niet'), undefined)
 })
 
 test('isGeldigeRol valideert correct', () => {
   assert.equal(isGeldigeRol('social'), true)
+  assert.equal(isGeldigeRol('foto'), false)
   assert.equal(isGeldigeRol('onzin'), false)
   assert.equal(isGeldigeRol(123), false)
 })

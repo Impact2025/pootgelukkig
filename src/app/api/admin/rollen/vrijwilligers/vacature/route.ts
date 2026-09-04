@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 // Bram (vrijwilligers) — vacaturetekst als concept.
 export const POST = maakSideEffectRoute({
   rol: 'vrijwilligers',
-  type: 'vacature',
+  type: 'briefing',
   bouwTitel: (body) => {
     const functie = typeof body.functie === 'string' && body.functie.trim() ? body.functie.trim() : 'vrijwilliger'
     return `Vacature — ${functie}`

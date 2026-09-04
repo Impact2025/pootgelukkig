@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
-import { blogPosts, dieren, asielen } from '@/lib/db/schema'
+import { blogPosts } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { CATEGORIEEN, ARTIKELEN } from '@/lib/kennisbank/content'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl'
 
 // ISR i.p.v. force-dynamic: de sitemap wordt gecachet en elk uur ververst.
 // Zo krijgt Googlebot altijd een snelle, volledige sitemap i.p.v. een verse
@@ -13,8 +13,6 @@ export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let posts: { slug: string; bijgewerktOp: Date | null }[] = []
-  let dierRijen: { id: number; bijgewerktOp: Date | null }[] = []
-  let asielRijen: { id: number; aangemaaktOp: Date | null }[] = []
   try {
     posts = await db
       .select({ slug: blogPosts.slug, bijgewerktOp: blogPosts.bijgewerktOp })
@@ -24,23 +22,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     // DB onbereikbaar: statische routes blijven geldig
   }
-  try {
-    dierRijen = await db
-      .select({ id: dieren.id, bijgewerktOp: dieren.bijgewerktOp })
-      .from(dieren)
-      .where(eq(dieren.status, 'beschikbaar'))
-      .orderBy(desc(dieren.bijgewerktOp))
-  } catch {
-    // negeer: dieren zijn optioneel in de sitemap
-  }
-  try {
-    asielRijen = await db
-      .select({ id: asielen.id, aangemaaktOp: asielen.aangemaaktOp })
-      .from(asielen)
-      .where(eq(asielen.actief, true))
-  } catch {
-    // negeer: asielen zijn optioneel in de sitemap
-  }
+  // Dossiers en organisaties zijn vertrouwelijke gegevens (geen publieke detailpagina's
+  // meer zoals de vroegere /animals en /asielen), dus die staan niet in de sitemap.
 
   const nu = new Date()
   const dertigDagenGeleden = new Date(nu.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -49,16 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${APP_URL}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${APP_URL}/blog`, changeFrequency: 'daily', priority: 0.9 },
     { url: `${APP_URL}/kennisbank`, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${APP_URL}/ai-assistent`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/voor-asielen`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${APP_URL}/voor-organisaties`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${APP_URL}/werkwijze`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/prijzen`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${APP_URL}/tarieven`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${APP_URL}/faq`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${APP_URL}/over-ons`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${APP_URL}/contact`, changeFrequency: 'yearly', priority: 0.5 },
-    { url: `${APP_URL}/demo-aanvragen`, changeFrequency: 'yearly', priority: 0.6 },
-    // /intake en /zoeken bewust weggelaten: die routes vereisen login (307 → /auth/login)
-    // en zijn dus niet indexeerbaar. Nooit loginmuren in de sitemap zetten.
+    // /ai-assistent en /demo-aanvragen zijn permanente redirects (zie next.config.ts),
+    // /intake vereist login (307 → /auth/login) — geen van drie is indexeerbaar content.
+    // Nooit loginmuren of redirect-stubs in de sitemap zetten.
   ]
 
   const artikelen: MetadataRoute.Sitemap = posts.map((p) => {
@@ -84,26 +66,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  const dierPaginas: MetadataRoute.Sitemap = dierRijen.map((d) => ({
-    url: `${APP_URL}/animals/${d.id}`,
-    lastModified: d.bijgewerktOp ?? undefined,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }))
-
-  const asielPaginas: MetadataRoute.Sitemap = asielRijen.map((a) => ({
-    url: `${APP_URL}/asielen/${a.id}`,
-    lastModified: a.aangemaaktOp ?? undefined,
-    changeFrequency: 'weekly',
-    priority: 0.6,
-  }))
-
   return [
     ...statisch,
     ...artikelen,
     ...kennisCategorieen,
     ...kennisArtikelen,
-    ...dierPaginas,
-    ...asielPaginas,
   ]
 }

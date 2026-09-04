@@ -3,15 +3,14 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { ToastProvider } from '@/components/ui/Toaster'
-import { AIAssistentWidget } from '@/components/AIAssistentWidget'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl'
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: 'PootGelukkig — Vind jouw perfecte match',
-  description: 'AI-gestuurde matching tussen mensen en asieldieren. Bedacht door Maya van Munster.',
-  keywords: ['dierenasiel', 'adoptie', 'hond', 'kat', 'matching', 'AI'],
+  title: 'ImpactOS — Minder bureaucratie, meer maatschappelijke impact',
+  description: 'ImpactOS (onderdeel van WeAreImpact) is het AI-gestuurde platform voor sociaal ondernemers en zorgkwartiermakers.',
+  keywords: ['sociaal domein', 'maatschappelijk ondernemen', 'AI', 'zorgkwartiermakers', 'impact'],
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.svg',
@@ -20,12 +19,12 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'PootGelukkig',
+    title: 'ImpactOS',
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
-    title: 'PootGelukkig',
-    description: 'Vind jouw perfecte asieldier via AI-matching',
+    title: 'ImpactOS',
+    description: 'Minder bureaucratie, meer maatschappelijke impact',
     locale: 'nl_NL',
     type: 'website',
   },
@@ -33,8 +32,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#33335c' },
-    { media: '(prefers-color-scheme: light)', color: '#33335c' },
+    { media: '(prefers-color-scheme: dark)', color: '#0F172A' },
+    { media: '(prefers-color-scheme: light)', color: '#0F172A' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -61,7 +60,6 @@ export default function RootLayout({
       <body className="bg-bg-dark text-white font-display antialiased">
         <Providers>
           <ToastProvider>{children}</ToastProvider>
-          <AIAssistentWidget />
         </Providers>
         <GoogleAnalytics gaId="G-LRTEECBPQN" />
       </body>

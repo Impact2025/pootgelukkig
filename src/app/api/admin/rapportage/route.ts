@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { dieren, adopties } from '@/lib/db/schema'
+import { dossiers, begeleidingen } from '@/lib/db/schema'
 import { and, eq, gte, lt, count, sql } from 'drizzle-orm'
 import { auth } from '@/auth'
 
@@ -19,102 +19,95 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Ongeldig jaar' }, { status: 400 })
   }
 
-  const asielId = session.user.asielId
+  const organisatieId = session.user.organisatieId
   const startJaar = new Date(`${jaar}-01-01T00:00:00Z`)
   const eindJaar = new Date(`${jaar + 1}-01-01T00:00:00Z`)
 
-  // Ingenomen per soort
-  const ingenomenQuery = db
-    .select({
-      soort: dieren.soort,
-      aantal: count(),
-    })
-    .from(dieren)
+  // Nieuwe dossiers per categorie
+  const nieuweDossiersQuery = db
+    .select({ categorie: dossiers.categorie, aantal: count() })
+    .from(dossiers)
     .where(
       and(
-        gte(dieren.binnengekomentOp, startJaar),
-        lt(dieren.binnengekomentOp, eindJaar),
-        ...(asielId ? [eq(dieren.asielId, asielId)] : [])
+        gte(dossiers.createdAt, startJaar),
+        lt(dossiers.createdAt, eindJaar),
+        ...(organisatieId ? [eq(dossiers.organisatieId, organisatieId)] : [])
       )
     )
-    .groupBy(dieren.soort)
+    .groupBy(dossiers.categorie)
 
-  // Geadopteerd per soort
-  const geadopteerdQuery = db
-    .select({
-      soort: dieren.soort,
-      aantal: count(),
-    })
-    .from(adopties)
-    .innerJoin(dieren, eq(adopties.dierId, dieren.id))
+  // Afgeronde begeleidingen per dossier-categorie
+  const afgerondQuery = db
+    .select({ categorie: dossiers.categorie, aantal: count() })
+    .from(begeleidingen)
+    .innerJoin(dossiers, eq(begeleidingen.dossierId, dossiers.id))
     .where(
       and(
-        eq(adopties.status, 'afgerond'),
-        gte(adopties.adoptieDatum, startJaar),
-        lt(adopties.adoptieDatum, eindJaar),
-        ...(asielId ? [eq(adopties.asielId, asielId)] : [])
+        eq(begeleidingen.status, 'afgerond'),
+        gte(begeleidingen.updatedAt, startJaar),
+        lt(begeleidingen.updatedAt, eindJaar),
+        ...(organisatieId ? [eq(begeleidingen.organisatieId, organisatieId)] : [])
       )
     )
-    .groupBy(dieren.soort)
+    .groupBy(dossiers.categorie)
 
-  // Gemiddelde verblijfsduur
-  const verblijfsduurQuery = db
+  // Gemiddelde doorlooptijd (dagen) van afgeronde begeleidingen
+  const doorlooptijdQuery = db
     .select({
-      gemDagen: sql<number>`AVG(EXTRACT(DAY FROM (${adopties.adoptieDatum} - ${dieren.binnengekomentOp})))`,
+      gemDagen: sql<number>`AVG(EXTRACT(DAY FROM (${begeleidingen.updatedAt} - ${begeleidingen.startDatum})))`,
     })
-    .from(adopties)
-    .innerJoin(dieren, eq(adopties.dierId, dieren.id))
+    .from(begeleidingen)
     .where(
       and(
-        eq(adopties.status, 'afgerond'),
-        gte(adopties.adoptieDatum, startJaar),
-        lt(adopties.adoptieDatum, eindJaar),
-        ...(asielId ? [eq(adopties.asielId, asielId)] : [])
+        eq(begeleidingen.status, 'afgerond'),
+        gte(begeleidingen.updatedAt, startJaar),
+        lt(begeleidingen.updatedAt, eindJaar),
+        ...(organisatieId ? [eq(begeleidingen.organisatieId, organisatieId)] : [])
       )
     )
 
-  // Totaal momenteel in opvang
-  const inOpvangQuery = db
+  // Totaal momenteel open (niet-afgerond)
+  const openQuery = db
     .select({ aantal: count() })
-    .from(dieren)
+    .from(dossiers)
     .where(
       and(
-        ...(asielId ? [eq(dieren.asielId, asielId)] : [])
+        sql`${dossiers.status} != 'afgerond'`,
+        ...(organisatieId ? [eq(dossiers.organisatieId, organisatieId)] : [])
       )
     )
 
-  const [ingenomen, geadopteerd, verblijfsduur, inOpvang] = await Promise.all([
-    ingenomenQuery,
-    geadopteerdQuery,
-    verblijfsduurQuery,
-    inOpvangQuery,
+  const [nieuweDossiers, afgerond, doorlooptijd, open] = await Promise.all([
+    nieuweDossiersQuery,
+    afgerondQuery,
+    doorlooptijdQuery,
+    openQuery,
   ])
 
-  const soorten = ['hond', 'kat', 'vogel', 'konijn', 'cavia', 'hamster', 'overig']
+  const categorieen = ['wmo', 'participatie', 'jeugd', 'reintegratie', 'overig']
 
-  const statsPerSoort = soorten.map((soort) => {
-    const ing = ingenomen.find((r) => r.soort === soort)?.aantal ?? 0
-    const geo = geadopteerd.find((r) => r.soort === soort)?.aantal ?? 0
+  const statsPerCategorie = categorieen.map((categorie) => {
+    const nieuw = nieuweDossiers.find((r) => r.categorie === categorie)?.aantal ?? 0
+    const afg = afgerond.find((r) => r.categorie === categorie)?.aantal ?? 0
     return {
-      soort,
-      ingenomen: Number(ing),
-      geadopteerd: Number(geo),
-      adoptiegraat: ing > 0 ? Math.round((Number(geo) / Number(ing)) * 100) : 0,
+      categorie,
+      nieuweDossiers: Number(nieuw),
+      afgerondeBegeleidingen: Number(afg),
     }
   })
 
-  const totaalIngenomen = statsPerSoort.reduce((s, r) => s + r.ingenomen, 0)
-  const totaalGeadopteerd = statsPerSoort.reduce((s, r) => s + r.geadopteerd, 0)
-  const gemVerblijf = Math.round(Number(verblijfsduur[0]?.gemDagen ?? 0))
+  const totaalNieuw = statsPerCategorie.reduce((s, r) => s + r.nieuweDossiers, 0)
+  const totaalAfgerond = statsPerCategorie.reduce((s, r) => s + r.afgerondeBegeleidingen, 0)
+  const gemDoorlooptijd = Math.round(Number(doorlooptijd[0]?.gemDagen ?? 0))
 
   // Geef CSV terug als format=csv
   const format = searchParams.get('format')
   if (format === 'csv') {
-    const header = 'Soort,Ingenomen,Geadopteerd,Adoptiegraad (%)\n'
-    const rows = statsPerSoort
-      .map((r) => `${r.soort},${r.ingenomen},${r.geadopteerd},${r.adoptiegraat}`)
+    const header = 'Categorie,Nieuwe dossiers,Afgeronde begeleidingen\n'
+    const rows = statsPerCategorie
+      .map((r) => `${r.categorie},${r.nieuweDossiers},${r.afgerondeBegeleidingen}`)
       .join('\n')
-    const totaal = `Totaal,${totaalIngenomen},${totaalGeadopteerd},${totaalIngenomen > 0 ? Math.round((totaalGeadopteerd / totaalIngenomen) * 100) : 0}`
+    const totaal = `Totaal,${totaalNieuw},${totaalAfgerond}`
     const csv = header + rows + '\n' + totaal
 
     return new NextResponse(csv, {
@@ -128,11 +121,11 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     data: {
       jaar,
-      totaalIngenomen,
-      totaalGeadopteerd,
-      gemVerblijfsdagen: gemVerblijf,
-      inOpvang: Number(inOpvang[0]?.aantal ?? 0),
-      perSoort: statsPerSoort,
+      totaalNieuweDossiers: totaalNieuw,
+      totaalAfgerondeBegeleidingen: totaalAfgerond,
+      gemDoorlooptijdDagen: gemDoorlooptijd,
+      open: Number(open[0]?.aantal ?? 0),
+      perCategorie: statsPerCategorie,
     },
   })
 }

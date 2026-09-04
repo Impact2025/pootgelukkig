@@ -5,11 +5,11 @@ import { MarketingNav } from '@/components/marketing/MarketingNav'
 import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 import { portfolioSameAs } from '@/lib/seo-kit'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.pootgelukkig.nl'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.impactos.nl'
 
 export const metadata: Metadata = {
   openGraph: {
-    siteName: 'PootGelukkig',
+    siteName: 'ImpactOS',
     locale: 'nl_NL',
     type: 'website',
   },
@@ -25,40 +25,32 @@ export default async function MarketingLayout({ children }: { children: ReactNod
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'PootGelukkig',
+      name: 'ImpactOS',
       url: APP_URL,
       logo: `${APP_URL}/favicon.svg`,
       description:
-        'AI-gestuurde matching die asiels helpt om de juiste adoptant bij het juiste dier te vinden.',
+        'AI-gestuurd platform voor sociaal ondernemers en zorgkwartiermakers. Minder bureaucratie, meer maatschappelijke impact.',
       parentOrganization: { '@type': 'Organization', name: 'WeAreImpact' },
       sameAs: [...portfolioSameAs],
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'PootGelukkig',
+      name: 'ImpactOS',
       url: APP_URL,
       inLanguage: 'nl-NL',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: `${APP_URL}/zoeken?q={search_term_string}`,
-        },
-        'query-input': 'required name=search_term_string',
-      },
     },
   ]
 
   return (
-    <div className="light min-h-screen bg-[#f9fafb] text-[#33335c]">
+    <div className="light min-h-screen bg-[#F8FAFC] text-[#1E293B]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <a
         href="#hoofdinhoud"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#33335c] focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#1E293B] focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white"
       >
         Naar hoofdinhoud
       </a>

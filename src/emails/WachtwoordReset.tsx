@@ -12,7 +12,7 @@ interface WachtwoordResetProps {
 
 export function WachtwoordReset({ naam, resetUrl, geldigMinuten }: WachtwoordResetProps) {
   return (
-    <EmailLayout preview="Stel een nieuw wachtwoord in voor je PootGelukkig-account">
+    <EmailLayout preview="Stel een nieuw wachtwoord in voor je ImpactOS-account">
       <EmailHeader label="Beveiliging" />
 
       <Section style={{ padding: '32px 40px 8px' }}>

@@ -5,7 +5,7 @@ declare module 'next-auth' {
     user: {
       id: string
       rol: 'adoptant' | 'asiel' | 'admin'
-      asielId?: number
+      organisatieId?: string
     } & DefaultSession['user']
   }
 }
@@ -22,13 +22,13 @@ export const authConfig: NextAuthConfig = {
     jwt({ token, user }) {
       if (user?.id) token.id = user.id
       if ((user as { rol?: string })?.rol) token.rol = (user as { rol: string }).rol
-      if ((user as { asielId?: number })?.asielId) token.asielId = (user as { asielId: number }).asielId
+      if ((user as { organisatieId?: string })?.organisatieId) token.organisatieId = (user as { organisatieId: string }).organisatieId
       return token
     },
     session({ session, token }) {
       if (token.id) session.user.id = token.id as string
       session.user.rol = (token.rol as 'adoptant' | 'asiel' | 'admin') ?? 'adoptant'
-      if (token.asielId) session.user.asielId = token.asielId as number
+      if (token.organisatieId) session.user.organisatieId = token.organisatieId as string
       return session
     },
   },

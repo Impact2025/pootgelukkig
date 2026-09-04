@@ -11,9 +11,9 @@ interface ModelPrijs {
 
 // Bekende modellen — vul aan naar behoefte. Sleutel = OpenRouter model-id.
 const PRIJZEN: Record<string, ModelPrijs> = {
-  'anthropic/claude-sonnet-4-5': { invoer: 3, uitvoer: 15 },
-  'anthropic/claude-3.5-sonnet': { invoer: 3, uitvoer: 15 },
-  'anthropic/claude-3.5-haiku': { invoer: 0.8, uitvoer: 4 },
+  'anthropic/claude-sonnet-4.5': { invoer: 3, uitvoer: 15 },
+  'anthropic/claude-sonnet-5': { invoer: 3, uitvoer: 15 },
+  'anthropic/claude-haiku-4.5': { invoer: 0.8, uitvoer: 4 },
   'openai/gpt-4o': { invoer: 2.5, uitvoer: 10 },
   'openai/gpt-4o-mini': { invoer: 0.15, uitvoer: 0.6 },
   'google/gemini-flash-1.5': { invoer: 0.075, uitvoer: 0.3 },

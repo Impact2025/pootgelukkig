@@ -5,11 +5,14 @@ import {
   boolean,
   timestamp,
   json,
+  jsonb,
   serial,
   pgEnum,
   real,
+  numeric,
   varchar,
   primaryKey,
+  index,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -17,10 +20,6 @@ import { relations } from 'drizzle-orm'
 
 export const animalSpeciesEnum = pgEnum('animal_species', [
   'hond', 'kat', 'vogel', 'konijn', 'cavia', 'hamster', 'overig'
-])
-
-export const animalStatusEnum = pgEnum('animal_status', [
-  'beschikbaar', 'in_behandeling', 'geadopteerd', 'niet_beschikbaar'
 ])
 
 export const woningTypeEnum = pgEnum('woning_type', [
@@ -35,10 +34,6 @@ export const berichtVerzenderEnum = pgEnum('bericht_verzender', [
   'adoptant', 'asiel', 'systeem'
 ])
 
-export const adoptieStatusEnum = pgEnum('adoptie_status', [
-  'aangevraagd', 'goedgekeurd', 'afgerond', 'afgewezen', 'geannuleerd'
-])
-
 export const medischStatusEnum = pgEnum('medisch_status', [
   'aankomend', 'voltooid', 'gemist', 'geannuleerd'
 ])
@@ -49,27 +44,61 @@ export const afspraakStatusEnum = pgEnum('afspraak_status', [
   'aangevraagd', 'bevestigd', 'afgerond', 'geannuleerd'
 ])
 
-// Wervingsstatus voor geïmporteerde asielen (cold-outreach flow)
+// Wervingsstatus voor geïmporteerde organisaties (cold-outreach flow)
 export const wervingStatusEnum = pgEnum('werving_status', [
   'nieuw',        // gevonden door import, nog niet benaderd
   'uitgenodigd',  // uitnodigingsmail verstuurd
   'overgeslagen', // handmatig overgeslagen, niet mailen
-  'aangesloten',  // asiel heeft zich aangemeld op het platform
+  'aangesloten',  // organisatie heeft zich aangemeld op het platform
 ])
 
 // Status van een verzonden e-mail (mail_log)
 export const mailStatusEnum = pgEnum('mail_status', ['verzonden', 'gefaald', 'geopend', 'gebounced'])
 
 // CRM
-export const crmContactTypeEnum = pgEnum('crm_contact_type', ['lead', 'asiel', 'adoptant', 'partner', 'overig'])
+export const crmContactTypeEnum = pgEnum('crm_contact_type', [
+  'lead', 'asiel', 'adoptant', 'partner', 'overig',
+  // Organisatie-CRM (/admin/crm): relaties van een organisatie zelf met haar omgeving.
+  'gemeente', 'fondsenverstrekker', 'zorgpartner',
+])
 export const crmDealFaseEnum = pgEnum('crm_deal_fase', ['nieuw', 'contact', 'onderhandeling', 'gewonnen', 'verloren'])
 export const crmActiviteitTypeEnum = pgEnum('crm_activiteit_type', ['notitie', 'mail', 'bel', 'taak', 'afspraak'])
 
 // Blog
 export const blogStatusEnum = pgEnum('blog_status', ['concept', 'gepubliceerd', 'gearchiveerd'])
 
+// Helpdesk (organisatie-inbox voor contactformulieren / web-intakes)
+export const helpdeskBronEnum = pgEnum('helpdesk_bron', ['contactformulier', 'webintake', 'widget'])
+export const helpdeskStatusEnum = pgEnum('helpdesk_status', ['open', 'concept_klaar', 'beantwoord', 'gesloten'])
+
 // Coupons (marketingcodes)
 export const couponTypeEnum = pgEnum('coupon_type', ['procent', 'vast'])
+
+// --- Multi-tenant kernentiteiten (organisaties / dossiers / clienten / begeleidingen) ---
+
+export const organisatieStatusEnum = pgEnum('organisatie_status', ['proef', 'actief', 'gearchiveerd'])
+
+// Voortgang van de chat-onboarding (intake + systeeminrichting bij aanmelding)
+export const onboardingStatusEnum = pgEnum('onboarding_status', [
+  'niet_gestart', 'bezig', 'afgerond', 'overgeslagen',
+])
+
+// Wie een onboarding-bericht heeft verstuurd
+export const onboardingAfzenderEnum = pgEnum('onboarding_afzender', ['gebruiker', 'assistent'])
+
+export const dossierCategorieEnum = pgEnum('dossier_categorie', [
+  'wmo', 'participatie', 'jeugd', 'reintegratie', 'overig',
+])
+
+export const dossierStatusEnum = pgEnum('dossier_status', [
+  'intake', 'actief', 'in_behandeling', 'afgerond',
+])
+
+export const clientStatusEnum = pgEnum('client_status', ['aangemeld', 'gematcht', 'afgerond'])
+
+export const begeleidingStatusEnum = pgEnum('begeleiding_status', [
+  'gepland', 'actief', 'afgerond', 'gestopt',
+])
 
 // =================== USERS (Adoptanten) ===================
 
@@ -86,7 +115,7 @@ export const users = pgTable('users', {
   lat: real('lat'),
   lng: real('lng'),
   rol: userRolEnum('rol').default('adoptant').notNull(),
-  asielId: integer('asiel_id'), // alleen gevuld voor rol 'asiel'
+  organisatieId: text('organisatie_id'), // alleen gevuld voor rol 'asiel'/'admin' binnen een organisatie
   profielVoltooid: boolean('profiel_voltooid').default(false).notNull(),
   aangemeldOp: timestamp('aangemeld_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
@@ -118,128 +147,112 @@ export const adopterProfielen = pgTable('adopter_profielen', {
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
 })
 
-// =================== SHELTERS (Asielen) ===================
+// =================== ORGANISATIES (B2B tenants, voorheen 'asielen') ===================
 
-export const asielen = pgTable('asielen', {
-  id: serial('id').primaryKey(),
+export const organisaties = pgTable('organisaties', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   naam: varchar('naam', { length: 255 }).notNull(),
-  stad: varchar('stad', { length: 100 }).notNull(),
-  regio: varchar('regio', { length: 100 }).notNull(), // "Noord-Holland", etc.
-  adres: text('adres'),
-  postcode: varchar('postcode', { length: 10 }),
-  lat: real('lat'),
-  lng: real('lng'),
-  telefoon: varchar('telefoon', { length: 20 }),
-  email: varchar('email', { length: 255 }),
+  slug: varchar('slug', { length: 160 }).notNull().unique(), // voor routing/subdomeinen
+  kvkNummer: varchar('kvk_nummer', { length: 20 }),
+  contactEmail: varchar('contact_email', { length: 255 }),
   website: varchar('website', { length: 255 }),
-  logoUrl: text('logo_url'),
-  beschrijving: text('beschrijving'),
-  actief: boolean('actief').default(true).notNull(),
+  telefoon: varchar('telefoon', { length: 20 }),
+  status: organisatieStatusEnum('status').default('proef').notNull(),
 
-  // Werving / herkomst — gevuld door de asielen-import cron
+  // Werving / herkomst — gevuld door de organisaties-import cron
   bron: varchar('bron', { length: 50 }).default('handmatig').notNull(), // 'handmatig' | 'import'
   wervingStatus: wervingStatusEnum('werving_status').default('aangesloten').notNull(),
   uitnodigingVerstuurdOp: timestamp('uitnodiging_verstuurd_op'),
 
-  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  // Organisatieprofiel — opgehaald tijdens de chat-onboarding (src/lib/ai/onboarding.ts).
+  // Elk veld wordt los, direct na het antwoord, weggeschreven — nooit pas aan het eind —
+  // zodat een afgebroken gesprek geen dataverlies geeft en de AI-collega's er meteen mee kunnen werken.
+  rechtsvorm: varchar('rechtsvorm', { length: 120 }),
+  werkveldCategorieen: jsonb('werkveld_categorieen').$type<string[]>().default([]),
+  gemeenten: jsonb('gemeenten').$type<string[]>().default([]),
+  teamgrootte: integer('teamgrootte'),
+  vrijwilligersAantal: integer('vrijwilligers_aantal'),
+  grootsteKnelpunt: text('grootste_knelpunt'),
+  toneOfVoice: varchar('tone_of_voice', { length: 60 }),
+  onboardingStatus: onboardingStatusEnum('onboarding_status').default('niet_gestart').notNull(),
+  onboardingAfgerondOp: timestamp('onboarding_afgerond_op'),
 
-  // Openingstijden per dag
-  openingstijden: json('openingstijden').$type<{
-    ma: { open: boolean; van: string; tot: string }
-    di: { open: boolean; van: string; tot: string }
-    wo: { open: boolean; van: string; tot: string }
-    do: { open: boolean; van: string; tot: string }
-    vr: { open: boolean; van: string; tot: string }
-    za: { open: boolean; van: string; tot: string }
-    zo: { open: boolean; van: string; tot: string }
-    notitie?: string
-  }>(),
-
-  // Social media
-  socialMedia: json('social_media').$type<{
-    instagram?: string
-    facebook?: string
-    tiktok?: string
-    youtube?: string
-  }>(),
-
-  // Overige configuratie
-  asielConfig: json('asiel_config').$type<{
-    spoedTelefoon?: string
-    kvkNummer?: string
-    anbiStatus?: boolean
-    iban?: string
-    maxCapaciteit?: number
-    specialisaties?: string[]
-    notificaties?: {
-      emailBijAanvraag?: boolean
-      emailBijBericht?: boolean
-      dagelijkseDigest?: boolean
-    }
-    adoptieProcedure?: {
-      minimumLeeftijdAdoptant?: number
-      tuinVereist?: boolean
-      huisbezoekVereist?: boolean
-      wachttijdDagen?: number
-      vereisten?: string
-    }
-  }>(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
-// =================== ANIMALS ===================
+// =================== ONBOARDING BERICHTEN (chat-transcript, resumable) ===================
+// Elk bericht wordt meteen bij verzending/ontvangst opgeslagen — het gesprek kan altijd
+// hervat worden vanaf het laatst bewaarde punt, ook na een paginaherlaad of sessiewissel.
 
-export const dieren = pgTable('dieren', {
+export const onboardingBerichten = pgTable('onboarding_berichten', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id),
-  naam: varchar('naam', { length: 100 }).notNull(),
-  soort: animalSpeciesEnum('soort').notNull(),
-  ras: varchar('ras', { length: 100 }),
-  leeftijdJaren: integer('leeftijd_jaren'),
-  leeftijdMaanden: integer('leeftijd_maanden'),
-  geslacht: varchar('geslacht', { length: 10 }), // "reu", "teef", "man", "vrouw"
-  gewichtKg: real('gewicht_kg'),
-  kleur: varchar('kleur', { length: 100 }),
-  verhaal: text('verhaal'), // Het persoonlijke verhaal van het dier
-  status: animalStatusEnum('status').default('beschikbaar').notNull(),
-  
-  // Foto's
-  hoofdFotoUrl: text('hoofd_foto_url'),
-  fotoUrls: json('foto_urls').$type<string[]>().default([]),
-  
-  // Gedragsprofiel (voor AI matching)
-  gedragsProfiel: json('gedragsrofiel').$type<{
-    energieNiveau: 'laag' | 'normaal' | 'hoog' | 'zeer_hoog'
-    kindvriendelijk: boolean
-    katVriendelijk: boolean
-    hondenVriendelijk: boolean
-    alleenThuis: 'goed' | 'matig' | 'slecht'
-    trainbaarheid: 'laag' | 'normaal' | 'hoog'
-    blaffen: 'weinig' | 'normaal' | 'veel'
-    speelsheid: 'laag' | 'normaal' | 'hoog'
-    tags: string[] // ["kindvriendelijk", "sociaal", "leergierig"]
-  }>(),
-  
-  // Medisch paspoort (samenvatting)
-  medischPaspoort: json('medisch_paspoort').$type<{
-    gevaccineerd: boolean
-    gecastreerd: boolean
-    gechippt: boolean
-    chipNummer: string | null
-    allergieën: string[]
-  }>(),
-  
-  vasteVerzorgerId: integer('vaste_verzorger_id').references(() => users.id),
-  binnengekomentOp: timestamp('binnengekomen_op').defaultNow().notNull(),
-  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
-  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-})
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  afzender: onboardingAfzenderEnum('afzender').notNull(),
+  inhoud: text('inhoud').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('onboarding_berichten_organisatie_id_idx').on(t.organisatieId),
+}))
+
+// =================== DOSSIERS (zorg-/hulpverleningstrajecten, voorheen 'dieren') ===================
+
+export const dossiers = pgTable('dossiers', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  dossierNummer: varchar('dossier_nummer', { length: 60 }).notNull(),
+  titel: varchar('titel', { length: 255 }).notNull(),
+  categorie: dossierCategorieEnum('categorie').default('overig').notNull(),
+  status: dossierStatusEnum('status').default('intake').notNull(),
+  samenvatting: text('samenvatting'),
+  intakeData: jsonb('intake_data').$type<Record<string, unknown>>().default({}),
+  vertrouwelijk: boolean('vertrouwelijk').default(true).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('dossiers_organisatie_id_idx').on(t.organisatieId),
+}))
+
+// =================== CLIENTEN (hulpvragers / deelnemers, voorheen 'adoptanten') ===================
+
+export const clienten = pgTable('clienten', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  voornaam: varchar('voornaam', { length: 120 }).notNull(),
+  achternaam: varchar('achternaam', { length: 120 }).notNull(),
+  email: varchar('email', { length: 255 }),
+  telefoon: varchar('telefoon', { length: 30 }),
+  geboortedatum: timestamp('geboortedatum'),
+  hulpvraagOmschrijving: text('hulpvraag_omschrijving'),
+  profielData: jsonb('profiel_data').$type<Record<string, unknown>>().default({}),
+  status: clientStatusEnum('status').default('aangemeld').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('clienten_organisatie_id_idx').on(t.organisatieId),
+}))
+
+// =================== BEGELEIDINGEN (trajectkoppelingen, voorheen 'adopties') ===================
+
+export const begeleidingen = pgTable('begeleidingen', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id, { onDelete: 'cascade' }),
+  clientId: text('client_id').notNull().references(() => clienten.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  startDatum: timestamp('start_datum'),
+  status: begeleidingStatusEnum('status').default('gepland').notNull(),
+  evaluatieNotities: text('evaluatie_notities'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('begeleidingen_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== MATCHES ===================
 
 export const matches = pgTable('matches', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id),
   score: integer('score').notNull(), // 0-100
   analyseTekst: text('analyse_tekst'), // AI motivatie
   woningScore: integer('woning_score'), // Sub-scores
@@ -249,8 +262,8 @@ export const matches = pgTable('matches', {
   alleenThuisScore: integer('alleen_thuis_score'),
   budgetScore: integer('budget_score'),
   isAanbevolen: boolean('is_aanbevolen').default(false),
-  // Feedback loop: uitkomst registreren na contact/adoptie
-  uitkomst: varchar('uitkomst', { length: 50 }), // 'geinteresseerd' | 'afspraak' | 'geadopteerd' | 'niet_geschikt'
+  // Feedback loop: uitkomst registreren na contact/begeleiding
+  uitkomst: varchar('uitkomst', { length: 50 }), // 'geinteresseerd' | 'afspraak' | 'gestart' | 'niet_geschikt'
   uitkomstOp: timestamp('uitkomst_op'),
   berekendOp: timestamp('berekend_op').defaultNow().notNull(),
 })
@@ -260,8 +273,8 @@ export const matches = pgTable('matches', {
 export const gesprekken = pgTable('gesprekken', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id),
   afspraakDatum: timestamp('afspraak_datum'),
   afspraakBevestigd: boolean('afspraak_bevestigd').default(false),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
@@ -278,39 +291,17 @@ export const berichten = pgTable('berichten', {
   verstuurdOp: timestamp('verstuurd_op').defaultNow().notNull(),
 })
 
-// =================== ADOPTIONS ===================
-
-export const adopties = pgTable('adopties', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id').notNull().references(() => users.id),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id),
-  status: adoptieStatusEnum('status').default('aangevraagd').notNull(),
-  adoptieDatum: timestamp('adoptie_datum'),
-  
-  // Documenten
-  overeenkomstUrl: text('overeenkomst_url'),
-  irRegistratieUrl: text('ir_registratie_url'),
-  
-  // Verzekering
-  verzekeringMaatschappij: varchar('verzekering_maatschappij', { length: 100 }),
-  verzekeringPolisnummer: varchar('verzekering_polisnummer', { length: 100 }),
-  
-  aangevraagdOp: timestamp('aangevraagd_op').defaultNow().notNull(),
-  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-})
-
 // =================== MEDICAL RECORDS ===================
 
 export const medischeRecords = pgTable('medische_records', {
   id: serial('id').primaryKey(),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id),
   type: varchar('type', { length: 100 }).notNull(), // "vaccinatie", "ontworming", "check-up", etc.
   titel: varchar('titel', { length: 255 }).notNull(),
   beschrijving: text('beschrijving'),
   datum: timestamp('datum').notNull(),
   status: medischStatusEnum('status').default('voltooid').notNull(),
-  uitvoerder: varchar('uitvoerder', { length: 100 }), // naam dierenarts/asiel
+  uitvoerder: varchar('uitvoerder', { length: 100 }), // naam behandelaar/organisatie
   rapportUrl: text('rapport_url'),
   notities: text('notities'),
   volgendeDatum: timestamp('volgende_datum'),
@@ -321,7 +312,7 @@ export const medischeRecords = pgTable('medische_records', {
 
 export const nazorgDagen = pgTable('nazorg_dagen', {
   id: serial('id').primaryKey(),
-  adoptieId: integer('adoptie_id').notNull().references(() => adopties.id),
+  begeleidingId: text('begeleiding_id').notNull().references(() => begeleidingen.id),
   dagNummer: integer('dag_nummer').notNull(), // 1 t/m 100
   focusOnderwerp: varchar('focus_onderwerp', { length: 100 }),
   beschrijving: text('beschrijving'),
@@ -340,7 +331,7 @@ export const nazorgDagen = pgTable('nazorg_dagen', {
 export const favorieten = pgTable('favorieten', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  dierId: integer('dier_id').notNull().references(() => dieren.id, { onDelete: 'cascade' }),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id, { onDelete: 'cascade' }),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
 })
 
@@ -349,8 +340,8 @@ export const favorieten = pgTable('favorieten', {
 export const afspraken = pgTable('afspraken', {
   id: serial('id').primaryKey(),
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id),
   type: afspraakTypeEnum('type').notNull().default('kennismaking'),
   status: afspraakStatusEnum('status').notNull().default('aangevraagd'),
   voorkeurDatum: timestamp('voorkeur_datum').notNull(),
@@ -362,6 +353,25 @@ export const afspraken = pgTable('afspraken', {
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
 })
+
+// =================== HELPDESK (contactformulieren & web-intakes per organisatie) ===================
+
+export const helpdeskTickets = pgTable('helpdesk_tickets', {
+  id: serial('id').primaryKey(),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  naam: varchar('naam', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  onderwerp: varchar('onderwerp', { length: 255 }).notNull(),
+  bericht: text('bericht').notNull(),
+  bron: helpdeskBronEnum('bron').default('webintake').notNull(),
+  status: helpdeskStatusEnum('status').default('open').notNull(),
+  // Verwijst naar het bijbehorende concept-antwoord van 'Samen' in ai_content_queue (indien gegenereerd).
+  conceptQueueId: integer('concept_queue_id'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+  beantwoordOp: timestamp('beantwoord_op'),
+}, (t) => ({
+  organisatieIdx: index('helpdesk_tickets_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== WACHTLIJST ===================
 export const wachtlijst = pgTable('wachtlijst', {
@@ -380,7 +390,7 @@ export const wachtlijst = pgTable('wachtlijst', {
 // =================== WELZIJN LOGS ===================
 export const welzijnLogs = pgTable('welzijn_logs', {
   id: serial('id').primaryKey(),
-  dierId: integer('dier_id').notNull().references(() => dieren.id, { onDelete: 'cascade' }),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id, { onDelete: 'cascade' }),
   medewerkerId: integer('medewerker_id').references(() => users.id),
   voeding: varchar('voeding', { length: 20 }).notNull(),
   gedrag: varchar('gedrag', { length: 20 }).notNull(),
@@ -392,7 +402,7 @@ export const welzijnLogs = pgTable('welzijn_logs', {
 // =================== PLEEGGEZINNEN ===================
 export const pleeggezinnen = pgTable('pleeggezinnen', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').references(() => asielen.id),
+  organisatieId: text('organisatie_id').references(() => organisaties.id),
   naam: varchar('naam', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }),
   telefoon: varchar('telefoon', { length: 20 }),
@@ -409,7 +419,7 @@ export const pleeggezinnen = pgTable('pleeggezinnen', {
 // =================== PLEEGPLAATSINGEN ===================
 export const pleegplaatsingen = pgTable('pleegplaatsingen', {
   id: serial('id').primaryKey(),
-  dierId: integer('dier_id').notNull().references(() => dieren.id),
+  dossierId: text('dossier_id').notNull().references(() => dossiers.id),
   pleeggezinId: integer('pleeggezin_id').notNull().references(() => pleeggezinnen.id),
   startdatum: timestamp('startdatum').notNull(),
   einddatum: timestamp('einddatum'),
@@ -429,20 +439,21 @@ export const wachtwoordResets = pgTable('wachtwoord_resets', {
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
 })
 
-// =================== AI-GEBRUIK (kostentracking) ===================
+// =================== AI-GEBRUIK (token- en kostentracking per organisatie) ===================
 
 export const aiGebruik = pgTable('ai_gebruik', {
   id: serial('id').primaryKey(),
-  module: varchar('module', { length: 50 }).notNull(), // 'matching' | 'copilot' | 'blog' | ...
-  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
-  asielId: integer('asiel_id'),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   model: varchar('model', { length: 100 }).notNull(),
-  promptTokens: integer('prompt_tokens').default(0).notNull(),
-  completionTokens: integer('completion_tokens').default(0).notNull(),
-  totaalTokens: integer('totaal_tokens').default(0).notNull(),
-  kostenEuro: real('kosten_euro').default(0).notNull(),
+  tokensIn: integer('tokens_in').default(0).notNull(),
+  tokensOut: integer('tokens_out').default(0).notNull(),
+  kostenEuro: numeric('kosten_euro', { precision: 10, scale: 4 }).default('0').notNull(),
+  actie: varchar('actie', { length: 80 }).notNull(), // 'matching' | 'copilot' | 'blog' | ...
+  userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
-})
+}, (t) => ({
+  organisatieIdx: index('ai_gebruik_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== MAIL LOG (verzendgeschiedenis) ===================
 
@@ -455,7 +466,7 @@ export const mailLog = pgTable('mail_log', {
   status: mailStatusEnum('status').default('verzonden').notNull(),
   resendId: varchar('resend_id', { length: 100 }),
   contactId: integer('contact_id'),
-  asielId: integer('asiel_id'),
+  organisatieId: text('organisatie_id'),
   userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   fout: text('fout'),
   verzondenOp: timestamp('verzonden_op').defaultNow().notNull(),
@@ -483,11 +494,13 @@ export const crmContacten = pgTable('crm_contacten', {
   eigenaar: varchar('eigenaar', { length: 120 }), // beheerder die het contact bezit
   tags: json('tags').$type<string[]>().default([]),
   notitie: text('notitie'),
-  asielId: integer('asiel_id'),
+  organisatieId: text('organisatie_id'),
   userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-})
+}, (t) => ({
+  organisatieIdx: index('crm_contacten_organisatie_id_idx').on(t.organisatieId),
+}))
 
 export const crmDeals = pgTable('crm_deals', {
   id: serial('id').primaryKey(),
@@ -530,6 +543,9 @@ export const blogPosts = pgTable('blog_posts', {
   excerpt: text('excerpt'),
   coverUrl: text('cover_url'),
   categorieId: integer('categorie_id').references(() => blogCategorieen.id, { onDelete: 'set null' }),
+  // Nullable: leeg = platformblog (WeAreImpact/ImpactOS-marketingsite, beheerd via /management/blog).
+  // Gevuld = artikel van een organisatie zelf, beheerd via /admin/blog.
+  organisatieId: text('organisatie_id').references(() => organisaties.id, { onDelete: 'cascade' }),
   status: blogStatusEnum('status').default('concept').notNull(),
   metaTitle: varchar('meta_title', { length: 255 }),
   metaDescription: varchar('meta_description', { length: 320 }),
@@ -542,7 +558,9 @@ export const blogPosts = pgTable('blog_posts', {
   gepubliceerdOp: timestamp('gepubliceerd_op'),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-})
+}, (t) => ({
+  organisatieIdx: index('blog_posts_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== COUPONS (marketingcodes) ===================
 
@@ -573,7 +591,8 @@ export const couponInwisselingen = pgTable('coupon_inwisselingen', {
 })
 
 // =================== AI-ROLLEN CONFIG ===================
-// Welke gespecialiseerde AI-rollen zijn geactiveerd per asiel
+// Welke gespecialiseerde AI-rollen zijn geactiveerd per organisatie, incl. optionele
+// custom system-prompt waarmee een organisatie het gedrag van een rol kan overschrijven.
 
 export const aiRolEnum = pgEnum('ai_rol', [
   'social', 'fundraising', 'vrijwilligers', 'evenementen',
@@ -581,20 +600,80 @@ export const aiRolEnum = pgEnum('ai_rol', [
 ])
 
 export const aiRollenConfig = pgTable('ai_rollen_config', {
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   rol: aiRolEnum('rol').notNull(),
   actief: boolean('actief').default(true).notNull(),
+  systemPrompt: text('system_prompt'), // optionele custom system-prompt per organisatie
   instellingen: json('instellingen').$type<Record<string, unknown>>().default({}),
   aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-}, (t) => ({ pk: primaryKey({ columns: [t.asielId, t.rol] }) }))
+}, (t) => ({ pk: primaryKey({ columns: [t.organisatieId, t.rol] }) }))
+
+// =================== KENNISKLUIS (brondocumenten voor AI-context) ===================
+// PDF's/tekstdocumenten die een organisatie uploadt (beleidsplan, Wmo-kader, goedgekeurde
+// fondsaanvragen). De geëxtraheerde tekst wordt als extra context meegegeven aan Sam, Mila
+// en Conny — zie src/lib/ai/rollen/context.ts → haalKenniskluisContext().
+
+export const kenniskluisStatusEnum = pgEnum('kenniskluis_status', ['verwerkt', 'mislukt'])
+
+export const kenniskluisDocumenten = pgTable('kenniskluis_documenten', {
+  id: serial('id').primaryKey(),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  bestandsnaam: varchar('bestandsnaam', { length: 255 }).notNull(),
+  blobUrl: text('blob_url').notNull(),
+  mimeType: varchar('mime_type', { length: 100 }).notNull(),
+  grootteBytes: integer('grootte_bytes').notNull(),
+  tekstInhoud: text('tekst_inhoud'), // geëxtraheerde tekst, ingekort voor contextgebruik
+  status: kenniskluisStatusEnum('status').default('verwerkt').notNull(),
+  foutmelding: text('foutmelding'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('kenniskluis_documenten_organisatie_id_idx').on(t.organisatieId),
+}))
+
+// =================== TEAMUITNODIGINGEN (teamleden per organisatie uitnodigen) ===================
+// Zelfde patroon als wachtwoord_resets: alleen een SHA-256 hash van het token wordt
+// opgeslagen, de ruwe token zit uitsluitend in de uitnodigingsmail.
+
+export const teamUitnodigingStatusEnum = pgEnum('team_uitnodiging_status', ['open', 'geaccepteerd', 'ingetrokken'])
+
+export const teamUitnodigingen = pgTable('team_uitnodigingen', {
+  id: serial('id').primaryKey(),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  email: varchar('email', { length: 255 }).notNull(),
+  tokenHash: varchar('token_hash', { length: 64 }).notNull(),
+  uitgenodigdDoor: integer('uitgenodigd_door').references(() => users.id, { onDelete: 'set null' }),
+  status: teamUitnodigingStatusEnum('status').default('open').notNull(),
+  verlooptOp: timestamp('verloopt_op').notNull(),
+  geaccepteerdOp: timestamp('geaccepteerd_op'),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
+}, (t) => ({
+  organisatieIdx: index('team_uitnodigingen_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== VRIJWILLIGERS ===================
+
+// =================== EXTERNE KOPPELINGEN (agenda-sync: Outlook/Google) ===================
+// OAuth-tokens voor per-organisatie agenda-koppelingen. Tokens staan versleuteld
+// (AES-256-GCM, zie src/lib/integraties/crypto.ts) — nooit in platte tekst opgeslagen.
+
+export const integratieProviderEnum = pgEnum('integratie_provider', ['microsoft', 'google'])
+
+export const externeKoppelingen = pgTable('externe_koppelingen', {
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
+  provider: integratieProviderEnum('provider').notNull(),
+  accountEmail: varchar('account_email', { length: 255 }),
+  accessTokenVersleuteld: text('access_token_versleuteld').notNull(),
+  refreshTokenVersleuteld: text('refresh_token_versleuteld').notNull(),
+  verlooptOp: timestamp('verloopt_op').notNull(),
+  gekoppeldOp: timestamp('gekoppeld_op').defaultNow().notNull(),
+  bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
+}, (t) => ({ pk: primaryKey({ columns: [t.organisatieId, t.provider] }) }))
 
 export const vrijwilligerStatusEnum = pgEnum('vrijwilliger_status', ['kandidaat', 'actief', 'inactief'])
 export const vrijwilligers = pgTable('vrijwilligers', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   naam: varchar('naam', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }),
   telefoon: varchar('telefoon', { length: 30 }),
@@ -612,7 +691,7 @@ export const vrijwilligers = pgTable('vrijwilligers', {
 export const sollicitatieStatusEnum = pgEnum('sollicitatie_status', ['nieuw', 'gescreend', 'uitgenodigd', 'afgewezen'])
 export const sollicitaties = pgTable('sollicitaties', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   naam: varchar('naam', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).notNull(),
   telefoon: varchar('telefoon', { length: 30 }),
@@ -633,7 +712,7 @@ export const donorTypeEnum = pgEnum('donor_type', ['eenmalig', 'structureel', 'b
 export const donorSegmentEnum = pgEnum('donor_segment', ['nieuw', 'regulier', 'major', 'laps', 'actief'])
 export const donoren = pgTable('donoren', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   naam: varchar('naam', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }),
   telefoon: varchar('telefoon', { length: 30 }),
@@ -653,7 +732,7 @@ export const campagneTypeEnum = pgEnum('campagne_type', ['donatie', 'grant', 'sp
 export const campagneStatusEnum = pgEnum('campagne_status', ['concept', 'actief', 'afgerond', 'gepauzeerd'])
 export const fondsenwervingCampagnes = pgTable('fondsenwerving_campagnes', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   naam: varchar('naam', { length: 255 }).notNull(),
   type: campagneTypeEnum('type').default('donatie').notNull(),
   status: campagneStatusEnum('status').default('concept').notNull(),
@@ -672,7 +751,7 @@ export const evenementTypeEnum = pgEnum('evenement_type', ['adoptiedag', 'openda
 export const evenementStatusEnum = pgEnum('evenement_status', ['concept', 'gepland', 'afgerond', 'geannuleerd'])
 export const evenementen = pgTable('evenementen', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   titel: varchar('titel', { length: 255 }).notNull(),
   type: evenementTypeEnum('type').default('adoptiedag').notNull(),
   beschrijving: text('beschrijving'),
@@ -697,24 +776,30 @@ export const evenementShiften = pgTable('evenement_shiften', {
   notities: text('notities'),
 })
 
-// =================== AI CONTENT QUEUE (social / nieuwsbrieven / verhalen) ===================
+// =================== AI CONTENT QUEUE (voorstellen door AI-rollen, wachtend op goedkeuring) ===================
 
-export const contentStatusEnum = pgEnum('content_status', ['concept', 'voorgesteld', 'gepland', 'gepubliceerd', 'afgewezen'])
+export const aiContentTypeEnum = pgEnum('ai_content_type', [
+  'subsidie', 'rapportage', 'social_post', 'briefing', 'email',
+])
+
+export const aiContentStatusEnum = pgEnum('ai_content_status', ['pending', 'approved', 'rejected'])
+
 export const aiContentQueue = pgTable('ai_content_queue', {
   id: serial('id').primaryKey(),
-  asielId: integer('asiel_id').notNull().references(() => asielen.id, { onDelete: 'cascade' }),
+  organisatieId: text('organisatie_id').notNull().references(() => organisaties.id, { onDelete: 'cascade' }),
   rol: aiRolEnum('rol').notNull(),
-  type: varchar('type', { length: 40 }).notNull(),
-  platform: varchar('platform', { length: 40 }),
+  type: aiContentTypeEnum('type').notNull(),
   titel: varchar('titel', { length: 255 }),
-  inhoud: text('inhoud').notNull(),
-  status: contentStatusEnum('status').default('concept').notNull(),
-  geplandVoor: timestamp('gepland_voor'),
-  gepubliceerdOp: timestamp('gepubliceerd_op'),
-  engagement: json('engagement').$type<{ bereik?: number; likes?: number; deelActies?: number; klikken?: number }>().default({}),
-  gemaaktDoor: varchar('gemaakt_door', { length: 60 }).default('ai'),
+  content: text('content').notNull(),
+  status: aiContentStatusEnum('status').default('pending').notNull(),
+  metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}),
+  beoordeeldOp: timestamp('beoordeeld_op'),
+  beoordeeldDoor: varchar('beoordeeld_door', { length: 120 }),
+  aangemaaktOp: timestamp('aangemaakt_op').defaultNow().notNull(),
   bijgewerktOp: timestamp('bijgewerkt_op').defaultNow().notNull(),
-})
+}, (t) => ({
+  organisatieIdx: index('ai_content_queue_organisatie_id_idx').on(t.organisatieId),
+}))
 
 // =================== RELATIONS ===================
 
@@ -722,17 +807,19 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   profiel: one(adopterProfielen, { fields: [users.id], references: [adopterProfielen.userId] }),
   matches: many(matches),
   gesprekken: many(gesprekken),
-  adopties: many(adopties),
 }))
 
-export const dierenRelations = relations(dieren, ({ one, many }) => ({
-  asiel: one(asielen, { fields: [dieren.asielId], references: [asielen.id] }),
+export const dossiersRelations = relations(dossiers, ({ one, many }) => ({
+  organisatie: one(organisaties, { fields: [dossiers.organisatieId], references: [organisaties.id] }),
   matches: many(matches),
   medischeRecords: many(medischeRecords),
+  begeleidingen: many(begeleidingen),
 }))
 
-export const asielenRelations = relations(asielen, ({ many }) => ({
-  dieren: many(dieren),
+export const organisatiesRelations = relations(organisaties, ({ many }) => ({
+  dossiers: many(dossiers),
+  clienten: many(clienten),
+  begeleidingen: many(begeleidingen),
   gesprekken: many(gesprekken),
   vrijwilligers: many(vrijwilligers),
   donoren: many(donoren),
@@ -740,18 +827,59 @@ export const asielenRelations = relations(asielen, ({ many }) => ({
   evenementen: many(evenementen),
   content: many(aiContentQueue),
   rollen: many(aiRollenConfig),
+  aiGebruik: many(aiGebruik),
+  kenniskluisDocumenten: many(kenniskluisDocumenten),
+  externeKoppelingen: many(externeKoppelingen),
+  onboardingBerichten: many(onboardingBerichten),
+  teamUitnodigingen: many(teamUitnodigingen),
+}))
+
+export const clientenRelations = relations(clienten, ({ one, many }) => ({
+  organisatie: one(organisaties, { fields: [clienten.organisatieId], references: [organisaties.id] }),
+  begeleidingen: many(begeleidingen),
+}))
+
+export const begeleidingenRelations = relations(begeleidingen, ({ one, many }) => ({
+  dossier: one(dossiers, { fields: [begeleidingen.dossierId], references: [dossiers.id] }),
+  client: one(clienten, { fields: [begeleidingen.clientId], references: [clienten.id] }),
+  organisatie: one(organisaties, { fields: [begeleidingen.organisatieId], references: [organisaties.id] }),
+  nazorgDagen: many(nazorgDagen),
 }))
 
 export const gesprekkenRelations = relations(gesprekken, ({ one, many }) => ({
   user: one(users, { fields: [gesprekken.userId], references: [users.id] }),
-  dier: one(dieren, { fields: [gesprekken.dierId], references: [dieren.id] }),
-  asiel: one(asielen, { fields: [gesprekken.asielId], references: [asielen.id] }),
+  dossier: one(dossiers, { fields: [gesprekken.dossierId], references: [dossiers.id] }),
+  organisatie: one(organisaties, { fields: [gesprekken.organisatieId], references: [organisaties.id] }),
   berichten: many(berichten),
 }))
 
-export const adoptiesRelations = relations(adopties, ({ one, many }) => ({
-  user: one(users, { fields: [adopties.userId], references: [users.id] }),
-  dier: one(dieren, { fields: [adopties.dierId], references: [dieren.id] }),
-  asiel: one(asielen, { fields: [adopties.asielId], references: [asielen.id] }),
-  nazorgDagen: many(nazorgDagen),
-}))
+// =================== TIJDELIJKE TYPE-ALIASSEN (compat tijdens migratie) ===================
+// Deze aliassen voorkomen een lawine van onnodige compile-fouten in de UI terwijl losse
+// routes/componenten stap voor stap overgezet worden naar de nieuwe organisatie/dossier/
+// client/begeleiding-namen (Sprint 3). Nieuwe code moet de nieuwe namen gebruiken.
+
+export type Organisatie = typeof organisaties.$inferSelect
+export type NewOrganisatie = typeof organisaties.$inferInsert
+export type Dossier = typeof dossiers.$inferSelect
+export type NewDossier = typeof dossiers.$inferInsert
+export type Client = typeof clienten.$inferSelect
+export type NewClient = typeof clienten.$inferInsert
+export type Begeleiding = typeof begeleidingen.$inferSelect
+export type NewBegeleiding = typeof begeleidingen.$inferInsert
+export type AiQueueItem = typeof aiContentQueue.$inferSelect
+export type NewAiQueueItem = typeof aiContentQueue.$inferInsert
+
+/** @deprecated gebruik `Organisatie` */
+export type Asiel = Organisatie
+/** @deprecated gebruik `NewOrganisatie` */
+export type NewAsiel = NewOrganisatie
+/** @deprecated gebruik `Dossier` */
+export type Dier = Dossier
+/** @deprecated gebruik `NewDossier` */
+export type NewDier = NewDossier
+/** @deprecated gebruik `Client` */
+export type Adoptant = Client
+/** @deprecated gebruik `Begeleiding` */
+export type Adoptie = Begeleiding
+/** @deprecated gebruik `NewBegeleiding` */
+export type NewAdoptie = NewBegeleiding

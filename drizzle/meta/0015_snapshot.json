@@ -1,0 +1,4718 @@
+{
+  "id": "e7bde92f-640a-4f5b-bcdf-4c4f6607d03d",
+  "prevId": "b5704b7a-8d05-4b50-928f-7768f7c3aed3",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.adopter_profielen": {
+      "name": "adopter_profielen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "woning_type": {
+          "name": "woning_type",
+          "type": "woning_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heeft_tuin": {
+          "name": "heeft_tuin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "tuin_oppervlakte": {
+          "name": "tuin_oppervlakte",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activiteit_niveau": {
+          "name": "activiteit_niveau",
+          "type": "activiteit_niveau",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aantal_volwassenen": {
+          "name": "aantal_volwassenen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "aantal_kinderen": {
+          "name": "aantal_kinderen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "jongste_kind_leeftijd": {
+          "name": "jongste_kind_leeftijd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "andere_dieren": {
+          "name": "andere_dieren",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "werk_uren_per_dag": {
+          "name": "werk_uren_per_dag",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 8
+        },
+        "ervaring_niveau": {
+          "name": "ervaring_niveau",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budget_dierenarts": {
+          "name": "budget_dierenarts",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "allergieën": {
+          "name": "allergieën",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "diersoort_voorkeur": {
+          "name": "diersoort_voorkeur",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "leeftijd_voorkeur": {
+          "name": "leeftijd_voorkeur",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extra_wensen": {
+          "name": "extra_wensen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profiel_hash": {
+          "name": "profiel_hash",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "adopter_profielen_user_id_users_id_fk": {
+          "name": "adopter_profielen_user_id_users_id_fk",
+          "tableFrom": "adopter_profielen",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.afspraken": {
+      "name": "afspraken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "afspraak_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'kennismaking'"
+        },
+        "status": {
+          "name": "status",
+          "type": "afspraak_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangevraagd'"
+        },
+        "voorkeur_datum": {
+          "name": "voorkeur_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "voorkeur_tijdslot": {
+          "name": "voorkeur_tijdslot",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bevestigde_datum": {
+          "name": "bevestigde_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bevestigd_tijdstip": {
+          "name": "bevestigd_tijdstip",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notitie_adoptant": {
+          "name": "notitie_adoptant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notitie_asiel": {
+          "name": "notitie_asiel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "afspraken_user_id_users_id_fk": {
+          "name": "afspraken_user_id_users_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "afspraken_dossier_id_dossiers_id_fk": {
+          "name": "afspraken_dossier_id_dossiers_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "afspraken_organisatie_id_organisaties_id_fk": {
+          "name": "afspraken_organisatie_id_organisaties_id_fk",
+          "tableFrom": "afspraken",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_content_queue": {
+      "name": "ai_content_queue",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rol": {
+          "name": "rol",
+          "type": "ai_rol",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "ai_content_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "ai_content_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        },
+        "beoordeeld_op": {
+          "name": "beoordeeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beoordeeld_door": {
+          "name": "beoordeeld_door",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ai_content_queue_organisatie_id_idx": {
+          "name": "ai_content_queue_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ai_content_queue_organisatie_id_organisaties_id_fk": {
+          "name": "ai_content_queue_organisatie_id_organisaties_id_fk",
+          "tableFrom": "ai_content_queue",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_gebruik": {
+      "name": "ai_gebruik",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokens_in": {
+          "name": "tokens_in",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "tokens_out": {
+          "name": "tokens_out",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "kosten_euro": {
+          "name": "kosten_euro",
+          "type": "numeric(10, 4)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "actie": {
+          "name": "actie",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "ai_gebruik_organisatie_id_idx": {
+          "name": "ai_gebruik_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ai_gebruik_organisatie_id_organisaties_id_fk": {
+          "name": "ai_gebruik_organisatie_id_organisaties_id_fk",
+          "tableFrom": "ai_gebruik",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ai_gebruik_user_id_users_id_fk": {
+          "name": "ai_gebruik_user_id_users_id_fk",
+          "tableFrom": "ai_gebruik",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_rollen_config": {
+      "name": "ai_rollen_config",
+      "schema": "",
+      "columns": {
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rol": {
+          "name": "rol",
+          "type": "ai_rol",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "system_prompt": {
+          "name": "system_prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "instellingen": {
+          "name": "instellingen",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::json"
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_rollen_config_organisatie_id_organisaties_id_fk": {
+          "name": "ai_rollen_config_organisatie_id_organisaties_id_fk",
+          "tableFrom": "ai_rollen_config",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ai_rollen_config_organisatie_id_rol_pk": {
+          "name": "ai_rollen_config_organisatie_id_rol_pk",
+          "columns": [
+            "organisatie_id",
+            "rol"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.app_instellingen": {
+      "name": "app_instellingen",
+      "schema": "",
+      "columns": {
+        "sleutel": {
+          "name": "sleutel",
+          "type": "varchar(100)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "waarde": {
+          "name": "waarde",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.begeleidingen": {
+      "name": "begeleidingen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_datum": {
+          "name": "start_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "begeleiding_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'gepland'"
+        },
+        "evaluatie_notities": {
+          "name": "evaluatie_notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "begeleidingen_organisatie_id_idx": {
+          "name": "begeleidingen_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "begeleidingen_dossier_id_dossiers_id_fk": {
+          "name": "begeleidingen_dossier_id_dossiers_id_fk",
+          "tableFrom": "begeleidingen",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "begeleidingen_client_id_clienten_id_fk": {
+          "name": "begeleidingen_client_id_clienten_id_fk",
+          "tableFrom": "begeleidingen",
+          "tableTo": "clienten",
+          "columnsFrom": [
+            "client_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "begeleidingen_organisatie_id_organisaties_id_fk": {
+          "name": "begeleidingen_organisatie_id_organisaties_id_fk",
+          "tableFrom": "begeleidingen",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.berichten": {
+      "name": "berichten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "gesprek_id": {
+          "name": "gesprek_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verzender_type": {
+          "name": "verzender_type",
+          "type": "bericht_verzender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verzender_id": {
+          "name": "verzender_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inhoud": {
+          "name": "inhoud",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gelezen": {
+          "name": "gelezen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "verstuurd_op": {
+          "name": "verstuurd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "berichten_gesprek_id_gesprekken_id_fk": {
+          "name": "berichten_gesprek_id_gesprekken_id_fk",
+          "tableFrom": "berichten",
+          "tableTo": "gesprekken",
+          "columnsFrom": [
+            "gesprek_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blog_categorieen": {
+      "name": "blog_categorieen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(140)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "blog_categorieen_slug_unique": {
+          "name": "blog_categorieen_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.blog_posts": {
+      "name": "blog_posts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(280)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inhoud_md": {
+          "name": "inhoud_md",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "excerpt": {
+          "name": "excerpt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cover_url": {
+          "name": "cover_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categorie_id": {
+          "name": "categorie_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "blog_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'concept'"
+        },
+        "meta_title": {
+          "name": "meta_title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "meta_description": {
+          "name": "meta_description",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leestijd": {
+          "name": "leestijd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "focus_keyword": {
+          "name": "focus_keyword",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "seo_score": {
+          "name": "seo_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "interne_links": {
+          "name": "interne_links",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "externe_links": {
+          "name": "externe_links",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "auteur_id": {
+          "name": "auteur_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gepubliceerd_op": {
+          "name": "gepubliceerd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "blog_posts_organisatie_id_idx": {
+          "name": "blog_posts_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "blog_posts_categorie_id_blog_categorieen_id_fk": {
+          "name": "blog_posts_categorie_id_blog_categorieen_id_fk",
+          "tableFrom": "blog_posts",
+          "tableTo": "blog_categorieen",
+          "columnsFrom": [
+            "categorie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "blog_posts_organisatie_id_organisaties_id_fk": {
+          "name": "blog_posts_organisatie_id_organisaties_id_fk",
+          "tableFrom": "blog_posts",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "blog_posts_auteur_id_users_id_fk": {
+          "name": "blog_posts_auteur_id_users_id_fk",
+          "tableFrom": "blog_posts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "auteur_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "blog_posts_slug_unique": {
+          "name": "blog_posts_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.clienten": {
+      "name": "clienten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "voornaam": {
+          "name": "voornaam",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "achternaam": {
+          "name": "achternaam",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geboortedatum": {
+          "name": "geboortedatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hulpvraag_omschrijving": {
+          "name": "hulpvraag_omschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profiel_data": {
+          "name": "profiel_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        },
+        "status": {
+          "name": "status",
+          "type": "client_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangemeld'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "clienten_organisatie_id_idx": {
+          "name": "clienten_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "clienten_organisatie_id_organisaties_id_fk": {
+          "name": "clienten_organisatie_id_organisaties_id_fk",
+          "tableFrom": "clienten",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.coupon_inwisselingen": {
+      "name": "coupon_inwisselingen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "coupon_id": {
+          "name": "coupon_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bedrag_korting": {
+          "name": "bedrag_korting",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ingewisseld_op": {
+          "name": "ingewisseld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "coupon_inwisselingen_coupon_id_coupons_id_fk": {
+          "name": "coupon_inwisselingen_coupon_id_coupons_id_fk",
+          "tableFrom": "coupon_inwisselingen",
+          "tableTo": "coupons",
+          "columnsFrom": [
+            "coupon_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "coupon_inwisselingen_user_id_users_id_fk": {
+          "name": "coupon_inwisselingen_user_id_users_id_fk",
+          "tableFrom": "coupon_inwisselingen",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.coupons": {
+      "name": "coupons",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "omschrijving": {
+          "name": "omschrijving",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "coupon_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'procent'"
+        },
+        "waarde": {
+          "name": "waarde",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_gebruik": {
+          "name": "max_gebruik",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gebruikt_aantal": {
+          "name": "gebruikt_aantal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "per_klant_limiet": {
+          "name": "per_klant_limiet",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "min_besteding": {
+          "name": "min_besteding",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "campagne": {
+          "name": "campagne",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "start_op": {
+          "name": "start_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verval_op": {
+          "name": "verval_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "coupons_code_unique": {
+          "name": "coupons_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crm_activiteiten": {
+      "name": "crm_activiteiten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deal_id": {
+          "name": "deal_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "crm_activiteit_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'notitie'"
+        },
+        "inhoud": {
+          "name": "inhoud",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auteur": {
+          "name": "auteur",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voltooid": {
+          "name": "voltooid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "deadline": {
+          "name": "deadline",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "crm_activiteiten_contact_id_crm_contacten_id_fk": {
+          "name": "crm_activiteiten_contact_id_crm_contacten_id_fk",
+          "tableFrom": "crm_activiteiten",
+          "tableTo": "crm_contacten",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "crm_activiteiten_deal_id_crm_deals_id_fk": {
+          "name": "crm_activiteiten_deal_id_crm_deals_id_fk",
+          "tableFrom": "crm_activiteiten",
+          "tableTo": "crm_deals",
+          "columnsFrom": [
+            "deal_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crm_contacten": {
+      "name": "crm_contacten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bedrijf": {
+          "name": "bedrijf",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "crm_contact_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'lead'"
+        },
+        "bron": {
+          "name": "bron",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'handmatig'"
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eigenaar": {
+          "name": "eigenaar",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "notitie": {
+          "name": "notitie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "crm_contacten_organisatie_id_idx": {
+          "name": "crm_contacten_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "crm_contacten_user_id_users_id_fk": {
+          "name": "crm_contacten_user_id_users_id_fk",
+          "tableFrom": "crm_contacten",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.crm_deals": {
+      "name": "crm_deals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fase": {
+          "name": "fase",
+          "type": "crm_deal_fase",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'nieuw'"
+        },
+        "waarde": {
+          "name": "waarde",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "eigenaar": {
+          "name": "eigenaar",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sluitingsdatum": {
+          "name": "sluitingsdatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "volgorde": {
+          "name": "volgorde",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "crm_deals_contact_id_crm_contacten_id_fk": {
+          "name": "crm_deals_contact_id_crm_contacten_id_fk",
+          "tableFrom": "crm_deals",
+          "tableTo": "crm_contacten",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.donoren": {
+      "name": "donoren",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bedrijf": {
+          "name": "bedrijf",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "donor_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'eenmalig'"
+        },
+        "segment": {
+          "name": "segment",
+          "type": "donor_segment",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'nieuw'"
+        },
+        "totaal_gedoneerd": {
+          "name": "totaal_gedoneerd",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "eerste_donatie_op": {
+          "name": "eerste_donatie_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "laatste_donatie_op": {
+          "name": "laatste_donatie_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "donoren_organisatie_id_organisaties_id_fk": {
+          "name": "donoren_organisatie_id_organisaties_id_fk",
+          "tableFrom": "donoren",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dossiers": {
+      "name": "dossiers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dossier_nummer": {
+          "name": "dossier_nummer",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categorie": {
+          "name": "categorie",
+          "type": "dossier_categorie",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'overig'"
+        },
+        "status": {
+          "name": "status",
+          "type": "dossier_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'intake'"
+        },
+        "samenvatting": {
+          "name": "samenvatting",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intake_data": {
+          "name": "intake_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        },
+        "vertrouwelijk": {
+          "name": "vertrouwelijk",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "dossiers_organisatie_id_idx": {
+          "name": "dossiers_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "dossiers_organisatie_id_organisaties_id_fk": {
+          "name": "dossiers_organisatie_id_organisaties_id_fk",
+          "tableFrom": "dossiers",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evenement_shiften": {
+      "name": "evenement_shiften",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "evenement_id": {
+          "name": "evenement_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taak": {
+          "name": "taak",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_op": {
+          "name": "start_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eind_op": {
+          "name": "eind_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vrijwilliger_id": {
+          "name": "vrijwilliger_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "shift_status": {
+          "name": "shift_status",
+          "type": "shift_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "evenement_shiften_evenement_id_evenementen_id_fk": {
+          "name": "evenement_shiften_evenement_id_evenementen_id_fk",
+          "tableFrom": "evenement_shiften",
+          "tableTo": "evenementen",
+          "columnsFrom": [
+            "evenement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "evenement_shiften_vrijwilliger_id_vrijwilligers_id_fk": {
+          "name": "evenement_shiften_vrijwilliger_id_vrijwilligers_id_fk",
+          "tableFrom": "evenement_shiften",
+          "tableTo": "vrijwilligers",
+          "columnsFrom": [
+            "vrijwilliger_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evenementen": {
+      "name": "evenementen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "evenement_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'adoptiedag'"
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "locatie": {
+          "name": "locatie",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_op": {
+          "name": "start_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eind_op": {
+          "name": "eind_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "capaciteit": {
+          "name": "capaciteit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "evenement_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'concept'"
+        },
+        "promo_concept_id": {
+          "name": "promo_concept_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "evenementen_organisatie_id_organisaties_id_fk": {
+          "name": "evenementen_organisatie_id_organisaties_id_fk",
+          "tableFrom": "evenementen",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.externe_koppelingen": {
+      "name": "externe_koppelingen",
+      "schema": "",
+      "columns": {
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "integratie_provider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "account_email": {
+          "name": "account_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_versleuteld": {
+          "name": "access_token_versleuteld",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "refresh_token_versleuteld": {
+          "name": "refresh_token_versleuteld",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verloopt_op": {
+          "name": "verloopt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gekoppeld_op": {
+          "name": "gekoppeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "externe_koppelingen_organisatie_id_organisaties_id_fk": {
+          "name": "externe_koppelingen_organisatie_id_organisaties_id_fk",
+          "tableFrom": "externe_koppelingen",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "externe_koppelingen_organisatie_id_provider_pk": {
+          "name": "externe_koppelingen_organisatie_id_provider_pk",
+          "columns": [
+            "organisatie_id",
+            "provider"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.favorieten": {
+      "name": "favorieten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "favorieten_user_id_users_id_fk": {
+          "name": "favorieten_user_id_users_id_fk",
+          "tableFrom": "favorieten",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "favorieten_dossier_id_dossiers_id_fk": {
+          "name": "favorieten_dossier_id_dossiers_id_fk",
+          "tableFrom": "favorieten",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fondsenwerving_campagnes": {
+      "name": "fondsenwerving_campagnes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "campagne_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'donatie'"
+        },
+        "status": {
+          "name": "status",
+          "type": "campagne_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'concept'"
+        },
+        "doel_bedrag": {
+          "name": "doel_bedrag",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "opgehaald_bedrag": {
+          "name": "opgehaald_bedrag",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "start_op": {
+          "name": "start_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eind_op": {
+          "name": "eind_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fondsenwerving_campagnes_organisatie_id_organisaties_id_fk": {
+          "name": "fondsenwerving_campagnes_organisatie_id_organisaties_id_fk",
+          "tableFrom": "fondsenwerving_campagnes",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.gesprekken": {
+      "name": "gesprekken",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "afspraak_datum": {
+          "name": "afspraak_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "afspraak_bevestigd": {
+          "name": "afspraak_bevestigd",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "laatste_bericht_op": {
+          "name": "laatste_bericht_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "gesprekken_user_id_users_id_fk": {
+          "name": "gesprekken_user_id_users_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "gesprekken_dossier_id_dossiers_id_fk": {
+          "name": "gesprekken_dossier_id_dossiers_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "gesprekken_organisatie_id_organisaties_id_fk": {
+          "name": "gesprekken_organisatie_id_organisaties_id_fk",
+          "tableFrom": "gesprekken",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.helpdesk_tickets": {
+      "name": "helpdesk_tickets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "onderwerp": {
+          "name": "onderwerp",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bericht": {
+          "name": "bericht",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bron": {
+          "name": "bron",
+          "type": "helpdesk_bron",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'webintake'"
+        },
+        "status": {
+          "name": "status",
+          "type": "helpdesk_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "concept_queue_id": {
+          "name": "concept_queue_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "beantwoord_op": {
+          "name": "beantwoord_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "helpdesk_tickets_organisatie_id_idx": {
+          "name": "helpdesk_tickets_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "helpdesk_tickets_organisatie_id_organisaties_id_fk": {
+          "name": "helpdesk_tickets_organisatie_id_organisaties_id_fk",
+          "tableFrom": "helpdesk_tickets",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kenniskluis_documenten": {
+      "name": "kenniskluis_documenten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bestandsnaam": {
+          "name": "bestandsnaam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blob_url": {
+          "name": "blob_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mime_type": {
+          "name": "mime_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grootte_bytes": {
+          "name": "grootte_bytes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tekst_inhoud": {
+          "name": "tekst_inhoud",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "kenniskluis_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'verwerkt'"
+        },
+        "foutmelding": {
+          "name": "foutmelding",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "kenniskluis_documenten_organisatie_id_idx": {
+          "name": "kenniskluis_documenten_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "kenniskluis_documenten_organisatie_id_organisaties_id_fk": {
+          "name": "kenniskluis_documenten_organisatie_id_organisaties_id_fk",
+          "tableFrom": "kenniskluis_documenten",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mail_log": {
+      "name": "mail_log",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naar": {
+          "name": "naar",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "van": {
+          "name": "van",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "onderwerp": {
+          "name": "onderwerp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template": {
+          "name": "template",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "mail_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'verzonden'"
+        },
+        "resend_id": {
+          "name": "resend_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fout": {
+          "name": "fout",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verzonden_op": {
+          "name": "verzonden_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "mail_log_user_id_users_id_fk": {
+          "name": "mail_log_user_id_users_id_fk",
+          "tableFrom": "mail_log",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.matches": {
+      "name": "matches",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "analyse_tekst": {
+          "name": "analyse_tekst",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "woning_score": {
+          "name": "woning_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "energie_score": {
+          "name": "energie_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gezin_score": {
+          "name": "gezin_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ervaring_score": {
+          "name": "ervaring_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alleen_thuis_score": {
+          "name": "alleen_thuis_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "budget_score": {
+          "name": "budget_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_aanbevolen": {
+          "name": "is_aanbevolen",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "uitkomst": {
+          "name": "uitkomst",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uitkomst_op": {
+          "name": "uitkomst_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "berekend_op": {
+          "name": "berekend_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "matches_user_id_users_id_fk": {
+          "name": "matches_user_id_users_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "matches_dossier_id_dossiers_id_fk": {
+          "name": "matches_dossier_id_dossiers_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medische_records": {
+      "name": "medische_records",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "titel": {
+          "name": "titel",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "datum": {
+          "name": "datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "medisch_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'voltooid'"
+        },
+        "uitvoerder": {
+          "name": "uitvoerder",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rapport_url": {
+          "name": "rapport_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "volgende_datum": {
+          "name": "volgende_datum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medische_records_dossier_id_dossiers_id_fk": {
+          "name": "medische_records_dossier_id_dossiers_id_fk",
+          "tableFrom": "medische_records",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nazorg_dagen": {
+      "name": "nazorg_dagen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "begeleiding_id": {
+          "name": "begeleiding_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dag_nummer": {
+          "name": "dag_nummer",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "focus_onderwerp": {
+          "name": "focus_onderwerp",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beschrijving": {
+          "name": "beschrijving",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tips": {
+          "name": "tips",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "checklist": {
+          "name": "checklist",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "checklist_voltooid": {
+          "name": "checklist_voltooid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "aantekeningen_gebruiker": {
+          "name": "aantekeningen_gebruiker",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "nazorg_dagen_begeleiding_id_begeleidingen_id_fk": {
+          "name": "nazorg_dagen_begeleiding_id_begeleidingen_id_fk",
+          "tableFrom": "nazorg_dagen",
+          "tableTo": "begeleidingen",
+          "columnsFrom": [
+            "begeleiding_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.onboarding_berichten": {
+      "name": "onboarding_berichten",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "afzender": {
+          "name": "afzender",
+          "type": "onboarding_afzender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inhoud": {
+          "name": "inhoud",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "onboarding_berichten_organisatie_id_idx": {
+          "name": "onboarding_berichten_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "onboarding_berichten_organisatie_id_organisaties_id_fk": {
+          "name": "onboarding_berichten_organisatie_id_organisaties_id_fk",
+          "tableFrom": "onboarding_berichten",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organisaties": {
+      "name": "organisaties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(160)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kvk_nummer": {
+          "name": "kvk_nummer",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contact_email": {
+          "name": "contact_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "website": {
+          "name": "website",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "organisatie_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'proef'"
+        },
+        "bron": {
+          "name": "bron",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'handmatig'"
+        },
+        "werving_status": {
+          "name": "werving_status",
+          "type": "werving_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aangesloten'"
+        },
+        "uitnodiging_verstuurd_op": {
+          "name": "uitnodiging_verstuurd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rechtsvorm": {
+          "name": "rechtsvorm",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "werkveld_categorieen": {
+          "name": "werkveld_categorieen",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "gemeenten": {
+          "name": "gemeenten",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "teamgrootte": {
+          "name": "teamgrootte",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vrijwilligers_aantal": {
+          "name": "vrijwilligers_aantal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grootste_knelpunt": {
+          "name": "grootste_knelpunt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tone_of_voice": {
+          "name": "tone_of_voice",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "onboarding_status": {
+          "name": "onboarding_status",
+          "type": "onboarding_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'niet_gestart'"
+        },
+        "onboarding_afgerond_op": {
+          "name": "onboarding_afgerond_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "organisaties_slug_unique": {
+          "name": "organisaties_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pleeggezinnen": {
+      "name": "pleeggezinnen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "adres": {
+          "name": "adres",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soort_voorkeur": {
+          "name": "soort_voorkeur",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "max_dieren": {
+          "name": "max_dieren",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "ervaring_niveau": {
+          "name": "ervaring_niveau",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'geen'"
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pleeggezinnen_organisatie_id_organisaties_id_fk": {
+          "name": "pleeggezinnen_organisatie_id_organisaties_id_fk",
+          "tableFrom": "pleeggezinnen",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pleegplaatsingen": {
+      "name": "pleegplaatsingen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pleeggezin_id": {
+          "name": "pleeggezin_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startdatum": {
+          "name": "startdatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "einddatum": {
+          "name": "einddatum",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pleegplaatsingen_dossier_id_dossiers_id_fk": {
+          "name": "pleegplaatsingen_dossier_id_dossiers_id_fk",
+          "tableFrom": "pleegplaatsingen",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pleegplaatsingen_pleeggezin_id_pleeggezinnen_id_fk": {
+          "name": "pleegplaatsingen_pleeggezin_id_pleeggezinnen_id_fk",
+          "tableFrom": "pleegplaatsingen",
+          "tableTo": "pleeggezinnen",
+          "columnsFrom": [
+            "pleeggezin_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sollicitaties": {
+      "name": "sollicitaties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "functie": {
+          "name": "functie",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "motivatie": {
+          "name": "motivatie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ervaring": {
+          "name": "ervaring",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "sollicitatie_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'nieuw'"
+        },
+        "ai_score": {
+          "name": "ai_score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ai_screen_notitie": {
+          "name": "ai_screen_notitie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vrijwilliger_id": {
+          "name": "vrijwilliger_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sollicitaties_organisatie_id_organisaties_id_fk": {
+          "name": "sollicitaties_organisatie_id_organisaties_id_fk",
+          "tableFrom": "sollicitaties",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "sollicitaties_vrijwilliger_id_vrijwilligers_id_fk": {
+          "name": "sollicitaties_vrijwilliger_id_vrijwilligers_id_fk",
+          "tableFrom": "sollicitaties",
+          "tableTo": "vrijwilligers",
+          "columnsFrom": [
+            "vrijwilliger_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.team_uitnodigingen": {
+      "name": "team_uitnodigingen",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uitgenodigd_door": {
+          "name": "uitgenodigd_door",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "team_uitnodiging_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "verloopt_op": {
+          "name": "verloopt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "geaccepteerd_op": {
+          "name": "geaccepteerd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "team_uitnodigingen_organisatie_id_idx": {
+          "name": "team_uitnodigingen_organisatie_id_idx",
+          "columns": [
+            {
+              "expression": "organisatie_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "team_uitnodigingen_organisatie_id_organisaties_id_fk": {
+          "name": "team_uitnodigingen_organisatie_id_organisaties_id_fk",
+          "tableFrom": "team_uitnodigingen",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "team_uitnodigingen_uitgenodigd_door_users_id_fk": {
+          "name": "team_uitnodigingen_uitgenodigd_door_users_id_fk",
+          "tableFrom": "team_uitnodigingen",
+          "tableTo": "users",
+          "columnsFrom": [
+            "uitgenodigd_door"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wachtwoord_hash": {
+          "name": "wachtwoord_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stad": {
+          "name": "stad",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postcode": {
+          "name": "postcode",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lng": {
+          "name": "lng",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rol": {
+          "name": "rol",
+          "type": "user_rol",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'adoptant'"
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profiel_voltooid": {
+          "name": "profiel_voltooid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vrijwilligers": {
+      "name": "vrijwilligers",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "organisatie_id": {
+          "name": "organisatie_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefoon": {
+          "name": "telefoon",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "functie": {
+          "name": "functie",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'algemene ondersteuning'"
+        },
+        "status": {
+          "name": "status",
+          "type": "vrijwilliger_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'kandidaat'"
+        },
+        "uren_per_week": {
+          "name": "uren_per_week",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "beschikbaarheid": {
+          "name": "beschikbaarheid",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::json"
+        },
+        "tags": {
+          "name": "tags",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "bijgewerkt_op": {
+          "name": "bijgewerkt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vrijwilligers_organisatie_id_organisaties_id_fk": {
+          "name": "vrijwilligers_organisatie_id_organisaties_id_fk",
+          "tableFrom": "vrijwilligers",
+          "tableTo": "organisaties",
+          "columnsFrom": [
+            "organisatie_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wachtlijst": {
+      "name": "wachtlijst",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "naam": {
+          "name": "naam",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "soort": {
+          "name": "soort",
+          "type": "animal_species",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ras": {
+          "name": "ras",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leeftijd_voorkeur": {
+          "name": "leeftijd_voorkeur",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notities": {
+          "name": "notities",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actief": {
+          "name": "actief",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "aangemeld_op": {
+          "name": "aangemeld_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "wachtlijst_user_id_users_id_fk": {
+          "name": "wachtlijst_user_id_users_id_fk",
+          "tableFrom": "wachtlijst",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.wachtwoord_resets": {
+      "name": "wachtwoord_resets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verloopt_op": {
+          "name": "verloopt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gebruikt_op": {
+          "name": "gebruikt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aangemaakt_op": {
+          "name": "aangemaakt_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "wachtwoord_resets_user_id_users_id_fk": {
+          "name": "wachtwoord_resets_user_id_users_id_fk",
+          "tableFrom": "wachtwoord_resets",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.welzijn_logs": {
+      "name": "welzijn_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "dossier_id": {
+          "name": "dossier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "medewerker_id": {
+          "name": "medewerker_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voeding": {
+          "name": "voeding",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gedrag": {
+          "name": "gedrag",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gezondheid": {
+          "name": "gezondheid",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notitie": {
+          "name": "notitie",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gelogd_op": {
+          "name": "gelogd_op",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "welzijn_logs_dossier_id_dossiers_id_fk": {
+          "name": "welzijn_logs_dossier_id_dossiers_id_fk",
+          "tableFrom": "welzijn_logs",
+          "tableTo": "dossiers",
+          "columnsFrom": [
+            "dossier_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "welzijn_logs_medewerker_id_users_id_fk": {
+          "name": "welzijn_logs_medewerker_id_users_id_fk",
+          "tableFrom": "welzijn_logs",
+          "tableTo": "users",
+          "columnsFrom": [
+            "medewerker_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.activiteit_niveau": {
+      "name": "activiteit_niveau",
+      "schema": "public",
+      "values": [
+        "laag",
+        "normaal",
+        "hoog",
+        "zeer_hoog"
+      ]
+    },
+    "public.afspraak_status": {
+      "name": "afspraak_status",
+      "schema": "public",
+      "values": [
+        "aangevraagd",
+        "bevestigd",
+        "afgerond",
+        "geannuleerd"
+      ]
+    },
+    "public.afspraak_type": {
+      "name": "afspraak_type",
+      "schema": "public",
+      "values": [
+        "kennismaking",
+        "thuischeck"
+      ]
+    },
+    "public.ai_content_status": {
+      "name": "ai_content_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "approved",
+        "rejected"
+      ]
+    },
+    "public.ai_content_type": {
+      "name": "ai_content_type",
+      "schema": "public",
+      "values": [
+        "subsidie",
+        "rapportage",
+        "social_post",
+        "briefing",
+        "email"
+      ]
+    },
+    "public.ai_rol": {
+      "name": "ai_rol",
+      "schema": "public",
+      "values": [
+        "social",
+        "fundraising",
+        "vrijwilligers",
+        "evenementen",
+        "medisch",
+        "foto",
+        "rapportage",
+        "chat"
+      ]
+    },
+    "public.animal_species": {
+      "name": "animal_species",
+      "schema": "public",
+      "values": [
+        "hond",
+        "kat",
+        "vogel",
+        "konijn",
+        "cavia",
+        "hamster",
+        "overig"
+      ]
+    },
+    "public.begeleiding_status": {
+      "name": "begeleiding_status",
+      "schema": "public",
+      "values": [
+        "gepland",
+        "actief",
+        "afgerond",
+        "gestopt"
+      ]
+    },
+    "public.bericht_verzender": {
+      "name": "bericht_verzender",
+      "schema": "public",
+      "values": [
+        "adoptant",
+        "asiel",
+        "systeem"
+      ]
+    },
+    "public.blog_status": {
+      "name": "blog_status",
+      "schema": "public",
+      "values": [
+        "concept",
+        "gepubliceerd",
+        "gearchiveerd"
+      ]
+    },
+    "public.campagne_status": {
+      "name": "campagne_status",
+      "schema": "public",
+      "values": [
+        "concept",
+        "actief",
+        "afgerond",
+        "gepauzeerd"
+      ]
+    },
+    "public.campagne_type": {
+      "name": "campagne_type",
+      "schema": "public",
+      "values": [
+        "donatie",
+        "grant",
+        "sponsor",
+        "evenement"
+      ]
+    },
+    "public.client_status": {
+      "name": "client_status",
+      "schema": "public",
+      "values": [
+        "aangemeld",
+        "gematcht",
+        "afgerond"
+      ]
+    },
+    "public.coupon_type": {
+      "name": "coupon_type",
+      "schema": "public",
+      "values": [
+        "procent",
+        "vast"
+      ]
+    },
+    "public.crm_activiteit_type": {
+      "name": "crm_activiteit_type",
+      "schema": "public",
+      "values": [
+        "notitie",
+        "mail",
+        "bel",
+        "taak",
+        "afspraak"
+      ]
+    },
+    "public.crm_contact_type": {
+      "name": "crm_contact_type",
+      "schema": "public",
+      "values": [
+        "lead",
+        "asiel",
+        "adoptant",
+        "partner",
+        "overig"
+      ]
+    },
+    "public.crm_deal_fase": {
+      "name": "crm_deal_fase",
+      "schema": "public",
+      "values": [
+        "nieuw",
+        "contact",
+        "onderhandeling",
+        "gewonnen",
+        "verloren"
+      ]
+    },
+    "public.donor_segment": {
+      "name": "donor_segment",
+      "schema": "public",
+      "values": [
+        "nieuw",
+        "regulier",
+        "major",
+        "laps",
+        "actief"
+      ]
+    },
+    "public.donor_type": {
+      "name": "donor_type",
+      "schema": "public",
+      "values": [
+        "eenmalig",
+        "structureel",
+        "bedrijf"
+      ]
+    },
+    "public.dossier_categorie": {
+      "name": "dossier_categorie",
+      "schema": "public",
+      "values": [
+        "wmo",
+        "participatie",
+        "jeugd",
+        "reintegratie",
+        "overig"
+      ]
+    },
+    "public.dossier_status": {
+      "name": "dossier_status",
+      "schema": "public",
+      "values": [
+        "intake",
+        "actief",
+        "in_behandeling",
+        "afgerond"
+      ]
+    },
+    "public.evenement_status": {
+      "name": "evenement_status",
+      "schema": "public",
+      "values": [
+        "concept",
+        "gepland",
+        "afgerond",
+        "geannuleerd"
+      ]
+    },
+    "public.evenement_type": {
+      "name": "evenement_type",
+      "schema": "public",
+      "values": [
+        "adoptiedag",
+        "opendag",
+        "fundraising",
+        "andere"
+      ]
+    },
+    "public.helpdesk_bron": {
+      "name": "helpdesk_bron",
+      "schema": "public",
+      "values": [
+        "contactformulier",
+        "webintake",
+        "widget"
+      ]
+    },
+    "public.helpdesk_status": {
+      "name": "helpdesk_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "concept_klaar",
+        "beantwoord",
+        "gesloten"
+      ]
+    },
+    "public.integratie_provider": {
+      "name": "integratie_provider",
+      "schema": "public",
+      "values": [
+        "microsoft",
+        "google"
+      ]
+    },
+    "public.kenniskluis_status": {
+      "name": "kenniskluis_status",
+      "schema": "public",
+      "values": [
+        "verwerkt",
+        "mislukt"
+      ]
+    },
+    "public.mail_status": {
+      "name": "mail_status",
+      "schema": "public",
+      "values": [
+        "verzonden",
+        "gefaald",
+        "geopend",
+        "gebounced"
+      ]
+    },
+    "public.medisch_status": {
+      "name": "medisch_status",
+      "schema": "public",
+      "values": [
+        "aankomend",
+        "voltooid",
+        "gemist",
+        "geannuleerd"
+      ]
+    },
+    "public.onboarding_afzender": {
+      "name": "onboarding_afzender",
+      "schema": "public",
+      "values": [
+        "gebruiker",
+        "assistent"
+      ]
+    },
+    "public.onboarding_status": {
+      "name": "onboarding_status",
+      "schema": "public",
+      "values": [
+        "niet_gestart",
+        "bezig",
+        "afgerond",
+        "overgeslagen"
+      ]
+    },
+    "public.organisatie_status": {
+      "name": "organisatie_status",
+      "schema": "public",
+      "values": [
+        "proef",
+        "actief",
+        "gearchiveerd"
+      ]
+    },
+    "public.shift_status": {
+      "name": "shift_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "ingevuld",
+        "geannuleerd"
+      ]
+    },
+    "public.sollicitatie_status": {
+      "name": "sollicitatie_status",
+      "schema": "public",
+      "values": [
+        "nieuw",
+        "gescreend",
+        "uitgenodigd",
+        "afgewezen"
+      ]
+    },
+    "public.team_uitnodiging_status": {
+      "name": "team_uitnodiging_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "geaccepteerd",
+        "ingetrokken"
+      ]
+    },
+    "public.user_rol": {
+      "name": "user_rol",
+      "schema": "public",
+      "values": [
+        "adoptant",
+        "asiel",
+        "admin"
+      ]
+    },
+    "public.vrijwilliger_status": {
+      "name": "vrijwilliger_status",
+      "schema": "public",
+      "values": [
+        "kandidaat",
+        "actief",
+        "inactief"
+      ]
+    },
+    "public.werving_status": {
+      "name": "werving_status",
+      "schema": "public",
+      "values": [
+        "nieuw",
+        "uitgenodigd",
+        "overgeslagen",
+        "aangesloten"
+      ]
+    },
+    "public.woning_type": {
+      "name": "woning_type",
+      "schema": "public",
+      "values": [
+        "appartement",
+        "huis_zonder_tuin",
+        "huis_met_tuin",
+        "boerderij"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

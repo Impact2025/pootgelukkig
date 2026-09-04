@@ -332,7 +332,7 @@ export function berekenCrossSpeciesSuggestie(
 
 // =================== AANBEVELING VIA AI ===================
 
-async function genereerAanbeveling(profiel: AdopterProfiel): Promise<string> {
+async function genereerAanbeveling(profiel: AdopterProfiel, organisatieId?: string): Promise<string> {
   const prompt = `Je bent Dr. Poot, een vriendelijke dierenwelzijn-expert voor PootGelukkig.
 
 Schrijf een warme, persoonlijke aanbeveling van 1-2 zinnen in het Nederlands over het ideale type dier voor deze persoon.
@@ -350,7 +350,7 @@ Profiel:
 Geef alleen de aanbevelingstekst, geen JSON.`
 
   try {
-    return await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 150, meta: { module: 'intake' } })
+    return await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 150, meta: { actie: 'intake', organisatieId: organisatieId ?? 'onbekend' } })
   } catch {
     const soort = profiel.diersoortVoorkeur[0] ?? 'dier'
     return `Op basis van jouw profiel zoeken we de beste ${soort === 'alles' ? 'match' : soort} voor je.`
@@ -360,7 +360,8 @@ Geef alleen de aanbevelingstekst, geen JSON.`
 // =================== EXPORT ===================
 
 export async function verwerkIntakeAntwoorden(
-  antwoorden: Record<string, string>
+  antwoorden: Record<string, string>,
+  organisatieId?: string
 ): Promise<{
   profiel: AdopterProfiel
   aanbeveling: string
@@ -368,7 +369,7 @@ export async function verwerkIntakeAntwoorden(
   crossSpeciesSuggestie: CrossSpeciesSuggestie | null
 }> {
   const profiel = mapAntwoordenNaarProfiel(antwoorden)
-  const [aanbeveling] = await Promise.all([genereerAanbeveling(profiel)])
+  const [aanbeveling] = await Promise.all([genereerAanbeveling(profiel, organisatieId)])
   const risicos = berekenRisicos(profiel)
   const crossSpeciesSuggestie = berekenCrossSpeciesSuggestie(profiel)
   return { profiel, aanbeveling, risicos, crossSpeciesSuggestie }

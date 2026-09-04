@@ -3,16 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import AdminSidebar from './AdminSidebar'
 import AdminTopBar from './AdminTopBar'
+import AdminBottomNav from './AdminBottomNav'
 import CommandPalette from './CommandPalette'
 import { cx } from '@/components/admin/ui'
 import { ToastProvider } from '@/components/admin/Toast'
 
 export interface AdminCounts {
-  openstaand: number
-  ongelezen: number
-  medisch: number
-  wachtlijst: number
-  afspraken: number
+  wachtrij: number
 }
 
 export interface AdminUser {
@@ -85,8 +82,10 @@ export default function AdminShell({
           onToggleSidebar={handleToggleSidebar}
           onOpenPalette={() => setPaletteOpen(true)}
         />
-        <main className="min-w-0">{children}</main>
+        <main className="min-w-0 pb-20 lg:pb-0">{children}</main>
       </div>
+
+      <AdminBottomNav counts={counts} />
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} isAdmin={user.rol === 'admin'} />
     </div>

@@ -28,7 +28,7 @@ export default async function ManagementDashboardPage() {
   const kpis = await getManagementKpis(maandStart)
   const maandNaam = maandStart.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
 
-  const maxModuleKosten = Math.max(...kpis.aiPerModule.map((m) => m.kosten), 0.000001)
+  const maxModuleKosten = Math.max(...kpis.aiPerActie.map((m) => m.kosten), 0.000001)
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-6">
@@ -41,7 +41,7 @@ export default async function ManagementDashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="Nieuwe gebruikers" value={kpis.nieuweGebruikers} icon="group_add" tone="success" />
         <StatCard label="Nieuwe matches" value={kpis.nieuweMatches} icon="favorite" tone="danger" />
-        <StatCard label="Nieuwe adopties" value={kpis.nieuweAdopties} icon="pets" tone="info" />
+        <StatCard label="Nieuwe adopties" value={kpis.nieuweBegeleidingen} icon="pets" tone="info" />
         <StatCard label="Verzonden mails" value={kpis.verzondenMails} icon="mail" tone="neutral" />
       </div>
 
@@ -57,14 +57,14 @@ export default async function ManagementDashboardPage() {
 
         <Card className="lg:col-span-2">
           <p className="text-sm font-bold text-[#33335c] mb-4">Kosten per module</p>
-          {kpis.aiPerModule.length === 0 ? (
+          {kpis.aiPerActie.length === 0 ? (
             <p className="text-[#33335c]/40 text-sm">Nog geen AI-gebruik geregistreerd deze maand.</p>
           ) : (
             <div className="space-y-2.5">
-              {kpis.aiPerModule.map((m) => (
-                <div key={m.module} className="flex items-center gap-3">
+              {kpis.aiPerActie.map((m) => (
+                <div key={m.actie} className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-[#33335c]/70 w-32 flex-shrink-0">
-                    {moduleLabels[m.module] ?? m.module}
+                    {moduleLabels[m.actie] ?? m.actie}
                   </span>
                   <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div

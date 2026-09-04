@@ -34,14 +34,14 @@ const ICONS: Record<ToastType, string> = {
 const TOAST_STYLES: Record<ToastType, string> = {
   success: 'bg-[#1a2e1a] border-emerald-700/60 text-white',
   error:   'bg-[#2e1a1a] border-red-700/60 text-white',
-  info:    'bg-[#1e1e38] border-[#33335c]/60 text-white',
+  info:    'bg-[#1e1e38] border-[#1E293B]/60 text-white',
   warning: 'bg-[#2e2410] border-amber-700/60 text-white',
 }
 
 const ICON_COLORS: Record<ToastType, string> = {
   success: 'text-emerald-400',
   error:   'text-red-400',
-  info:    'text-[#f8aa25]',
+  info:    'text-[#1D4ED8]',
   warning: 'text-amber-400',
 }
 

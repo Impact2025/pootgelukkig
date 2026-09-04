@@ -21,7 +21,7 @@ export default async function ManagementLayout({ children }: { children: React.R
         email: session.user.email ?? '',
         rol: session.user.rol,
       }}
-      counts={{ openstaand: 0, ongelezen: 0, medisch: 0, wachtlijst: 0, afspraken: 0 }}
+      counts={{ wachtrij: 0 }}
     >
       {children}
     </ManagementShell>

@@ -4,15 +4,13 @@ import { NextRequest } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import {
-  dieren,
-  adopties,
+  dossiers,
+  begeleidingen,
   afspraken,
-  medischeRecords,
-  asielen,
-  users,
+  organisaties,
 } from '@/lib/db/schema'
-import { and, eq, count, lt, gte, ne, desc } from 'drizzle-orm'
-import { chatStream } from '@/lib/ai/client'
+import { and, eq, count, gte, ne, desc } from 'drizzle-orm'
+import { chatStream, MODEL_SONNET } from '@/lib/ai/client'
 import { haalRol, isGeldigeRol } from '@/lib/ai/rollen'
 
 type Bericht = {
@@ -20,69 +18,57 @@ type Bericht = {
   inhoud: string
 }
 
-async function bouwCopilotContext(asielId: number | undefined | null): Promise<string> {
+async function bouwCopilotContext(organisatieId: string | undefined | null): Promise<string> {
   const vandaag = new Date()
-  const dertigDagenGeleden = new Date(vandaag)
-  dertigDagenGeleden.setDate(dertigDagenGeleden.getDate() - 30)
-  const zeveDagenGeleden = new Date(vandaag)
-  zeveDagenGeleden.setDate(zeveDagenGeleden.getDate() - 7)
-  const morgen = new Date(vandaag)
-  morgen.setDate(morgen.getDate() + 1)
-  morgen.setHours(23, 59, 59, 999)
 
-  let asielNaam = 'het asiel'
-  let asielConfig: { stad?: string | null; telefoon?: string | null; email?: string | null } = {}
+  let organisatieNaam = 'de organisatie'
+  let organisatieInfo: { website?: string | null; telefoon?: string | null; contactEmail?: string | null } = {}
 
-  if (asielId) {
-    const [asiel] = await db
-      .select({ naam: asielen.naam, stad: asielen.stad, telefoon: asielen.telefoon, email: asielen.email })
-      .from(asielen)
-      .where(eq(asielen.id, asielId))
+  if (organisatieId) {
+    const [org] = await db
+      .select({ naam: organisaties.naam, website: organisaties.website, telefoon: organisaties.telefoon, contactEmail: organisaties.contactEmail })
+      .from(organisaties)
+      .where(eq(organisaties.id, organisatieId))
       .limit(1)
-    if (asiel) {
-      asielNaam = asiel.naam
-      asielConfig = { stad: asiel.stad, telefoon: asiel.telefoon, email: asiel.email }
+    if (org) {
+      organisatieNaam = org.naam
+      organisatieInfo = { website: org.website, telefoon: org.telefoon, contactEmail: org.contactEmail }
     }
   }
 
-  // Dieren overzicht
-  const alleDieren = await db
+  // Dossiers overzicht
+  const alleDossiers = await db
     .select({
-      id: dieren.id,
-      naam: dieren.naam,
-      soort: dieren.soort,
-      ras: dieren.ras,
-      status: dieren.status,
-      leeftijdJaren: dieren.leeftijdJaren,
-      geslacht: dieren.geslacht,
-      binnengekomentOp: dieren.binnengekomentOp,
+      id: dossiers.id,
+      titel: dossiers.titel,
+      categorie: dossiers.categorie,
+      status: dossiers.status,
+      createdAt: dossiers.createdAt,
     })
-    .from(dieren)
-    .where(asielId ? and(eq(dieren.asielId, asielId), ne(dieren.status, 'geadopteerd')) : ne(dieren.status, 'geadopteerd'))
-    .orderBy(desc(dieren.binnengekomentOp))
+    .from(dossiers)
+    .where(organisatieId ? and(eq(dossiers.organisatieId, organisatieId), ne(dossiers.status, 'afgerond')) : ne(dossiers.status, 'afgerond'))
+    .orderBy(desc(dossiers.createdAt))
     .limit(50)
 
-  // Openstaande adopties met detail
-  const openAdopties = await db
+  // Openstaande begeleidingen
+  const openBegeleidingen = await db
     .select({
-      id: adopties.id,
-      aangevraagdOp: adopties.aangevraagdOp,
-      dierNaam: dieren.naam,
-      dierSoort: dieren.soort,
-      userName: users.naam,
+      id: begeleidingen.id,
+      startDatum: begeleidingen.startDatum,
+      createdAt: begeleidingen.createdAt,
+      dossierTitel: dossiers.titel,
     })
-    .from(adopties)
-    .innerJoin(dieren, eq(adopties.dierId, dieren.id))
-    .innerJoin(users, eq(adopties.userId, users.id))
-    .where(asielId ? and(eq(adopties.status, 'aangevraagd'), eq(adopties.asielId, asielId)) : eq(adopties.status, 'aangevraagd'))
-    .orderBy(adopties.aangevraagdOp)
+    .from(begeleidingen)
+    .innerJoin(dossiers, eq(begeleidingen.dossierId, dossiers.id))
+    .where(organisatieId ? and(eq(begeleidingen.status, 'gepland'), eq(begeleidingen.organisatieId, organisatieId)) : eq(begeleidingen.status, 'gepland'))
+    .orderBy(begeleidingen.createdAt)
     .limit(20)
 
-  // Recente afgeronde adopties
-  const [afgrondeAdopties] = await db
+  // Recent afgeronde begeleidingen
+  const [afgerondeBegeleidingen] = await db
     .select({ aantal: count() })
-    .from(adopties)
-    .where(asielId ? and(eq(adopties.status, 'afgerond'), eq(adopties.asielId, asielId)) : eq(adopties.status, 'afgerond'))
+    .from(begeleidingen)
+    .where(organisatieId ? and(eq(begeleidingen.status, 'afgerond'), eq(begeleidingen.organisatieId, organisatieId)) : eq(begeleidingen.status, 'afgerond'))
 
   // Afspraken komende 7 dagen
   const komende = await db
@@ -95,67 +81,48 @@ async function bouwCopilotContext(asielId: number | undefined | null): Promise<s
     })
     .from(afspraken)
     .where(
-      asielId
-        ? and(eq(afspraken.asielId, asielId), eq(afspraken.status, 'bevestigd'), gte(afspraken.bevestigdeDatum, vandaag))
+      organisatieId
+        ? and(eq(afspraken.organisatieId, organisatieId), eq(afspraken.status, 'bevestigd'), gte(afspraken.bevestigdeDatum, vandaag))
         : and(eq(afspraken.status, 'bevestigd'), gte(afspraken.bevestigdeDatum, vandaag))
     )
     .orderBy(afspraken.bevestigdeDatum)
     .limit(10)
 
-  // Medische alerts
-  const medischAchterstallig = await db
-    .select({ titel: medischeRecords.titel, dierId: medischeRecords.dierId, volgendeDatum: medischeRecords.volgendeDatum })
-    .from(medischeRecords)
-    .where(and(eq(medischeRecords.status, 'aankomend'), lt(medischeRecords.volgendeDatum, vandaag)))
-    .limit(10)
+  const actief = alleDossiers.filter((d) => d.status === 'actief')
+  const inBehandeling = alleDossiers.filter((d) => d.status === 'in_behandeling')
 
-  const komendMedisch = await db
-    .select({ titel: medischeRecords.titel, dierId: medischeRecords.dierId, volgendeDatum: medischeRecords.volgendeDatum })
-    .from(medischeRecords)
-    .where(and(eq(medischeRecords.status, 'aankomend'), gte(medischeRecords.volgendeDatum, vandaag), lt(medischeRecords.volgendeDatum, morgen)))
-    .limit(10)
-
-  const beschikbaar = alleDieren.filter((d) => d.status === 'beschikbaar')
-  const inBehandeling = alleDieren.filter((d) => d.status === 'in_behandeling')
-
-  const dierenLijst = beschikbaar
+  const dossierLijst = actief
     .slice(0, 20)
     .map((d) => {
-      const dagen = d.binnengekomentOp
-        ? Math.floor((vandaag.getTime() - new Date(d.binnengekomentOp).getTime()) / 86400000)
-        : null
-      return `- ${d.naam} (${d.soort}${d.ras ? ` - ${d.ras}` : ''}, ${d.leeftijdJaren ?? '?'} jaar, ${d.geslacht ?? 'onbekend'})${dagen ? `, ${dagen} dagen in asiel` : ''}`
+      const dagen = d.createdAt ? Math.floor((vandaag.getTime() - new Date(d.createdAt).getTime()) / 86400000) : null
+      return `- ${d.titel} (${d.categorie})${dagen ? `, ${dagen} dagen open` : ''}`
     })
     .join('\n')
 
-  const adoptieLijst = openAdopties
-    .map((a) => {
-      const dagen = Math.floor((vandaag.getTime() - new Date(a.aangevraagdOp).getTime()) / 86400000)
-      return `- ${a.dierNaam} (${a.dierSoort}) aangevraagd door ${a.userName}, ${dagen} dagen geleden`
+  const begeleidingLijst = openBegeleidingen
+    .map((b) => {
+      const dagen = Math.floor((vandaag.getTime() - new Date(b.createdAt).getTime()) / 86400000)
+      return `- ${b.dossierTitel}, ${dagen} dagen geleden aangemaakt`
     })
     .join('\n')
 
-  return `ASIEL: ${asielNaam}${asielConfig.stad ? ` — ${asielConfig.stad}` : ''}
+  return `ORGANISATIE: ${organisatieNaam}
 DATUM: ${vandaag.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
 
-DIEREN IN OPVANG (${alleDieren.length} totaal):
-  Beschikbaar: ${beschikbaar.length}
+DOSSIERS (${alleDossiers.length} totaal):
+  Actief: ${actief.length}
   In behandeling: ${inBehandeling.length}
 
-BESCHIKBARE DIEREN:
-${dierenLijst || '  Geen beschikbare dieren'}
+ACTIEVE DOSSIERS:
+${dossierLijst || '  Geen actieve dossiers'}
 
-OPENSTAANDE ADOPTIEVERZOEKEN (${openAdopties.length}):
-${adoptieLijst || '  Geen openstaande verzoeken'}
+OPENSTAANDE (GEPLANDE) BEGELEIDINGEN (${openBegeleidingen.length}):
+${begeleidingLijst || '  Geen openstaande begeleidingen'}
 
-TOTAAL SUCCESVOLLE ADOPTIES: ${afgrondeAdopties?.aantal ?? 0}
+TOTAAL AFGERONDE BEGELEIDINGEN: ${afgerondeBegeleidingen?.aantal ?? 0}
 
 KOMENDE AFSPRAKEN: ${komende.length}
-${komende.slice(0, 5).map((a) => `- ${a.type} op ${a.bevestigdeDatum ? new Date(a.bevestigdeDatum).toLocaleDateString('nl-NL') : 'datum onbekend'}`).join('\n') || '  Geen komende afspraken'}
-
-MEDISCHE ALERTS:
-  Achterstallig: ${medischAchterstallig.length}${medischAchterstallig.length > 0 ? '\n' + medischAchterstallig.map((m) => `  - ${m.titel}`).join('\n') : ''}
-  Komende 7 dagen: ${komendMedisch.length}${komendMedisch.length > 0 ? '\n' + komendMedisch.map((m) => `  - ${m.titel} (${m.volgendeDatum ? new Date(m.volgendeDatum).toLocaleDateString('nl-NL') : '?'})`).join('\n') : ''}`
+${komende.slice(0, 5).map((a) => `- ${a.type} op ${a.bevestigdeDatum ? new Date(a.bevestigdeDatum).toLocaleDateString('nl-NL') : 'datum onbekend'}`).join('\n') || '  Geen komende afspraken'}`
 }
 
 export async function POST(request: NextRequest) {
@@ -175,7 +142,10 @@ export async function POST(request: NextRequest) {
     return new Response('Geen berichten', { status: 400 })
   }
 
-  const asielId = session.user.asielId
+  const organisatieId = session.user.organisatieId
+  if (!organisatieId) {
+    return new Response('Geen organisatie gekoppeld aan dit account', { status: 400 })
+  }
 
   // Rol-gebaseerde systeemprompt (RAG-lite) of de algemene copilot-prompt
   const rolId = isGeldigeRol(body.rol) ? body.rol : null
@@ -183,7 +153,7 @@ export async function POST(request: NextRequest) {
 
   let context = ''
   try {
-    context = await bouwCopilotContext(asielId)
+    context = await bouwCopilotContext(organisatieId)
   } catch (error) {
     console.error('Context bouw fout:', error)
   }
@@ -192,20 +162,20 @@ export async function POST(request: NextRequest) {
   if (rol) {
     let rolContext = ''
     try {
-      rolContext = await rol.bouwContext(Number(asielId))
+      rolContext = await rol.bouwContext(organisatieId)
     } catch (error) {
       console.error(`Rol-context fout (${rol.id}):`, error)
     }
     systemPrompt = `${rol.systeemInstructie}
 
-ASIEL CONTEXT:
+ORGANISATIE CONTEXT:
 ${context}
 
 ROL-SPECIFIEKE DATA:
 ${rolContext}
 
 STIJL:
-- Persoonlijk en warm, maar professioneel
+- Persoonlijk en zorgvuldig, maar professioneel
 - Concreet met namen en cijfers (gebruik echte data hierboven)
 - Beknopt tenzij gevraagd om meer detail
 - Gebruik **bold** voor belangrijke punten
@@ -213,28 +183,27 @@ STIJL:
 
 Als je iets niet weet of data mist, zeg dat eerlijk.`
   } else {
-    systemPrompt = `Je bent de PootGelukkig Asiel Copilot — een slimme, proactieve AI-assistent voor medewerkers van het asiel.
+    systemPrompt = `Je bent de ImpactOS Copilot — een slimme, proactieve AI-assistent voor medewerkers van deze organisatie.
 
 Je bent niet zomaar een chatbot. Je bent een echte werkmaatje dat:
-- Alle actuele data kent van het asiel
+- Alle actuele data kent van de organisatie
 - Proactief signaleert wat aandacht nodig heeft
-- Helpt met teksten schrijven (dierenverhalen, sociale media, brieven)
+- Helpt met teksten schrijven (rapportages, subsidieaanvragen, communicatie)
 - Praktische adviezen geeft op basis van echte data
 - Altijd concreet en bruikbaar is
 
-HUIDIGE ASIEL DATA:
+HUIDIGE ORGANISATIE-DATA:
 ${context}
 
 JOUW MOGELIJKHEDEN:
-- Beantwoord vragen over specifieke dieren, adopties, afspraken
-- Schrijf adoptieverhalen en profielteksten voor dieren
-- Genereer sociale media posts (Instagram, Facebook)
+- Beantwoord vragen over specifieke dossiers, begeleidingen, afspraken
+- Schrijf conceptteksten (subsidies, rapportages, communicatie)
 - Analyseer trends en geef aanbevelingen
 - Stel vragen om taken beter te begrijpen
 - Geef dagelijkse prioriteiten
 
 STIJL:
-- Persoonlijk en warm, maar professioneel
+- Persoonlijk en zorgvuldig, maar professioneel
 - Concreet met namen en cijfers (gebruik echte data hierboven)
 - Beknopt tenzij gevraagd om meer detail
 - Gebruik **bold** voor belangrijke punten
@@ -250,8 +219,9 @@ Als je iets niet weet of data mist, zeg dat eerlijk.`
 
   try {
     const stream = await chatStream(messages, {
+      model: MODEL_SONNET,
       maxTokens: 800,
-      meta: { module: rol ? `rol-${rol.id}` : 'copilot', userId: Number(session.user.id), asielId: Number(asielId) },
+      meta: { actie: rol ? `rol-${rol.id}` : 'copilot', userId: Number(session.user.id), organisatieId },
     })
     return new Response(stream, {
       headers: {

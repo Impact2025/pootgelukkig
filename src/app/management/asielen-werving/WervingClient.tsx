@@ -4,21 +4,19 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface Asiel {
-  id: number
+  id: string
   naam: string
-  stad: string
-  regio: string
   email: string | null
   website: string | null
 }
 
 export default function WervingClient({ asielen }: { asielen: Asiel[] }) {
   const router = useRouter()
-  const [geselecteerd, setGeselecteerd] = useState<Set<number>>(new Set())
+  const [geselecteerd, setGeselecteerd] = useState<Set<string>>(new Set())
   const [bezig, setBezig] = useState(false)
   const [melding, setMelding] = useState<string | null>(null)
 
-  function toggle(id: number) {
+  function toggle(id: string) {
     setGeselecteerd((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
@@ -134,8 +132,7 @@ export default function WervingClient({ asielen }: { asielen: Asiel[] }) {
                   className="accent-[#f8aa25] size-4 cursor-pointer"
                 />
               </th>
-              <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">Asiel</th>
-              <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">Regio</th>
+              <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">Organisatie</th>
               <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">E-mail</th>
               <th className="text-left px-5 py-3.5 text-xs font-bold text-gray-400 uppercase tracking-wider">Website</th>
             </tr>
@@ -161,9 +158,7 @@ export default function WervingClient({ asielen }: { asielen: Asiel[] }) {
                   </td>
                   <td className="px-5 py-4">
                     <p className="font-bold text-[#33335c] text-sm">{a.naam}</p>
-                    <p className="text-[#33335c]/40 text-xs mt-0.5">{a.stad}</p>
                   </td>
-                  <td className="px-5 py-4 text-sm text-[#33335c]/60">{a.regio}</td>
                   <td className="px-5 py-4">
                     {heeftEmail ? (
                       <a href={`mailto:${a.email}`} className="text-sm text-[#33335c]/70 hover:text-[#33335c]">

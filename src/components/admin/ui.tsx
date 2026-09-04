@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { statusTone, statusLabel, type StatusTone } from './nav'
 
-/* Presentatie-primitives voor de admin. Licht thema, navy #33335c + amber #f8aa25.
+/* Presentatie-primitives voor de admin. Licht thema, navy #1E293B + amber #1D4ED8.
    Geen hooks → bruikbaar in zowel server- als client-componenten. */
 
 export function cx(...classes: (string | false | null | undefined)[]): string {
@@ -23,7 +23,7 @@ export function Card({
   return (
     <div
       className={cx(
-        'rounded-2xl border border-[#33335c]/8 bg-white shadow-[0_1px_3px_rgba(51,51,92,0.04)]',
+        'rounded-2xl border border-[#1E293B]/8 bg-white shadow-[0_1px_3px_rgba(51,51,92,0.04)]',
         padding && 'p-5',
         className
       )}
@@ -50,15 +50,15 @@ export function PageHeader({
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="flex items-start gap-3">
         {icon && (
-          <span className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#33335c] text-[#f8aa25]">
+          <span className="mt-0.5 flex size-10 items-center justify-center rounded-xl bg-[#1E293B] text-[#1D4ED8]">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
               {icon}
             </span>
           </span>
         )}
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#33335c]">{title}</h1>
-          {description && <p className="mt-1 text-sm text-[#33335c]/55">{description}</p>}
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#1E293B]">{title}</h1>
+          {description && <p className="mt-1 text-sm text-[#1E293B]/55">{description}</p>}
         </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -71,9 +71,9 @@ export function PageHeader({
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-[#33335c] text-white hover:bg-[#26264a]',
-  secondary: 'bg-[#f8aa25] text-[#33335c] hover:bg-[#e39207]',
-  ghost: 'border border-[#33335c]/15 bg-white text-[#33335c] hover:border-[#33335c]/30',
+  primary: 'bg-[#1E293B] text-white hover:bg-[#26264a]',
+  secondary: 'bg-[#1D4ED8] text-[#1E293B] hover:bg-[#e39207]',
+  ghost: 'border border-[#1E293B]/15 bg-white text-[#1E293B] hover:border-[#1E293B]/30',
   danger: 'bg-red-500 text-white hover:bg-red-600',
 }
 
@@ -176,13 +176,13 @@ export function StatCard({
         </span>
         {delta && <DeltaPill value={delta.value} positiefIsGoed={delta.positiefIsGoed ?? true} />}
       </div>
-      <p className="mt-4 text-3xl font-extrabold tracking-tight text-[#33335c]">{value}</p>
-      <p className="mt-1 text-sm font-semibold text-[#33335c]/55">{label}</p>
-      {hint && <p className="mt-0.5 text-xs text-[#33335c]/40">{hint}</p>}
+      <p className="mt-4 text-3xl font-extrabold tracking-tight text-[#1E293B]">{value}</p>
+      <p className="mt-1 text-sm font-semibold text-[#1E293B]/55">{label}</p>
+      {hint && <p className="mt-0.5 text-xs text-[#1E293B]/40">{hint}</p>}
     </>
   )
   const className =
-    'block rounded-2xl border border-[#33335c]/8 bg-white p-5 shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow'
+    'block rounded-2xl border border-[#1E293B]/8 bg-white p-5 shadow-[0_1px_3px_rgba(51,51,92,0.04)] transition-shadow'
   return href ? (
     <Link href={href} className={cx(className, 'hover:shadow-[0_8px_30px_rgba(51,51,92,0.08)]')}>
       {inner}
@@ -194,7 +194,7 @@ export function StatCard({
 
 function DeltaPill({ value, positiefIsGoed }: { value: number; positiefIsGoed: boolean }) {
   if (value === 0) {
-    return <span className="text-xs font-bold text-[#33335c]/35">0%</span>
+    return <span className="text-xs font-bold text-[#1E293B]/35">0%</span>
   }
   const positief = value > 0
   const goed = positief === positiefIsGoed
@@ -225,12 +225,12 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#33335c]/15 bg-white px-6 py-14 text-center">
-      <span className="flex size-12 items-center justify-center rounded-2xl bg-[#f6f8f6] text-[#33335c]/35">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#1E293B]/15 bg-white px-6 py-14 text-center">
+      <span className="flex size-12 items-center justify-center rounded-2xl bg-[#f6f8f6] text-[#1E293B]/35">
         <span className="material-symbols-outlined text-[1.6rem]">{icon}</span>
       </span>
-      <h3 className="mt-4 text-base font-bold text-[#33335c]">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-sm text-[#33335c]/55">{description}</p>}
+      <h3 className="mt-4 text-base font-bold text-[#1E293B]">{title}</h3>
+      {description && <p className="mt-1 max-w-sm text-sm text-[#1E293B]/55">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   )
@@ -239,7 +239,7 @@ export function EmptyState({
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cx('animate-pulse rounded-lg bg-[#33335c]/8', className)} />
+  return <div className={cx('animate-pulse rounded-lg bg-[#1E293B]/8', className)} />
 }
 
 // ─── Avatar ──────────────────────────────────────────────────────────────────
@@ -248,7 +248,7 @@ export function Avatar({ naam, className }: { naam: string; className?: string }
   return (
     <span
       className={cx(
-        'flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#33335c] text-sm font-extrabold leading-none text-[#f8aa25]',
+        'flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#1E293B] text-sm font-extrabold leading-none text-[#1D4ED8]',
         className
       )}
     >

@@ -16,16 +16,8 @@ interface Props {
 
 function badgeFor(item: NavItem, counts: AdminCounts): { value: number; tone: 'rood' | 'navy' } | null {
   switch (item.badge) {
-    case 'openstaand':
-      return counts.openstaand > 0 ? { value: counts.openstaand, tone: 'rood' } : null
-    case 'afspraken':
-      return counts.afspraken > 0 ? { value: counts.afspraken, tone: 'rood' } : null
-    case 'ongelezen':
-      return counts.ongelezen > 0 ? { value: counts.ongelezen, tone: 'rood' } : null
-    case 'medisch':
-      return counts.medisch > 0 ? { value: counts.medisch, tone: 'rood' } : null
-    case 'wachtlijst':
-      return counts.wachtlijst > 0 ? { value: counts.wachtlijst, tone: 'navy' } : null
+    case 'wachtrij':
+      return counts.wachtrij > 0 ? { value: counts.wachtrij, tone: 'navy' } : null
     default:
       return null
   }
@@ -46,7 +38,7 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
           type="button"
           aria-label="Menu sluiten"
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-[#33335c]/30 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#1E293B]/30 backdrop-blur-sm lg:hidden"
         />
       )}
 
@@ -61,17 +53,17 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
       >
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 border-b border-gray-50 px-5">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#33335c]">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#1E293B]">
             <span
-              className="material-symbols-outlined text-[#f8aa25]"
+              className="material-symbols-outlined text-[#1D4ED8]"
               style={{ fontSize: '1.1rem', fontVariationSettings: "'FILL' 1" }}
             >
-              pets
+              hub
             </span>
           </div>
           <div className={cx(collapsed && 'lg:hidden')}>
-            <p className="text-sm font-extrabold leading-tight text-[#33335c]">PootGelukkig</p>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#33335c]/40">Asiel Portaal</p>
+            <p className="text-sm font-extrabold leading-tight text-[#1E293B]">ImpactOS</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#1E293B]/40">Digitaal Kantoor</p>
           </div>
         </div>
 
@@ -89,7 +81,7 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
                 )}
                 {groep.titel && (
                   <div className={cx('px-3 pb-1.5 pt-2', collapsed && 'lg:hidden')}>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#33335c]/30">{groep.titel}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#1E293B]/30">{groep.titel}</p>
                   </div>
                 )}
                 {items.map((item) => {
@@ -106,10 +98,10 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
                         'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all',
                         collapsed && 'lg:justify-center',
                         active
-                          ? 'bg-[#33335c] text-white shadow-md shadow-[#33335c]/20'
+                          ? 'bg-[#1E293B] text-white shadow-md shadow-[#1E293B]/20'
                           : item.highlight
-                            ? 'bg-[#f8aa25]/10 text-[#33335c] hover:bg-[#f8aa25]/20'
-                            : 'text-[#33335c]/50 hover:bg-gray-50 hover:text-[#33335c]'
+                            ? 'bg-[#1D4ED8]/10 text-[#1E293B] hover:bg-[#1D4ED8]/20'
+                            : 'text-[#1E293B]/50 hover:bg-gray-50 hover:text-[#1E293B]'
                       )}
                     >
                       <span className="relative flex-shrink-0">
@@ -117,7 +109,7 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
                           className="material-symbols-outlined text-xl"
                           style={{
                             fontVariationSettings: active || item.highlight ? "'FILL' 1" : "'FILL' 0",
-                            color: !active && item.highlight ? '#f8aa25' : undefined,
+                            color: !active && item.highlight ? '#1D4ED8' : undefined,
                           }}
                         >
                           {item.icon}
@@ -133,7 +125,7 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
                           className={cx(
                             'rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold leading-tight min-w-[18px]',
                             collapsed && 'lg:hidden',
-                            badge.tone === 'rood' ? 'bg-red-500 text-white' : 'bg-[#33335c]/20 text-[#33335c]'
+                            badge.tone === 'rood' ? 'bg-red-500 text-white' : 'bg-[#1E293B]/20 text-[#1E293B]'
                           )}
                         >
                           {badge.value}
@@ -153,7 +145,7 @@ export default function AdminSidebar({ user, counts, collapsed, mobileOpen, onCl
             href="/management"
             title={collapsed ? 'Management portaal' : undefined}
             className={cx(
-              'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#33335c]/40 transition-colors hover:bg-gray-50 hover:text-[#33335c]',
+              'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#1E293B]/40 transition-colors hover:bg-gray-50 hover:text-[#1E293B]',
               collapsed && 'lg:justify-center'
             )}
           >

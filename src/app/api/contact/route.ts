@@ -7,6 +7,12 @@ export const dynamic = 'force-dynamic'
 
 const MANAGEMENT_EMAIL = process.env.MANAGEMENT_EMAIL ?? 'v.munster@weareimpact.nl'
 
+const ONDERWERP_LABELS: Record<string, string> = {
+  algemeen: 'Algemene vraag',
+  demo: 'Demo aanvragen',
+  'doorbraak-sprint': 'Doorbraak Sprint plannen',
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -16,7 +22,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
     }
 
-    const { naam, email, asiel, bericht, website } = parsed.data
+    const { naam, email, asiel, onderwerp, bericht, website } = parsed.data
+    const onderwerpLabel = onderwerp ? ONDERWERP_LABELS[onderwerp] ?? onderwerp : 'Algemene vraag'
 
     // Honeypot ingevuld: doe alsof het gelukt is, maar verstuur niets.
     if (website) {
@@ -24,19 +31,19 @@ export async function POST(req: Request) {
     }
 
     const html = `
-      <div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;max-width:560px;margin:0 auto;color:#33335c">
-        <h2 style="font-size:18px;margin:0 0 16px">Nieuw bericht via de website</h2>
+      <div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;max-width:560px;margin:0 auto;color:#1E293B">
+        <h2 style="font-size:18px;margin:0 0 16px">Nieuw bericht via de website — ${escapeHtml(onderwerpLabel)}</h2>
         <table style="font-size:14px;line-height:1.6;border-collapse:collapse">
           <tr><td style="padding:4px 16px 4px 0;color:#9595a8">Naam</td><td style="font-weight:600">${escapeHtml(naam)}</td></tr>
           <tr><td style="padding:4px 16px 4px 0;color:#9595a8">E-mail</td><td style="font-weight:600">${escapeHtml(email)}</td></tr>
-          ${asiel ? `<tr><td style="padding:4px 16px 4px 0;color:#9595a8">Asiel</td><td style="font-weight:600">${escapeHtml(asiel)}</td></tr>` : ''}
+          ${asiel ? `<tr><td style="padding:4px 16px 4px 0;color:#9595a8">Organisatie</td><td style="font-weight:600">${escapeHtml(asiel)}</td></tr>` : ''}
         </table>
         <p style="font-size:14px;line-height:1.7;margin:16px 0 0;white-space:pre-wrap">${escapeHtml(bericht)}</p>
       </div>`
 
     const result = await verstuurMail({
       naar: MANAGEMENT_EMAIL,
-      onderwerp: `Contact via website${asiel ? ` — ${asiel}` : ''}: ${naam}`,
+      onderwerp: `${onderwerpLabel} via website${asiel ? ` — ${asiel}` : ''}: ${naam}`,
       html,
       antwoordNaar: email,
       meta: { template: 'contact-formulier' },
@@ -44,7 +51,7 @@ export async function POST(req: Request) {
 
     if (!result.ok) {
       return NextResponse.json(
-        { error: 'Je bericht kon niet worden verzonden. Mail ons gerust direct op info@pootgelukkig.nl.' },
+        { error: 'Je bericht kon niet worden verzonden. Mail ons gerust direct op info@weareimpact.nl.' },
         { status: 502 }
       )
     }

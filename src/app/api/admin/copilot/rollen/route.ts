@@ -13,12 +13,12 @@ export async function GET() {
     return NextResponse.json({ error: 'Geen toegang' }, { status: 401 })
   }
 
-  const asielId = session.user.asielId
-  const actief = asielId
+  const organisatieId = session.user.organisatieId
+  const actief = organisatieId
     ? await db
         .select({ rol: aiRollenConfig.rol, actief: aiRollenConfig.actief })
         .from(aiRollenConfig)
-        .where(eq(aiRollenConfig.asielId, asielId))
+        .where(eq(aiRollenConfig.organisatieId, organisatieId))
     : []
   const actiefMap = new Map(actief.map((a) => [a.rol, a.actief]))
 

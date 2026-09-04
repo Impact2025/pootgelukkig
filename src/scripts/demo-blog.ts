@@ -13,9 +13,9 @@ const onderwerp = 'Een kat adopteren uit het asiel: de complete gids voor beginn
 const focusKeyword = 'kat adopteren'
 
 const interneOpties = [
-  { tekst: 'Vind jouw match', url: '/zoeken' },
+  { tekst: 'Vraag een demo aan', url: '/contact?onderwerp=demo' },
   { tekst: 'Doe de intake', url: '/intake' },
-  { tekst: 'Aangesloten asielen', url: '/asielen' },
+  { tekst: 'Voor organisaties', url: '/voor-organisaties' },
 ]
 
 interface Artikel {
@@ -47,7 +47,7 @@ Eisen voor wereldklasse SEO:
 Geef je antwoord als puur JSON, zonder uitleg of code-fences:
 {"titel":"...","excerpt":"...","metaTitle":"...","metaDescription":"...","inhoudMd":"# ...","interneLinks":[{"tekst":"...","url":"/..."}],"externeLinks":[{"tekst":"...","url":"https://..."}]}`
 
-  const raw = await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 4000, meta: { module: 'blog' } })
+  const raw = await chatCompletion([{ role: 'user', content: prompt }], { maxTokens: 4000, meta: { actie: 'blog', organisatieId: 'platform' } })
   const schoon = raw.replace(/^```(?:json)?\s*/m, '').replace(/\s*```$/m, '').trim()
   const artikel = JSON.parse(schoon.slice(schoon.indexOf('{'), schoon.lastIndexOf('}') + 1)) as Artikel
 

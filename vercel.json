@@ -5,10 +5,6 @@
       "schedule": "0 8 * * 1"
     },
     {
-      "path": "/api/cron/afspraken",
-      "schedule": "0 9 * * *"
-    },
-    {
       "path": "/api/cron/asielen-import",
       "schedule": "0 6 1 * *"
     },

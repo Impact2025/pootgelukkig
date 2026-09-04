@@ -4,21 +4,21 @@ import { NextResponse } from 'next/server'
 
 const { auth } = NextAuth(authConfig)
 
-const PUBLIC_ROUTES = ['/auth/login', '/auth/register', '/pitch', '/auth/wachtwoord-vergeten', '/auth/wachtwoord-reset']
-const PUBLIC_API_ROUTES = ['/api/register', '/api/postcode', '/api/cron', '/api/coupons/valideer', '/api/blog/agent-os']
+const PUBLIC_ROUTES = ['/auth/login', '/auth/wachtwoord-vergeten', '/auth/wachtwoord-reset', '/auth/uitnodiging']
+const PUBLIC_API_ROUTES = ['/api/postcode', '/api/cron', '/api/coupons/valideer', '/api/blog/agent-os', '/api/widget', '/api/asielen/aanmelden']
 const API_AUTH_PREFIX = '/api/auth'
 const ASIEL_ROUTES = ['/admin']
 const MANAGEMENT_ROUTES = ['/management']
-const ADOPTANT_ROUTES = ['/dashboard', '/intake', '/favorieten', '/dossier', '/nazorg', '/zoeken', '/profiel', '/chat', '/medical']
+// Organisatie-pagina's die ook admin-rol (bv. hybride accounts met een gekoppelde
+// organisatie) mag bereiken vanuit het management-portaal — bv. via een cross-link.
+const ASIEL_ROUTES_GEDEELD_MET_ADMIN = ['/admin/ai-rollen']
 // Publieke marketing-site — altijd toegankelijk, ook uitgelogd
-const MARKETING_ROUTES = ['/werkwijze', '/voor-asielen', '/prijzen', '/ai-assistent', '/over-ons', '/faq', '/kennisbank', '/contact', '/demo-aanvragen']
-// Publieke content-pagina's: dier- en asielprofielen. Volledig indexeerbaar voor SEO.
-// Renderen zonder sessie (alleen publieke dier/asiel-data); ingelogde adoptanten
-// krijgen dezelfde pagina verrijkt met matchscore, favorieten en afspraken.
-const PUBLIC_CONTENT_ROUTES = ['/animals', '/asielen']
+const MARKETING_ROUTES = ['/werkwijze', '/voor-organisaties', '/prijzen', '/tarieven', '/over-ons', '/faq', '/kennisbank', '/contact']
+// De embeddable "Samen"-widget draait volledig los van de auth-shell (WordPress/Wix embed).
+const WIDGET_ROUTES = ['/widget']
 
 function thuisRoute(rol?: string) {
-  return rol === 'admin' ? '/management' : rol === 'asiel' ? '/admin' : '/dashboard'
+  return rol === 'admin' ? '/management' : rol === 'asiel' ? '/admin' : '/'
 }
 
 export default auth((req) => {
@@ -58,8 +58,8 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
-  // Publieke dier- en asielprofielen: altijd toegankelijk (ook uitgelogd, voor SEO)
-  if (PUBLIC_CONTENT_ROUTES.some((r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + '/'))) {
+  // De embeddable widget is publiek en draait buiten de auth-shell (extern ingesloten).
+  if (WIDGET_ROUTES.some((r) => nextUrl.pathname === r || nextUrl.pathname.startsWith(r + '/'))) {
     return NextResponse.next()
   }
 
@@ -83,20 +83,16 @@ export default auth((req) => {
     return NextResponse.redirect(url)
   }
 
-  // Asiel-gebruiker probeert adoptant-pagina's te bezoeken → admin
-  const isAdoptantRoute = ADOPTANT_ROUTES.some((r) => nextUrl.pathname.startsWith(r))
-  if (isAdoptantRoute && (rol === 'asiel' || rol === 'admin')) {
-    return NextResponse.redirect(new URL(rol === 'admin' ? '/management' : '/admin', req.url))
-  }
-
-  // Adoptant probeert admin-pagina's te bezoeken → dashboard
+  // Adoptant-rol heeft geen eigen portaal meer in ImpactOS → terug naar de marketing-homepage.
   const isAsielRoute = ASIEL_ROUTES.some((r) => nextUrl.pathname.startsWith(r))
   if (isAsielRoute && rol === 'adoptant') {
-    return NextResponse.redirect(new URL('/dashboard', req.url))
+    return NextResponse.redirect(new URL('/', req.url))
   }
 
-  // Admin hoort in het management-portaal; /admin is voor asielen.
-  if (isAsielRoute && rol === 'admin') {
+  // Admin hoort in het management-portaal; /admin is voor organisaties — met uitzondering
+  // van enkele gedeelde pagina's die ook vanuit het management-portaal gelinkt worden.
+  const isGedeeldeAsielRoute = ASIEL_ROUTES_GEDEELD_MET_ADMIN.some((r) => nextUrl.pathname.startsWith(r))
+  if (isAsielRoute && rol === 'admin' && !isGedeeldeAsielRoute) {
     return NextResponse.redirect(new URL('/management', req.url))
   }
 

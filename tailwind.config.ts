@@ -10,19 +10,46 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#f8aa25',
-        'primary-dark': '#e39207',
-        navy: '#33335c',
-        terracotta: '#E2725B',
-        'terracotta-dark': '#ee5b2b',
-        'bg-dark': '#12122a',
-        'bg-light': '#f9fafb',
+        primary: '#2563EB',
+        'primary-dark': '#1D4ED8',
+        navy: '#0F172A',
+        accent: '#3B82F6',
+        'accent-dark': '#2563EB',
+        'bg-dark': '#0F172A',
+        'bg-light': '#F8FAFC',
+        neutral: '#F8FAFC',
+        'neutral-dark': '#1E293B',
         sage: '#9db99d',
         'sage-dark': '#3b543b',
         'sage-bg': '#E9EDC9',
+        // "Calm Executive" design system — alleen gebruikt in /admin (cockpit + wachtrij).
+        // Losstaand namespace zodat de rest van het platform (marketing, adoptant-app) het
+        // bestaande navy/amber-thema behoudt.
+        calm: {
+          surface: '#faf8ff',
+          'surface-lowest': '#ffffff',
+          'surface-low': '#f2f3ff',
+          'surface-container': '#eaedff',
+          'surface-high': '#e2e7ff',
+          'surface-highest': '#dae2fd',
+          primary: '#0037b0',
+          'primary-container': '#1d4ed8',
+          'primary-fixed': '#dce1ff',
+          'on-primary': '#ffffff',
+          secondary: '#006c49',
+          'secondary-fixed': '#6ffbbe',
+          'on-secondary-fixed': '#002113',
+          tertiary: '#36455b',
+          'on-surface': '#131b2e',
+          'on-surface-variant': '#434655',
+          outline: '#747686',
+          'outline-variant': '#c4c5d7',
+        },
       },
       fontFamily: {
         display: ['Plus Jakarta Sans', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
       },
       borderRadius: {
         DEFAULT: '0.25rem',

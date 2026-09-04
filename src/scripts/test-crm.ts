@@ -1,40 +1,39 @@
 /**
- * Script: voeg "Asiel Proef" toe aan asielen + CRM en verstuur testmail
+ * Script: voeg "Organisatie Proef" toe aan organisaties + CRM en verstuur testmail
  */
 import { db } from '@/lib/db'
-import { asielen, crmContacten } from '@/lib/db/schema'
+import { organisaties, crmContacten } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { verstuurMail } from '@/lib/email'
 
-const TEST_NAAM = 'Asiel Proef'
+const TEST_NAAM = 'Organisatie Proef'
 const TEST_EMAIL = 'v.munster@weareimpact.nl'
 
 async function run() {
-  console.log('🧪 Asiel Proef toevoegen...')
+  console.log('🧪 Organisatie Proef toevoegen...')
 
   // Check of al bestaat
   const bestaand = await db
     .select()
-    .from(asielen)
-    .where(eq(asielen.naam, TEST_NAAM))
+    .from(organisaties)
+    .where(eq(organisaties.naam, TEST_NAAM))
     .limit(1)
 
-  let asielId: number
+  let organisatieId: string
   if (bestaand.length > 0) {
-    asielId = bestaand[0].id
-    console.log('  → Bestond al in asielen (id=' + asielId + ')')
+    organisatieId = bestaand[0].id
+    console.log('  → Bestond al in organisaties (id=' + organisatieId + ')')
   } else {
-    const [asiel] = await db.insert(asielen).values({
+    const [organisatie] = await db.insert(organisaties).values({
       naam: TEST_NAAM,
-      stad: 'Test',
-      regio: 'Test',
-      email: TEST_EMAIL,
-      actief: true,
+      slug: 'organisatie-proef',
+      contactEmail: TEST_EMAIL,
+      status: 'proef',
       bron: 'handmatig',
       wervingStatus: 'aangesloten',
-    }).returning({ id: asielen.id })
-    asielId = asiel.id
-    console.log('  → Toegevoegd aan asielen (id=' + asielId + ')')
+    }).returning({ id: organisaties.id })
+    organisatieId = organisatie.id
+    console.log('  → Toegevoegd aan organisaties (id=' + organisatieId + ')')
   }
 
   // Check CRM
@@ -52,8 +51,7 @@ async function run() {
       email: TEST_EMAIL,
       type: 'asiel',
       bron: 'handmatig',
-      stad: 'Test',
-      asielId: asielId,
+      organisatieId,
       eigenaar: 'systeem',
       tags: ['test'],
     })
@@ -64,21 +62,20 @@ async function run() {
   console.log('\n📧 Testmail versturen naar ' + TEST_EMAIL + '...')
   const result = await verstuurMail({
     naar: TEST_EMAIL,
-    onderwerp: '🧪 Testmail — PootGelukkig CRM is actief!',
+    onderwerp: '🧪 Testmail — ImpactOS CRM is actief!',
     html: `
       <div style="font-family:'Plus Jakarta Sans',Arial,sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #ebebf0">
-        <div style="background:linear-gradient(135deg,#33335c,#1a1a3e);padding:28px 32px">
-          <p style="margin:0;font-size:20px;font-weight:800;color:#fff">🐾 PootGelukkig</p>
+        <div style="background:linear-gradient(135deg,#0F172A,#1E293B);padding:28px 32px">
+          <p style="margin:0;font-size:20px;font-weight:800;color:#fff">ImpactOS</p>
         </div>
         <div style="padding:32px">
           <h2 style="color:#1a1a2e;font-size:20px;margin:0 0 12px">CRM is live! 🎉</h2>
           <p style="color:#555;font-size:14px;line-height:1.6;margin:0 0 24px">
             Hallo Vincent,<br/><br/>
-            Dit is een testmail vanuit het <strong>PootGelukkig CRM</strong>.<br/><br/>
-            Het CRM bevat nu <strong>160 asielen</strong> met emailadres, <br/>
-            klaar om uitnodigingen en nieuwsbrieven te versturen.<br/><br/>
-            🐾 Groet,<br/>
-            Het PootGelukkig systeem
+            Dit is een testmail vanuit het <strong>ImpactOS CRM</strong>.<br/><br/>
+            Klaar om uitnodigingen en nieuwsbrieven te versturen naar aangesloten organisaties.<br/><br/>
+            Groet,<br/>
+            Het ImpactOS systeem
           </p>
         </div>
       </div>`,

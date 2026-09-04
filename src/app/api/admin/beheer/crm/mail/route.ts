@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     naar: contact.email,
     onderwerp: body.onderwerp.trim(),
     html: brandedHtml(body.bericht.trim()),
-    meta: { template: 'crm-handmatig', contactId: contact.id, userId: contact.userId, asielId: contact.asielId },
+    meta: { template: 'crm-handmatig', contactId: contact.id, userId: contact.userId, organisatieId: contact.organisatieId },
   })
 
   // Leg de verzonden mail vast als activiteit op het contact

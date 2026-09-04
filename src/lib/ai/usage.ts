@@ -3,9 +3,11 @@ import { aiGebruik } from '@/lib/db/schema'
 import { berekenKostenEuro } from './pricing'
 
 export interface AiMeta {
-  module: string
+  // Elke AI-generatie is verplicht gekoppeld aan een organisatie (multi-tenant kostentracking).
+  organisatieId: string
+  // Korte actie-naam, bv. 'rol-fundraising-appeal', 'matching', 'intake'
+  actie: string
   userId?: number | null
-  asielId?: number | null
 }
 
 export interface AiUsage {
@@ -20,26 +22,23 @@ export interface AiUsage {
  * gelogd maar nooit doorgegooid, zodat een logfout nooit een AI-respons breekt.
  */
 export async function logAiGebruik(
-  meta: AiMeta | undefined,
+  meta: AiMeta,
   model: string,
   usage: AiUsage | undefined
 ): Promise<void> {
-  if (!meta) return
   try {
-    const promptTokens = usage?.prompt_tokens ?? 0
-    const completionTokens = usage?.completion_tokens ?? 0
-    const totaalTokens = usage?.total_tokens ?? promptTokens + completionTokens
-    const kostenEuro = berekenKostenEuro(model, promptTokens, completionTokens, usage?.cost)
+    const tokensIn = usage?.prompt_tokens ?? 0
+    const tokensOut = usage?.completion_tokens ?? 0
+    const kostenEuro = berekenKostenEuro(model, tokensIn, tokensOut, usage?.cost)
 
     await db.insert(aiGebruik).values({
-      module: meta.module,
-      userId: meta.userId ?? null,
-      asielId: meta.asielId ?? null,
+      organisatieId: meta.organisatieId,
       model,
-      promptTokens,
-      completionTokens,
-      totaalTokens,
-      kostenEuro,
+      tokensIn,
+      tokensOut,
+      kostenEuro: kostenEuro.toFixed(6),
+      actie: meta.actie,
+      userId: meta.userId ?? null,
     })
   } catch (err) {
     console.error('[AI-gebruik] loggen mislukt:', err)

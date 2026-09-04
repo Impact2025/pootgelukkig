@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { asielen } from '@/lib/db/schema'
+import { organisaties } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 export async function PATCH(
@@ -13,39 +13,39 @@ export async function PATCH(
     return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
   }
 
-  const { id } = await params
-  const asielId = parseInt(id)
+  const { id: organisatieId } = await params
 
-  // Asiel-gebruikers mogen alleen hun eigen asiel bewerken
-  if (session.user.rol === 'asiel' && session.user.asielId !== asielId) {
+  // Asiel-gebruikers mogen alleen hun eigen organisatie bewerken
+  if (session.user.rol === 'asiel' && session.user.organisatieId !== organisatieId) {
     return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
   }
 
   const body = await request.json()
   const {
-    naam, stad, regio, adres, postcode, lat, lng,
-    telefoon, email, website, beschrijving, logoUrl,
-    openingstijden, socialMedia, asielConfig,
+    naam, telefoon, website, contactEmail, kvkNummer,
+    // Onboarding-profiel — hetzelfde profiel dat Noor tijdens het intakegesprek invult
+    // (src/lib/ai/onboarding.ts), hier handmatig te corrigeren zonder het gesprek te heropenen.
+    rechtsvorm, werkveldCategorieen, gemeenten, teamgrootte, vrijwilligersAantal, grootsteKnelpunt, toneOfVoice,
   } = body
 
   const updates: Record<string, unknown> = {}
   if (naam !== undefined) updates.naam = naam
-  if (stad !== undefined) updates.stad = stad
-  if (regio !== undefined) updates.regio = regio
-  if (adres !== undefined) updates.adres = adres
-  if (postcode !== undefined) updates.postcode = postcode
-  if (lat !== undefined) updates.lat = lat
-  if (lng !== undefined) updates.lng = lng
   if (telefoon !== undefined) updates.telefoon = telefoon
-  if (email !== undefined) updates.email = email
   if (website !== undefined) updates.website = website
-  if (beschrijving !== undefined) updates.beschrijving = beschrijving
-  if (logoUrl !== undefined) updates.logoUrl = logoUrl
-  if (openingstijden !== undefined) updates.openingstijden = openingstijden
-  if (socialMedia !== undefined) updates.socialMedia = socialMedia
-  if (asielConfig !== undefined) updates.asielConfig = asielConfig
+  if (contactEmail !== undefined) updates.contactEmail = contactEmail
+  if (kvkNummer !== undefined) updates.kvkNummer = kvkNummer
+  if (rechtsvorm !== undefined) updates.rechtsvorm = rechtsvorm
+  if (Array.isArray(werkveldCategorieen)) updates.werkveldCategorieen = werkveldCategorieen
+  if (Array.isArray(gemeenten)) updates.gemeenten = gemeenten
+  if (teamgrootte !== undefined) updates.teamgrootte = teamgrootte === '' || teamgrootte === null ? null : Number(teamgrootte)
+  if (vrijwilligersAantal !== undefined) updates.vrijwilligersAantal = vrijwilligersAantal === '' || vrijwilligersAantal === null ? null : Number(vrijwilligersAantal)
+  if (grootsteKnelpunt !== undefined) updates.grootsteKnelpunt = grootsteKnelpunt
+  if (toneOfVoice !== undefined) updates.toneOfVoice = toneOfVoice
 
-  await db.update(asielen).set(updates).where(eq(asielen.id, asielId))
+  if (Object.keys(updates).length > 0) {
+    updates.updatedAt = new Date()
+    await db.update(organisaties).set(updates).where(eq(organisaties.id, organisatieId))
+  }
 
   return NextResponse.json({ succes: true })
 }

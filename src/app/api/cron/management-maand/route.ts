@@ -31,12 +31,12 @@ export async function GET(req: Request) {
     const pct = Math.round(((nu - vorig) / vorig) * 100)
     return `${nu} (${pct >= 0 ? '+' : ''}${pct}%)`
   }
-  const conversie = vorige.nieuweMatches > 0 ? Math.round((vorige.nieuweAdopties / vorige.nieuweMatches) * 100) : 0
+  const conversie = vorige.nieuweMatches > 0 ? Math.round((vorige.nieuweBegeleidingen / vorige.nieuweMatches) * 100) : 0
 
   const trends = [
     { label: 'Nieuwe gebruikers', waarde: trend(vorige.nieuweGebruikers, eervorige.nieuweGebruikers) },
     { label: 'Nieuwe matches', waarde: trend(vorige.nieuweMatches, eervorige.nieuweMatches) },
-    { label: 'Adopties', waarde: trend(vorige.nieuweAdopties, eervorige.nieuweAdopties) },
+    { label: 'Adopties', waarde: trend(vorige.nieuweBegeleidingen, eervorige.nieuweBegeleidingen) },
     { label: 'AI-kosten', waarde: `${euro(vorige.aiKostenEuro)} (vorige: ${euro(eervorige.aiKostenEuro)})` },
     { label: 'Match → adoptie conversie', waarde: `${conversie}%` },
   ]
@@ -49,24 +49,24 @@ export async function GET(req: Request) {
 Deze maand: ${JSON.stringify({
       nieuweGebruikers: vorige.nieuweGebruikers,
       nieuweMatches: vorige.nieuweMatches,
-      adopties: vorige.nieuweAdopties,
+      adopties: vorige.nieuweBegeleidingen,
       verzondenMails: vorige.verzondenMails,
       aiKostenEuro: vorige.aiKostenEuro,
       aiCalls: vorige.aiCalls,
-      aiPerModule: vorige.aiPerModule,
+      aiPerActie: vorige.aiPerActie,
       conversiePct: conversie,
     })}
 Vorige maand: ${JSON.stringify({
       nieuweGebruikers: eervorige.nieuweGebruikers,
       nieuweMatches: eervorige.nieuweMatches,
-      adopties: eervorige.nieuweAdopties,
+      adopties: eervorige.nieuweBegeleidingen,
       aiKostenEuro: eervorige.aiKostenEuro,
     })}
 
 Benoem: 1) wat opvalt, 2) waar de AI-kosten naartoe gaan en of dat gezond is, 3) concrete aanbevelingen. Geen opsomming van alle cijfers, wel scherpe inzichten. Geen markdown-koppen.`
     samenvatting = await chatCompletion([{ role: 'user', content: prompt }], {
       maxTokens: 700,
-      meta: { module: 'mgmt' },
+      meta: { actie: 'mgmt', organisatieId: 'platform' },
     })
   } catch (err) {
     console.error('[Management-maand] AI-analyse mislukt:', err)
@@ -79,12 +79,12 @@ Benoem: 1) wat opvalt, 2) waar de AI-kosten naartoe gaan en of dat gezond is, 3)
     stats: {
       nieuweGebruikers: vorige.nieuweGebruikers,
       nieuweMatches: vorige.nieuweMatches,
-      nieuweAdopties: vorige.nieuweAdopties,
+      nieuweBegeleidingen: vorige.nieuweBegeleidingen,
       verzondenMails: vorige.verzondenMails,
     },
     aiKosten: euro(vorige.aiKostenEuro),
     aiCalls: vorige.aiCalls,
-    aiPerModule: vorige.aiPerModule.map((m) => ({ module: m.module, kosten: euro(m.kosten), calls: m.calls })),
+    aiPerActie: vorige.aiPerActie.map((m) => ({ actie: m.actie, kosten: euro(m.kosten), calls: m.calls })),
     samenvatting,
     trends,
   })

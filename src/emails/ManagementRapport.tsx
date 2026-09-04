@@ -11,21 +11,22 @@ export interface ManagementRapportProps {
   stats: {
     nieuweGebruikers: number
     nieuweMatches: number
-    nieuweAdopties: number
+    nieuweBegeleidingen: number
     verzondenMails: number
   }
   aiKosten: string
   aiCalls: number
-  aiPerModule: { module: string; kosten: string; calls: number }[]
+  aiPerActie: { actie: string; kosten: string; calls: number }[]
   samenvatting?: string
   trends?: { label: string; waarde: string }[]
   portaalUrl: string
 }
 
-const moduleLabels: Record<string, string> = {
-  matching: 'Matching', copilot: 'AI Copilot', intake: 'Intake', 'dier-intake': 'Dier-intake',
-  'dier-scan': 'Foto-scan', verhaal: 'Verhalen', nazorg: 'Nazorg', contract: 'Contracten',
-  assistent: 'Assistent', blog: 'Blog', mgmt: 'Management-analyse',
+const actieLabels: Record<string, string> = {
+  matching: 'Matching', copilot: 'AI Copilot', intake: 'Intake',
+  'rol-fundraising-subsidie': 'Sam · Fondsen & Subsidies', 'rol-rapportage-rapportage': 'Mila · Rapportage',
+  'rol-social-social_post': 'Conny · Communicatie', 'rol-vrijwilligers-briefing': 'Bram · Vrijwilligers',
+  'copilot-briefing': 'Copilot-briefing', mgmt: 'Management-analyse',
 }
 
 const tekstStijl = { fontFamily: "'Plus Jakarta Sans', Arial, sans-serif" }
@@ -36,7 +37,7 @@ export function ManagementRapport({
   stats,
   aiKosten,
   aiCalls,
-  aiPerModule,
+  aiPerActie,
   samenvatting,
   trends,
   portaalUrl,
@@ -61,7 +62,7 @@ export function ManagementRapport({
             <tr>
               <StatCard getal={stats.nieuweGebruikers} label="Nieuwe gebruikers" kleur="#22c55e" />
               <StatCard getal={stats.nieuweMatches} label="Nieuwe matches" kleur="#f8aa25" />
-              <StatCard getal={stats.nieuweAdopties} label="Adopties" kleur="#E2725B" />
+              <StatCard getal={stats.nieuweBegeleidingen} label="Begeleidingen" kleur="#3B82F6" />
               <StatCard getal={stats.verzondenMails} label="Mails verzonden" kleur="#33335c" />
             </tr>
           </tbody>
@@ -78,10 +79,10 @@ export function ManagementRapport({
         <Text style={{ margin: '0 0 16px', fontSize: '28px', fontWeight: 800, color: '#33335c', ...tekstStijl }}>
           {aiKosten} <span style={{ fontSize: '13px', fontWeight: 600, color: '#aaa' }}>· {aiCalls} aanroepen</span>
         </Text>
-        {aiPerModule.map((m, i) => (
+        {aiPerActie.map((m, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', background: i % 2 === 0 ? '#f8f8fb' : '#fff', borderRadius: '8px', marginBottom: '4px' }}>
             <Text style={{ margin: 0, fontSize: '13px', color: '#555', ...tekstStijl }}>
-              {moduleLabels[m.module] ?? m.module} <span style={{ color: '#bbb' }}>· {m.calls}×</span>
+              {actieLabels[m.actie] ?? m.actie} <span style={{ color: '#bbb' }}>· {m.calls}×</span>
             </Text>
             <Text style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#1a1a2e', ...tekstStijl }}>{m.kosten}</Text>
           </div>

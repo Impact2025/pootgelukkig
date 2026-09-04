@@ -13,7 +13,7 @@ export default async function ManagementInstellingenPage() {
 
   const modules = [
     { href: '/management/gebruikers', icon: 'group', label: 'Gebruikers', sub: 'Accounts & rechten' },
-    { href: '/management/ai-rollen', icon: 'group_add', label: 'AI-rollen', sub: 'Activeer het AI-team' },
+    { href: '/admin/ai-rollen', icon: 'group_add', label: 'AI-rollen', sub: 'Activeer het AI-team' },
     { href: '/management/coupons', icon: 'sell', label: 'Coupons', sub: 'Marketingcodes' },
     { href: '/management/blog', icon: 'article', label: 'Blog', sub: 'AI-SEO artikelen' },
   ]

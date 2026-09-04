@@ -1,5 +1,6 @@
 {
-  "name": "pootgelukkig",
+  "name": "impactos-saas",
+  "description": "AI-gestuurd platform voor het sociaal domein en maatschappelijk ondernemers",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -27,6 +28,7 @@
     "marked": "^15.0.12",
     "next": "^15.3.9",
     "next-auth": "^5.0.0-beta.25",
+    "pdf-parse": "^2.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-email": "^5.2.10",

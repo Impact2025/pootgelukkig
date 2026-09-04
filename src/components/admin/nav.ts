@@ -7,7 +7,7 @@ export interface NavItem {
   label: string
   exact?: boolean
   highlight?: boolean
-  badge?: 'openstaand' | 'afspraken' | 'ongelezen' | 'medisch' | 'wachtlijst'
+  badge?: 'wachtrij'
   adminOnly?: boolean
   asielOnly?: boolean
 }
@@ -17,23 +17,35 @@ export interface NavGroup {
   items: NavItem[]
 }
 
-// Asiel-portaal: dagelijkse operatie van één asiel.
+// Organisatie-portaal: dagelijkse operatie van één organisatie.
 export const asielNav: NavGroup[] = [
   {
     items: [
       { href: '/admin', icon: 'grid_view', label: 'Dashboard', exact: true },
-      { href: '/admin/copilot', icon: 'auto_awesome', label: 'AI Copilot', highlight: true },
-      { href: '/admin/dieren', icon: 'pets', label: 'Dieren' },
-      { href: '/admin/adopties', icon: 'favorite', label: 'Adoptie', badge: 'openstaand' },
-      { href: '/admin/afspraken', icon: 'calendar_month', label: 'Afspraken', badge: 'afspraken' },
-      { href: '/admin/berichten', icon: 'chat', label: 'Berichten', badge: 'ongelezen' },
+      { href: '/admin/content-queue', icon: 'inbox', label: 'Wachtrij', badge: 'wachtrij' },
     ],
   },
   {
+    titel: 'Dossiers & Cliënten',
     items: [
-      { href: '/admin/medisch', icon: 'medical_services', label: 'Medisch', badge: 'medisch' },
-      { href: '/admin/wachtlijst', icon: 'format_list_bulleted', label: 'Wachtlijst', badge: 'wachtlijst' },
-      { href: '/admin/pleeggezinnen', icon: 'house', label: 'Pleeggezinnen' },
+      { href: '/admin/dossiers', icon: 'folder', label: 'Dossiers & Cliënten' },
+      { href: '/admin/agenda', icon: 'calendar_month', label: 'Agenda & Planning' },
+      { href: '/admin/helpdesk', icon: 'support_agent', label: 'Helpdesk & Inbox' },
+    ],
+  },
+  {
+    titel: 'Relaties & Content',
+    items: [
+      { href: '/admin/crm', icon: 'contacts', label: 'CRM & Relaties' },
+      { href: '/admin/social', icon: 'campaign', label: 'Social Media & PR' },
+      { href: '/admin/blog', icon: 'article', label: 'Blog Beheer' },
+    ],
+  },
+  {
+    titel: 'Beheer',
+    items: [
+      { href: '/admin/copilot', icon: 'auto_awesome', label: 'AI Copilot', highlight: true },
+      { href: '/admin/ai-rollen', icon: 'group_add', label: 'AI Rollen & Copilot' },
       { href: '/admin/instellingen', icon: 'settings', label: 'Instellingen' },
     ],
   },
@@ -46,9 +58,9 @@ export const managementNav: NavGroup[] = [
       { href: '/management', icon: 'insights', label: 'Management', exact: true },
       { href: '/management/gebruikers', icon: 'group', label: 'Gebruikers' },
       { href: '/management/crm', icon: 'contacts', label: 'CRM' },
-      { href: '/management/asielen-werving', icon: 'domain_add', label: 'Asielen werving' },
+      { href: '/management/asielen-werving', icon: 'domain_add', label: 'Organisaties werving' },
       { href: '/management/rapportage', icon: 'bar_chart', label: 'Rapportage' },
-      { href: '/management/content-queue', icon: 'inbox', label: 'Content-queue' },
+      { href: '/admin/content-queue', icon: 'inbox', label: 'Wachtrij' },
     ],
   },
   {
@@ -56,7 +68,7 @@ export const managementNav: NavGroup[] = [
     items: [
       { href: '/management/blog', icon: 'article', label: 'Blog' },
       { href: '/management/coupons', icon: 'sell', label: 'Coupons' },
-      { href: '/management/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
+      { href: '/admin/ai-rollen', icon: 'group_add', label: 'AI-rollen activeren' },
       { href: '/management/instellingen', icon: 'settings', label: 'Instellingen' },
     ],
   },
@@ -71,27 +83,24 @@ export const ALL_NAV_ITEMS: NavItem[] = [
 // Labels voor padsegmenten die geen eigen navitem hebben.
 export const SEGMENT_LABELS: Record<string, string> = {
   admin: 'Admin',
-  dieren: 'Dieren',
+  dossiers: 'Dossiers',
+  clienten: 'Cliënten',
   nieuw: 'Nieuw',
   bewerken: 'Bewerken',
-  adopties: 'Adoptie',
-  afspraken: 'Afspraken',
-  berichten: 'Berichten',
-  medisch: 'Medisch',
-  welzijn: 'Welzijn',
-  wachtlijst: 'Wachtlijst',
-  pleeggezinnen: 'Pleeggezinnen',
-  'asielen-werving': 'Asielen werving',
+  'asielen-werving': 'Organisaties werving',
   rapportage: 'Rapportage',
   instellingen: 'Instellingen',
   copilot: 'AI Copilot',
+  agenda: 'Agenda & Planning',
+  helpdesk: 'Helpdesk & Inbox',
+  social: 'Social Media & PR',
   beheer: 'Management',
   gebruikers: 'Gebruikers',
   crm: 'CRM',
   blog: 'Blog',
   coupons: 'Coupons',
   'ai-rollen': 'AI-rollen',
-  'content-queue': 'Content-queue',
+  'content-queue': 'Wachtrij',
   management: 'Management',
 }
 
@@ -101,7 +110,7 @@ export interface Crumb {
   isLast: boolean
 }
 
-// Leidt een breadcrumb-pad af van een URL-pad. Numerieke id-segmenten worden
+// Leidt een breadcrumb-pad af van een URL-pad. Numerieke/uuid id-segmenten worden
 // als "Detail" getoond. Het eerste segment (admin) linkt naar het dashboard.
 export function deriveBreadcrumbs(pathname: string): Crumb[] {
   const segments = pathname.split('/').filter(Boolean)
@@ -110,7 +119,7 @@ export function deriveBreadcrumbs(pathname: string): Crumb[] {
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i]
     href += `/${seg}`
-    const isId = /^\d+$/.test(seg)
+    const isId = /^[0-9a-f-]{8,}$|^\d+$/i.test(seg)
     const label = isId ? 'Detail' : SEGMENT_LABELS[seg] ?? capitalize(seg)
     crumbs.push({ label, href, isLast: i === segments.length - 1 })
   }
@@ -126,46 +135,59 @@ function capitalize(s: string): string {
 export type StatusTone = 'success' | 'warning' | 'danger' | 'neutral' | 'info'
 
 const STATUS_TONE: Record<string, StatusTone> = {
-  // positief / afgerond
-  beschikbaar: 'success',
-  goedgekeurd: 'success',
-  afgerond: 'success',
-  voltooid: 'success',
-  bevestigd: 'success',
-  geadopteerd: 'info',
-  // in behandeling / aankomend
-  aangevraagd: 'warning',
+  // dossiers
+  intake: 'info',
+  actief: 'success',
   in_behandeling: 'warning',
-  aankomend: 'warning',
-  // negatief
-  afgewezen: 'danger',
-  gemist: 'danger',
-  niet_beschikbaar: 'danger',
-  // neutraal
-  geannuleerd: 'neutral',
+  afgerond: 'success',
+  // organisaties
+  proef: 'warning',
   gearchiveerd: 'neutral',
+  // clienten
+  aangemeld: 'info',
+  gematcht: 'success',
+  // begeleidingen
+  gepland: 'info',
+  gestopt: 'danger',
+  // ai_content_queue
+  pending: 'warning',
+  approved: 'success',
+  rejected: 'danger',
   // blog
   concept: 'warning',
   gepubliceerd: 'success',
+  // afspraken (agenda)
+  aangevraagd: 'warning',
+  bevestigd: 'success',
+  geannuleerd: 'danger',
+  // helpdesk
+  open: 'warning',
+  concept_klaar: 'info',
+  beantwoord: 'success',
 }
 
 const STATUS_LABELS: Record<string, string> = {
-  beschikbaar: 'Beschikbaar',
+  intake: 'Intake',
+  actief: 'Actief',
   in_behandeling: 'In behandeling',
-  geadopteerd: 'Geadopteerd',
-  niet_beschikbaar: 'Niet beschikbaar',
-  aangevraagd: 'Aangevraagd',
-  goedgekeurd: 'Goedgekeurd',
   afgerond: 'Afgerond',
-  afgewezen: 'Afgewezen',
-  geannuleerd: 'Geannuleerd',
-  aankomend: 'Aankomend',
-  voltooid: 'Voltooid',
-  gemist: 'Gemist',
-  bevestigd: 'Bevestigd',
+  proef: 'Proef',
+  gearchiveerd: 'Gearchiveerd',
+  aangemeld: 'Aangemeld',
+  gematcht: 'Gematcht',
+  gepland: 'Gepland',
+  gestopt: 'Gestopt',
+  pending: 'In afwachting',
+  approved: 'Goedgekeurd',
+  rejected: 'Afgewezen',
   concept: 'Concept',
   gepubliceerd: 'Gepubliceerd',
-  gearchiveerd: 'Gearchiveerd',
+  aangevraagd: 'Aangevraagd',
+  bevestigd: 'Bevestigd',
+  geannuleerd: 'Geannuleerd',
+  open: 'Open',
+  concept_klaar: 'Concept klaar',
+  beantwoord: 'Beantwoord',
 }
 
 export function statusTone(status: string): StatusTone {
@@ -188,8 +210,8 @@ export interface CommandItem {
 }
 
 export const QUICK_ACTIONS: CommandItem[] = [
-  { id: 'nieuw-dier', label: 'Nieuw dier toevoegen', icon: 'add_circle', href: '/admin/dieren/nieuw', keywords: ['toevoegen', 'aanmaken', 'dier'] },
-  { id: 'nieuw-pleeggezin', label: 'Nieuw pleeggezin', icon: 'add_home', href: '/admin/pleeggezinnen/nieuw', keywords: ['pleeg', 'gezin', 'toevoegen'] },
+  { id: 'nieuw-dossier', label: 'Nieuw dossier aanmaken', icon: 'add_circle', href: '/admin/dossiers/nieuw', keywords: ['toevoegen', 'aanmaken', 'dossier'] },
+  { id: 'nieuwe-client', label: 'Nieuwe cliënt aanmaken', icon: 'person_add', href: '/intake', keywords: ['client', 'toevoegen', 'aanmaken'] },
   { id: 'rapportage', label: 'Rapportage downloaden', icon: 'download', href: '/management/rapportage', keywords: ['export', 'pdf', 'csv'] },
 ]
 

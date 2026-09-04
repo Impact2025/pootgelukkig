@@ -22,7 +22,7 @@ export default async function BeheerGebruikersPage() {
 
   const totaalAiKosten = rijen.reduce((s, r) => s + r.aiKostenEuro, 0)
   const totaalMails = rijen.reduce((s, r) => s + r.mailVolume, 0)
-  const totaalDieren = rijen.reduce((s, r) => s + r.aantalDieren, 0)
+  const totaalDieren = rijen.reduce((s, r) => s + r.aantalDossiers, 0)
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -76,14 +76,14 @@ export default async function BeheerGebruikersPage() {
                       <Badge tone={ROL_TONE[r.rol] ?? 'neutral'}>{ROL_LABELS[r.rol] ?? r.rol}</Badge>
                     </td>
                     <td className="px-4 py-3 text-right font-semibold text-[#33335c]">
-                      {r.aantalDieren || '–'}
+                      {r.aantalDossiers || '–'}
                     </td>
                     <td className="px-4 py-3 text-right font-semibold text-[#33335c]">
                       {r.aiKostenEuro > 0 ? euro(r.aiKostenEuro) : '–'}
                     </td>
                     <td className="px-4 py-3 text-right text-[#33335c]/70">{r.mailVolume || '–'}</td>
                     <td className="px-4 py-3 text-right text-[#33335c]/70">{r.matchesAantal || '–'}</td>
-                    <td className="px-4 py-3 text-right text-[#33335c]/70">{r.adoptiesAantal || '–'}</td>
+                    <td className="px-4 py-3 text-right text-[#33335c]/70">{r.begeleidingenAantal || '–'}</td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/management/gebruikers/${r.id}`}

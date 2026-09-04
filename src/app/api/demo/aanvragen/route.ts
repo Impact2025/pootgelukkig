@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
       onderwerp: `Demo-aanvraag ${d.asielNaam}: ${d.naam} (${DUUR_LABELS[d.duur]})`,
       html: bouwTeamHtml(d),
       antwoordNaar: d.email,
-      meta: { template: 'demo-aanvraag', asielId: null },
+      meta: { template: 'demo-aanvraag', organisatieId: null },
     })
 
     // 3) Bevestigingsmail naar het asiel.

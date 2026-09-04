@@ -1,22 +1,19 @@
 // Generieke fabriek voor rol-side-effect endpoints.
-// Een side-effect genereert content via de AI en schrijft die als CONCEPT
-// naar de ai_content_queue — er wordt NOOIT automatisch gepubliceerd of gemaild.
-// Een medewerker keurt het concept goed in de content-queue.
+// Een side-effect genereert content via de AI en schrijft die ALTIJD als 'pending'
+// naar de ai_content_queue — er wordt NOOIT automatisch gepubliceerd of verstuurd.
+// Een medewerker keurt het concept goed (of wijst het af) in de content-queue.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { db } from '@/lib/db'
-import { aiContentQueue } from '@/lib/db/schema'
-import { chatCompletion } from '@/lib/ai/client'
-import { haalRol, type AiRolId } from '@/lib/ai/rollen'
+import { chatCompletion, MODEL_HAIKU, MODEL_SONNET } from '@/lib/ai/client'
+import { plaatsInQueue } from '@/lib/ai/queue'
+import { haalRol, haalRolConfig, type AiRolId, type AiContentType } from '@/lib/ai/rollen'
 
 interface SideEffectConfig {
   // Rol waartoe dit endpoint hoort (voor context + systeemprompt + queue-rij)
   rol: AiRolId
-  // Type content dat weggeschreven wordt (bv. 'nieuwsbrief', 'vacature', 'rapport')
-  type: string
-  // Optioneel platform (bv. 'instagram', 'facebook', 'email')
-  platform?: string
+  // Content-type waaronder dit item in ai_content_queue belandt
+  type: AiContentType
   // Bouw de user-prompt voor de AI. Krijgt de request-body mee (optioneel).
   bouwPrompt: (body: Record<string, unknown>) => string
   // Bouw een korte titel voor het queue-item.
@@ -32,9 +29,9 @@ export function maakSideEffectRoute(config: SideEffectConfig) {
       return NextResponse.json({ fout: 'Geen toegang' }, { status: 401 })
     }
 
-    const asielId = session.user.asielId
-    if (!asielId) {
-      return NextResponse.json({ fout: 'Geen asiel gekoppeld aan dit account' }, { status: 400 })
+    const organisatieId = session.user.organisatieId
+    if (!organisatieId) {
+      return NextResponse.json({ fout: 'Geen organisatie gekoppeld aan dit account' }, { status: 400 })
     }
 
     let body: Record<string, unknown> = {}
@@ -47,38 +44,47 @@ export function maakSideEffectRoute(config: SideEffectConfig) {
 
     const rol = haalRol(config.rol)
     if (!rol) {
-      return NextResponse.json({ fout: `Onbekende rol: ${config.rol}` }, { status: 400 })
+      return NextResponse.json({ fout: `Onbekende of gedeactiveerde rol: ${config.rol}` }, { status: 400 })
     }
 
     // RAG-lite rol-context ophalen
     let rolContext = ''
     try {
-      rolContext = await rol.bouwContext(Number(asielId))
+      rolContext = await rol.bouwContext(organisatieId)
     } catch (error) {
       console.error(`Rol-context fout (${rol.id}/${config.type}):`, error)
     }
 
+    // Dynamische organisatie-configuratie: custom system-prompt/instellingen uit ai_rollen_config
+    const rolConfig = await haalRolConfig(organisatieId, rol.id).catch(() => null)
+    if (rolConfig && rolConfig.actief === false) {
+      return NextResponse.json({ fout: `Rol ${rol.naam} staat uit voor deze organisatie` }, { status: 403 })
+    }
+
     const systemPrompt = `${rol.systeemInstructie}
 
-ASIEL DATA:
+ORGANISATIE-DATA:
 ${rolContext}
-
+${rolConfig?.systemPrompt ? `\nORGANISATIE-SPECIFIEKE INSTRUCTIES (overschrijft/vult bovenstaande aan):\n${rolConfig.systemPrompt}\n` : ''}
 STIJL:
-- Persoonlijk en warm, maar professioneel
-- Concreet met echte namen en cijfers uit de data hierboven
+- Persoonlijk en zorgvuldig, maar professioneel
+- Concreet met echte gegevens uit de data hierboven, nooit verzonnen cijfers
 - Alle tekst in het Nederlands
 - Lever een compleet, direct bruikbaar concept (geen meta-uitleg, geen vraag terug)`
 
-    let inhoud: string
+    const model = rol.modelKlasse === 'haiku' ? MODEL_HAIKU : MODEL_SONNET
+
+    let content: string
     try {
-      inhoud = await chatCompletion(
+      content = await chatCompletion(
         [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: config.bouwPrompt(body) },
         ],
         {
+          model,
           maxTokens: config.maxTokens ?? 900,
-          meta: { module: `rol-${rol.id}-${config.type}`, userId: Number(session.user.id), asielId: Number(asielId) },
+          meta: { actie: `rol-${rol.id}-${config.type}`, organisatieId, userId: Number(session.user.id) },
         }
       )
     } catch (error) {
@@ -86,32 +92,27 @@ STIJL:
       return NextResponse.json({ fout: 'Genereren mislukt. Probeer opnieuw.' }, { status: 500 })
     }
 
-    // Concept wegschrijven naar de content-queue (status = concept, wacht op goedkeuring)
+    // Concept ALTIJD wegschrijven naar de content-queue (status = pending, wacht op goedkeuring)
     let queueId: number | null = null
     try {
-      const [rij] = await db
-        .insert(aiContentQueue)
-        .values({
-          asielId: Number(asielId),
-          rol: config.rol,
-          type: config.type,
-          platform: config.platform ?? null,
-          titel: config.bouwTitel(body).slice(0, 255),
-          inhoud,
-          status: 'concept',
-          gemaaktDoor: 'ai',
-        })
-        .returning({ id: aiContentQueue.id })
-      queueId = rij?.id ?? null
+      const rij = await plaatsInQueue({
+        organisatieId,
+        rol: config.rol,
+        type: config.type,
+        titel: config.bouwTitel(body),
+        content,
+        metadata: { gemaaktDoor: 'ai', model },
+      })
+      queueId = rij.id
     } catch (error) {
       console.error(`Content-queue schrijffout (${rol.id}/${config.type}):`, error)
-      // De generatie is gelukt — geef inhoud terug, meld dat opslaan faalde
+      // De generatie is gelukt — geef content terug, meld dat opslaan faalde
       return NextResponse.json(
-        { inhoud, opgeslagen: false, waarschuwing: 'Concept gegenereerd maar niet opgeslagen in de queue.' },
+        { content, opgeslagen: false, waarschuwing: 'Concept gegenereerd maar niet opgeslagen in de queue.' },
         { status: 200 }
       )
     }
 
-    return NextResponse.json({ inhoud, opgeslagen: true, queueId, type: config.type, rol: config.rol }, { status: 200 })
+    return NextResponse.json({ content, opgeslagen: true, queueId, type: config.type, rol: config.rol }, { status: 200 })
   }
 }

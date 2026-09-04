@@ -11,8 +11,9 @@ interface Entry {
 
 const store = new Map<string, Entry>()
 
-// Opschonen elke minuut
-setInterval(
+// Opschonen elke minuut — unref() zodat deze timer een proces (of testrun) nooit
+// levend houdt puur om zichzelf.
+const opschoonTimer = setInterval(
   () => {
     const now = Date.now()
     for (const [key, entry] of store.entries()) {
@@ -21,6 +22,7 @@ setInterval(
   },
   60_000
 )
+opschoonTimer.unref?.()
 
 export interface RateLimitResult {
   allowed: boolean

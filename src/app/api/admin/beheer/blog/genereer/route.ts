@@ -11,9 +11,9 @@ export const maxDuration = 60
 
 // Vaste kernpagina's waar de AI naar mag interlinken
 const KERNPAGINAS = [
-  { tekst: 'Vind jouw match', url: '/zoeken' },
+  { tekst: 'Vraag een demo aan', url: '/contact?onderwerp=demo' },
   { tekst: 'Doe de intake', url: '/intake' },
-  { tekst: 'Aangesloten asielen', url: '/asielen' },
+  { tekst: 'Voor organisaties', url: '/voor-organisaties' },
 ]
 
 interface GegenereerdArtikel {
@@ -79,7 +79,7 @@ Geef je antwoord als puur JSON, zonder uitleg of code-fences, in dit formaat:
   try {
     const raw = await chatCompletion([{ role: 'user', content: prompt }], {
       maxTokens: 4000,
-      meta: { module: 'blog', userId: admin.userId },
+      meta: { actie: 'blog', userId: admin.userId, organisatieId: 'platform' },
     })
     const schoon = raw.replace(/^```(?:json)?\s*/m, '').replace(/\s*```$/m, '').trim()
     const start = schoon.indexOf('{')

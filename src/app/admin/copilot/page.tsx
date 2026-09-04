@@ -2,18 +2,18 @@ export const dynamic = 'force-dynamic'
 
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { asielen } from '@/lib/db/schema'
+import { organisaties } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import CopilotClient from './CopilotClient'
 
 export default async function CopilotPage() {
   const session = await auth()
-  const asielId = session?.user?.asielId
+  const organisatieId = session?.user?.organisatieId
 
-  let asielNaam = 'het asiel'
-  if (asielId) {
-    const [asiel] = await db.select({ naam: asielen.naam }).from(asielen).where(eq(asielen.id, asielId)).limit(1)
-    if (asiel) asielNaam = asiel.naam
+  let asielNaam = 'de organisatie'
+  if (organisatieId) {
+    const [organisatie] = await db.select({ naam: organisaties.naam }).from(organisaties).where(eq(organisaties.id, organisatieId)).limit(1)
+    if (organisatie) asielNaam = organisatie.naam
   }
 
   const gebruikerNaam = session?.user?.name?.split(' ')[0] ?? 'beheerder'

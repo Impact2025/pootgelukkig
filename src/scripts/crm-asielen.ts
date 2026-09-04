@@ -1,62 +1,61 @@
 /**
- * Script: asielen uit de DB ook als CRM-contact toevoegen
+ * Script: organisaties uit de DB ook als CRM-contact toevoegen
  * Zodat je ze direct kunt mailen vanuit /admin/beheer/crm
  *
  * Uitvoeren: tsx --env-file=.env.local src/scripts/crm-asielen.ts
  */
 import { db } from '@/lib/db'
-import { asielen, crmContacten } from '@/lib/db/schema'
-import { eq, and, sql } from 'drizzle-orm'
+import { organisaties, crmContacten } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
 
 async function run() {
-  console.log('🔄 Asielen naar CRM kopiëren...')
+  console.log('🔄 Organisaties naar CRM kopiëren...')
 
-  // Haal alle asielen op
-  const alleAsielen = await db.select().from(asielen)
+  // Haal alle organisaties op
+  const alleOrganisaties = await db.select().from(organisaties)
 
   // Haal bestaande CRM-contacten van type 'asiel' op
   const bestaandeCrm = await db
-    .select({ email: crmContacten.email, asielId: crmContacten.asielId })
+    .select({ email: crmContacten.email, organisatieId: crmContacten.organisatieId })
     .from(crmContacten)
     .where(eq(crmContacten.type, 'asiel'))
 
   const bestaandeEmails = new Set(bestaandeCrm.map(c => c.email))
-  const bestaandeAsielIds = new Set(bestaandeCrm.map(c => c.asielId))
+  const bestaandeOrganisatieIds = new Set(bestaandeCrm.map(c => c.organisatieId))
 
   let nieuw = 0
   let overgeslagen = 0
 
-  for (const a of alleAsielen) {
-    // Skip asielen zonder email
-    if (!a.email) {
+  for (const o of alleOrganisaties) {
+    // Skip organisaties zonder contact-e-mail
+    if (!o.contactEmail) {
       overgeslagen++
       continue
     }
 
-    // Skip als al in CRM zit (op asielId of email)
-    if (bestaandeAsielIds.has(a.id) || bestaandeEmails.has(a.email)) {
+    // Skip als al in CRM zit (op organisatieId of email)
+    if (bestaandeOrganisatieIds.has(o.id) || bestaandeEmails.has(o.contactEmail)) {
       overgeslagen++
       continue
     }
 
     await db.insert(crmContacten).values({
-      naam: a.naam,
-      email: a.email,
-      telefoon: a.telefoon ?? null,
+      naam: o.naam,
+      email: o.contactEmail,
+      telefoon: o.telefoon ?? null,
       type: 'asiel',
       bron: 'import-excel',
-      stad: a.stad ?? null,
-      asielId: a.id,
+      organisatieId: o.id,
       eigenaar: 'systeem',
-      tags: ['asiel', a.regio ?? ''],
+      tags: ['organisatie'],
     })
 
     nieuw++
   }
 
-  console.log(`✓ ${nieuw} asielen toegevoegd aan CRM`)
+  console.log(`✓ ${nieuw} organisaties toegevoegd aan CRM`)
   console.log(`✓ ${overgeslagen} overgeslagen (geen email / al in CRM)`)
-  console.log(`📊 Totaal asielen: ${alleAsielen.length}`)
+  console.log(`📊 Totaal organisaties: ${alleOrganisaties.length}`)
 }
 
 run().then(() => process.exit(0)).catch((e) => { console.error('✗ Mislukt:', e); process.exit(1) })
